@@ -8,15 +8,15 @@ public func strictlyEquals(_ env: napi_env, lhs: napi_value, rhs: napi_value) th
 }
 
 public func strictlyEquals(_ env: napi_env, lhs: napi_value, rhs: ValueConvertible) throws -> Bool {
-    return try strictlyEquals(env, lhs: lhs, rhs: rhs.napiValue(env))
+    try strictlyEquals(env, lhs: lhs, rhs: rhs.napiValue(env))
 }
 
 public func strictlyEquals(_ env: napi_env, lhs: ValueConvertible, rhs: napi_value) throws -> Bool {
-    return try strictlyEquals(env, lhs: lhs.napiValue(env), rhs: rhs)
+    try strictlyEquals(env, lhs: lhs.napiValue(env), rhs: rhs)
 }
 
 public func strictlyEquals(_ env: napi_env, lhs: ValueConvertible, rhs: ValueConvertible) throws -> Bool {
-    return try strictlyEquals(env, lhs: lhs.napiValue(env), rhs: rhs.napiValue(env))
+    try strictlyEquals(env, lhs: lhs.napiValue(env), rhs: rhs.napiValue(env))
 }
 
 public func defineProperties(_ env: napi_env, _ object: napi_value, _ properties: [PropertyDescriptor]) throws {

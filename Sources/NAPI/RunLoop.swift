@@ -1,7 +1,7 @@
 import Foundation
 import NAPIC
 
-fileprivate func setTimeout(_ env: napi_env, _ fn: Function, _ ms: Double) throws {
+private func setTimeout(_ env: napi_env, _ fn: Function, _ ms: Double) throws {
     var status: napi_status!
 
     var global: napi_value!
@@ -15,7 +15,7 @@ fileprivate func setTimeout(_ env: napi_env, _ fn: Function, _ ms: Double) throw
     try Function(env, from: setTimeout).call(env, fn, ms)
 }
 
-public class RunLoop {
+public enum RunLoop {
     private static var refCount = 0
     private static var scheduled = false
 

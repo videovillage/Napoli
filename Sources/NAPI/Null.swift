@@ -24,12 +24,12 @@ public struct Null: ValueConvertible {
 
 extension Null: CustomStringConvertible {
     public var description: String {
-        return "null"
+        "null"
     }
 }
 
 extension Null: Equatable {
-    public static func ==(_: Null, _: Null) -> Bool {
-        return true
+    public static func == (_: Null, _: Null) -> Bool {
+        true
     }
 }

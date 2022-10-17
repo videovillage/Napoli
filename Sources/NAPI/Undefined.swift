@@ -24,12 +24,12 @@ public struct Undefined: ValueConvertible {
 
 extension Undefined: CustomStringConvertible {
     public var description: String {
-        return "undefined"
+        "undefined"
     }
 }
 
 extension Undefined: Equatable {
-    public static func ==(_: Undefined, _: Undefined) -> Bool {
-        return true
+    public static func == (_: Undefined, _: Undefined) -> Bool {
+        true
     }
 }

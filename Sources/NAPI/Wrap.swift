@@ -1,6 +1,6 @@
 import NAPIC
 
-func swiftNAPIDeinit(_ env: napi_env!, pointer: UnsafeMutableRawPointer?, hint: UnsafeMutableRawPointer?) {
+func swiftNAPIDeinit(_: napi_env!, pointer: UnsafeMutableRawPointer?, hint _: UnsafeMutableRawPointer?) {
     Unmanaged<AnyObject>.fromOpaque(pointer!).release()
 }
 

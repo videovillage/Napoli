@@ -1,5 +1,5 @@
-import NAPIC
 import Foundation
+import NAPIC
 
 public protocol ValueConvertible {
     init(_ env: napi_env, from: napi_value) throws
@@ -18,16 +18,16 @@ extension Optional: ValueConvertible where Wrapped: ValueConvertible {
             return
         }
 
-        self = .some(try Wrapped.init(env, from: from))
+        self = .some(try Wrapped(env, from: from))
     }
 
     public func napiValue(_ env: napi_env) throws -> napi_value {
-        return try self?.napiValue(env) ?? Value.null.napiValue(env)
+        try self?.napiValue(env) ?? Value.null.napiValue(env)
     }
 }
 
 extension Dictionary: ValueConvertible where Key == String, Value: ValueConvertible {
-    public init(_ env: napi_env, from: napi_value) throws {
+    public init(_: napi_env, from _: napi_value) throws {
         fatalError("Not implemented")
     }
 
@@ -48,7 +48,7 @@ extension Dictionary: ValueConvertible where Key == String, Value: ValueConverti
 }
 
 extension Array: ValueConvertible where Element: ValueConvertible {
-    public init(_ env: napi_env, from: napi_value) throws {
+    public init(_: napi_env, from _: napi_value) throws {
         fatalError("Not implemented")
     }
 
@@ -56,10 +56,10 @@ extension Array: ValueConvertible where Element: ValueConvertible {
         var status: napi_status!
         var result: napi_value!
 
-        status = napi_create_array_with_length(env, self.count, &result)
+        status = napi_create_array_with_length(env, count, &result)
         guard status == napi_ok else { throw NAPI.Error(status) }
 
-        for (index, element) in self.enumerated() {
+        for (index, element) in enumerated() {
             status = napi_set_element(env, result, UInt32(index), try element.napiValue(env))
             guard status == napi_ok else { throw NAPI.Error(status) }
         }
@@ -71,7 +71,7 @@ extension Array: ValueConvertible where Element: ValueConvertible {
 extension String: ValueConvertible {
     public init(_ env: napi_env, from: napi_value) throws {
         var status: napi_status!
-        var length: Int = 0
+        var length = 0
 
         status = napi_get_value_string_utf8(env, from, nil, 0, &length)
         guard status == napi_ok else { throw NAPI.Error(status) }
@@ -88,7 +88,7 @@ extension String: ValueConvertible {
 
     public func napiValue(_ env: napi_env) throws -> napi_value {
         var result: napi_value?
-        let data = self.data(using: .utf8)!
+        let data = data(using: .utf8)!
 
         let status = data.withUnsafeBytes { (bytes: UnsafePointer<Int8>) in
             napi_create_string_utf8(env, bytes, data.count, &result)

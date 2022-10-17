@@ -1,12 +1,12 @@
-import NAPIC
 import Foundation
+import NAPIC
 
 public protocol ErrorConvertible: Swift.Error {
     var message: String { get }
     var code: String? { get }
 }
 
-fileprivate func throwError(_ env: napi_env, _ error: Swift.Error) throws {
+private func throwError(_ env: napi_env, _ error: Swift.Error) throws {
     if let error = error as? NAPI.Error {
         let status = error.napi_throw(env)
         guard status == napi_ok else { throw NAPI.Error(status) }
@@ -22,8 +22,8 @@ fileprivate func throwError(_ env: napi_env, _ error: Swift.Error) throws {
     }
 }
 
-fileprivate func exceptionIsPending(_ env: napi_env) throws -> Bool {
-    var result: Bool = false
+private func exceptionIsPending(_ env: napi_env) throws -> Bool {
+    var result = false
 
     let status = napi_is_exception_pending(env, &result)
     guard status == napi_ok else { throw NAPI.Error(status) }
@@ -69,21 +69,21 @@ public enum Value: ValueConvertible {
     case null
     case undefined
 
-    public init(_ env: napi_env, from: napi_value) throws {
+    public init(_: napi_env, from _: napi_value) throws {
         fatalError("Not implemented")
     }
 
     public func napiValue(_ env: napi_env) throws -> napi_value {
         switch self {
-            case .class(let `class`): return try `class`.napiValue(env)
-            case .function(let function): return try function.napiValue(env)
-            case .object(let object): return try object.napiValue(env)
-            case .array(let array): return try array.napiValue(env)
-            case .string(let string): return try string.napiValue(env)
-            case .number(let number): return try number.napiValue(env)
-            case .boolean(let boolean): return try boolean.napiValue(env)
-            case .null: return try Null.default.napiValue(env)
-            case .undefined: return try Undefined.default.napiValue(env)
+        case let .class(`class`): return try `class`.napiValue(env)
+        case let .function(function): return try function.napiValue(env)
+        case let .object(object): return try object.napiValue(env)
+        case let .array(array): return try array.napiValue(env)
+        case let .string(string): return try string.napiValue(env)
+        case let .number(number): return try number.napiValue(env)
+        case let .boolean(boolean): return try boolean.napiValue(env)
+        case .null: return try Null.default.napiValue(env)
+        case .undefined: return try Undefined.default.napiValue(env)
         }
     }
 }
@@ -113,15 +113,15 @@ extension Value: Decodable {
 extension Value: CustomStringConvertible {
     public var description: String {
         switch self {
-            case .class(_): return "[Function: ...]"
-            case .function(_): return "[Function: ...]"
-            case .object(let object): return "{ \(object.map({ "\($0): \($1)" }).joined(separator: ", "))) }"
-            case .array(let array): return "[ \(array.map({ String(describing: $0) }).joined(separator: ", ")) ]"
-            case .string(let string): return string
-            case .number(let number): return String(describing: number)
-            case .boolean(let boolean): return boolean ? "true" : "false"
-            case .null: return "null"
-            case .undefined: return "undefined"
+        case .class: return "[Function: ...]"
+        case .function: return "[Function: ...]"
+        case let .object(object): return "{ \(object.map { "\($0): \($1)" }.joined(separator: ", "))) }"
+        case let .array(array): return "[ \(array.map { String(describing: $0) }.joined(separator: ", ")) ]"
+        case let .string(string): return string
+        case let .number(number): return String(describing: number)
+        case let .boolean(boolean): return boolean ? "true" : "false"
+        case .null: return "null"
+        case .undefined: return "undefined"
         }
     }
 }
