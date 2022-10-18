@@ -7,8 +7,8 @@ private func createFunction(_ env: napi_env, named name: String, _ function: @es
     let data = CallbackData(callback: function)
     let dataPointer = Unmanaged.passRetained(data).toOpaque()
 
-    let status = nameData.withUnsafeBytes { nameBytes in
-        napi_create_function(env, nameBytes, nameData.count, swiftNAPICallback, dataPointer, &result)
+    let status = nameData.withUnsafeBytes {
+        napi_create_function(env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, swiftNAPICallback, dataPointer, &result)
     }
 
     guard status == napi_ok else { throw NAPI.Error(status) }

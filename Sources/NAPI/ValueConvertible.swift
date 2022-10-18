@@ -79,7 +79,7 @@ extension String: ValueConvertible {
         var data = Data(count: length + 1)
 
         status = data.withUnsafeMutableBytes {
-            napi_get_value_string_utf8(env, from, $0, length + 1, &length)
+            napi_get_value_string_utf8(env, from, $0.baseAddress, length + 1, &length)
         }
         guard status == napi_ok else { throw NAPI.Error(status) }
 
@@ -90,8 +90,8 @@ extension String: ValueConvertible {
         var result: napi_value?
         let data = data(using: .utf8)!
 
-        let status = data.withUnsafeBytes { (bytes: UnsafePointer<Int8>) in
-            napi_create_string_utf8(env, bytes, data.count, &result)
+        let status = data.withUnsafeBytes {
+            napi_create_string_utf8(env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, &result)
         }
 
         guard status == napi_ok else {
@@ -123,7 +123,7 @@ extension Bool: ValueConvertible {
         let status = napi_get_value_bool(env, from, &self)
         guard status == napi_ok else { throw NAPI.Error(status) }
     }
-
+    
     public func napiValue(_ env: napi_env) throws -> napi_value {
         var result: napi_value?
         let status = napi_get_boolean(env, self, &result)

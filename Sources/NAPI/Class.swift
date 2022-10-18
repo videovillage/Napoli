@@ -10,7 +10,7 @@ private func defineClass(_ env: napi_env, named name: String, _ constructor: @es
 
     let status = nameData.withUnsafeBytes { nameBytes in
         props.withUnsafeBufferPointer { propertiesBytes in
-            napi_define_class(env, nameBytes, nameData.count, swiftNAPICallback, dataPointer, properties.count, propertiesBytes.baseAddress, &result)
+            napi_define_class(env, nameBytes.baseAddress?.assumingMemoryBound(to: UInt8.self), nameBytes.count, swiftNAPICallback, dataPointer, properties.count, propertiesBytes.baseAddress, &result)
         }
     }
 
