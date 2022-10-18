@@ -21,7 +21,8 @@ public enum RunLoop {
             return
         }
 
-        CFRunLoopRunInMode(.defaultMode, 0.02, false)
+        _ = Foundation.RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.02))
+
         try setTimeout(env, Function(named: "tick", RunLoop.tick), 0)
     }
 

@@ -40,7 +40,7 @@ public enum Error: Swift.Error {
         case 15: self = .queueFull
         case 16: self = .closing
         case 17: self = .bigintExpected
-        default: self = .unknown(napiStatus.rawValue)
+        default: self = .unknown(UInt32(napiStatus.rawValue))
         }
     }
 }
