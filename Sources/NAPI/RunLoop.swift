@@ -2,15 +2,11 @@ import Foundation
 import NAPIC
 
 private func setTimeout(_ env: napi_env, _ fn: Function, _ ms: Double) throws {
-    var status: napi_status!
-
     var global: napi_value!
-    status = napi_get_global(env, &global)
-    guard status == napi_ok else { throw NAPI.Error(status) }
+    try napi_get_global(env, &global).throwIfError()
 
     var setTimeout: napi_value!
-    status = napi_get_named_property(env, global, "setTimeout", &setTimeout)
-    guard status == napi_ok else { throw NAPI.Error(status) }
+    try napi_get_named_property(env, global, "setTimeout", &setTimeout).throwIfError()
 
     try Function(env, from: setTimeout).call(env, fn, ms)
 }

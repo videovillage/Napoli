@@ -8,13 +8,11 @@ private func defineClass(_ env: napi_env, named name: String, _ constructor: @es
     let data = CallbackData(callback: constructor)
     let dataPointer = Unmanaged.passRetained(data).toOpaque()
 
-    let status = nameData.withUnsafeBytes { nameBytes in
+    try nameData.withUnsafeBytes { nameBytes in
         props.withUnsafeBufferPointer { propertiesBytes in
             napi_define_class(env, nameBytes.baseAddress?.assumingMemoryBound(to: UInt8.self), nameBytes.count, swiftNAPICallback, dataPointer, properties.count, propertiesBytes.baseAddress, &result)
         }
-    }
-
-    guard status == napi_ok else { throw NAPI.Error(status) }
+    }.throwIfError()
 
     return result!
 }

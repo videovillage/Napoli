@@ -7,11 +7,9 @@ private func createFunction(_ env: napi_env, named name: String, _ function: @es
     let data = CallbackData(callback: function)
     let dataPointer = Unmanaged.passRetained(data).toOpaque()
 
-    let status = nameData.withUnsafeBytes {
+    try nameData.withUnsafeBytes {
         napi_create_function(env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, swiftNAPICallback, dataPointer, &result)
-    }
-
-    guard status == napi_ok else { throw NAPI.Error(status) }
+    }.throwIfError()
 
     return result!
 }
@@ -76,22 +74,18 @@ public extension Function {
     private func _call(_ env: napi_env, this: napi_value, args: [napi_value?]) throws {
         let handle = try napiValue(env)
 
-        let status = args.withUnsafeBufferPointer { argsBytes in
+        try args.withUnsafeBufferPointer { argsBytes in
             napi_call_function(env, this, handle, args.count, argsBytes.baseAddress, nil)
-        }
-
-        guard status == napi_ok else { throw NAPI.Error(status) }
+        }.throwIfError()
     }
 
     private func _call<Result: ValueConvertible>(_ env: napi_env, this: napi_value, args: [napi_value?]) throws -> Result {
         let handle = try napiValue(env)
 
         var result: napi_value?
-        let status = args.withUnsafeBufferPointer { argsBytes in
+        try args.withUnsafeBufferPointer { argsBytes in
             napi_call_function(env, this, handle, args.count, argsBytes.baseAddress, &result)
-        }
-
-        guard status == napi_ok else { throw NAPI.Error(status) }
+        }.throwIfError()
 
         return try Result(env, from: result!)
     }

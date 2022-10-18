@@ -60,3 +60,11 @@ extension Error {
         }
     }
 }
+
+extension napi_status {
+    func throwIfError() throws {
+        guard self == napi_ok else {
+            throw NAPI.Error(self)
+        }
+    }
+}

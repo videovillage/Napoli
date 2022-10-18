@@ -15,8 +15,7 @@ public struct Null: ValueConvertible {
     public func napiValue(_ env: napi_env) throws -> napi_value {
         var result: napi_value?
 
-        let status = napi_get_null(env, &result)
-        guard status == napi_ok else { throw NAPI.Error(status) }
+        try napi_get_null(env, &result).throwIfError()
 
         return result!
     }

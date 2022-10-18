@@ -8,25 +8,20 @@ public protocol ErrorConvertible: Swift.Error {
 
 private func throwError(_ env: napi_env, _ error: Swift.Error) throws {
     if let error = error as? NAPI.Error {
-        let status = error.napi_throw(env)
-        guard status == napi_ok else { throw NAPI.Error(status) }
+        try error.napi_throw(env).throwIfError()
     } else if let error = error as? ValueConvertible {
-        let status = napi_throw(env, try error.napiValue(env))
-        guard status == napi_ok else { throw NAPI.Error(status) }
+        try napi_throw(env, error.napiValue(env)).throwIfError()
     } else if let error = error as? ErrorConvertible {
-        let status = napi_throw_error(env, error.code, error.message)
-        guard status == napi_ok else { throw NAPI.Error(status) }
+        try napi_throw_error(env, error.code, error.message).throwIfError()
     } else {
-        let status = napi_throw_error(env, nil, error.localizedDescription)
-        guard status == napi_ok else { throw NAPI.Error(status) }
+        try napi_throw_error(env, nil, error.localizedDescription).throwIfError()
     }
 }
 
 private func exceptionIsPending(_ env: napi_env) throws -> Bool {
     var result = false
 
-    let status = napi_is_exception_pending(env, &result)
-    guard status == napi_ok else { throw NAPI.Error(status) }
+    try napi_is_exception_pending(env, &result).throwIfError()
 
     return result
 }
