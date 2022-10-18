@@ -32,7 +32,6 @@ extension Dictionary: ValueConvertible where Key == String, Value: ValueConverti
     }
 
     public func napiValue(_ env: napi_env) throws -> napi_value {
-        var status: napi_status!
         var result: napi_value!
 
         try napi_create_object(env, &result).throwIfError()
