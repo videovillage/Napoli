@@ -107,7 +107,7 @@ extension Bool: ValueConvertible {
         self = false
         try napi_get_value_bool(env, from, &self).throwIfError()
     }
-    
+
     public func napiValue(_ env: napi_env) throws -> napi_value {
         var result: napi_value?
         try napi_get_boolean(env, self, &result).throwIfError()
