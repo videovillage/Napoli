@@ -8,6 +8,8 @@ let package = Package(
     products: [
         .library(name: "NAPI", targets: ["NAPI"]),
         .library(name: "NAPIC", targets: ["NAPIC"]),
+        .library(name: "NAPI-Dynamic", type: .dynamic, targets: ["NAPI"]),
+        .library(name: "NAPIC-Dynamic", type: .dynamic, targets: ["NAPIC"]),
     ],
     targets: [
         .target(name: "NAPI", dependencies: ["NAPIC"]),
