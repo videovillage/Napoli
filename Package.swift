@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "NAPI",
+    name: "swift-napi-bindings",
     platforms: [.macOS(.v10_15)],
     products: [
         .library(name: "NAPI", targets: ["NAPI"]),
