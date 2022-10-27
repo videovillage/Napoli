@@ -2,6 +2,7 @@ import Foundation
 import NAPIC
 
 private enum InternalPropertyDescriptor {
+    case getSet(String, getter: Callback, setter: Callback? = nil, napi_property_attributes)
     case method(String, Callback, napi_property_attributes)
     case value(String, ValueConvertible, napi_property_attributes)
 }
@@ -15,6 +16,11 @@ public struct PropertyDescriptor {
 
     func value(_ env: napi_env) throws -> napi_property_descriptor {
         switch value {
+        case let .getSet(name, getter, setter, attributes):
+            let _name = try name.napiValue(env)
+            let data = GetSetCallbackData(getter: getter, setter: setter)
+            let dataPointer = Unmanaged.passRetained(data).toOpaque()
+            return napi_property_descriptor(utf8name: nil, name: _name, method: nil, getter: swiftNAPIGetterCallback, setter: swiftNAPIGetterCallback, value: nil, attributes: attributes, data: dataPointer)
         case let .method(name, callback, attributes):
             let _name = try name.napiValue(env)
             let data = CallbackData(callback: callback)
@@ -69,29 +75,64 @@ public struct PropertyDescriptor {
 
     /* (this, ...) -> Void */
 
-    public static func method<This: AnyObject>(_ name: String, _ callback: @escaping (This) throws -> Void, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+    public static func instanceMethod<This: AnyObject>(_ name: String, _ callback: @escaping (This) throws -> Void, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
         .init(.method(name, { env, args in try callback(Wrap<This>.unwrap(env, jsObject: args.this)); return Value.undefined }, attributes))
     }
 
-    public static func method<This: AnyObject, A: ValueConvertible>(_ name: String, _ callback: @escaping (This, A) throws -> Void, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+    public static func instanceMethod<This: AnyObject, A: ValueConvertible>(_ name: String, _ callback: @escaping (This, A) throws -> Void, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
         .init(.method(name, { env, args in try callback(Wrap<This>.unwrap(env, jsObject: args.this), A(env, from: args.0)); return Value.undefined }, attributes))
     }
 
-    public static func method<This: AnyObject, A: ValueConvertible, B: ValueConvertible>(_ name: String, _ callback: @escaping (This, A, B) throws -> Void, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+    public static func instanceMethod<This: AnyObject, A: ValueConvertible, B: ValueConvertible>(_ name: String, _ callback: @escaping (This, A, B) throws -> Void, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
         .init(.method(name, { env, args in try callback(Wrap<This>.unwrap(env, jsObject: args.this), A(env, from: args.0), B(env, from: args.1)); return Value.undefined }, attributes))
     }
 
     /* (this, ...) -> ValueConvertible */
 
-    public static func method<This: AnyObject>(_ name: String, _ callback: @escaping (This) throws -> ValueConvertible, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+    public static func instanceMethod<This: AnyObject>(_ name: String, _ callback: @escaping (This) throws -> ValueConvertible, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
         .init(.method(name, { env, args in try callback(Wrap<This>.unwrap(env, jsObject: args.this)) }, attributes))
     }
 
-    public static func method<This: AnyObject, A: ValueConvertible>(_ name: String, _ callback: @escaping (This, A) throws -> ValueConvertible, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+    public static func instanceMethod<This: AnyObject, A: ValueConvertible>(_ name: String, _ callback: @escaping (This, A) throws -> ValueConvertible, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
         .init(.method(name, { env, args in try callback(Wrap<This>.unwrap(env, jsObject: args.this), A(env, from: args.0)) }, attributes))
     }
 
-    public static func method<This: AnyObject, A: ValueConvertible, B: ValueConvertible>(_ name: String, _ callback: @escaping (This, A, B) throws -> ValueConvertible, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+    public static func instanceMethod<This: AnyObject, A: ValueConvertible, B: ValueConvertible>(_ name: String, _ callback: @escaping (This, A, B) throws -> ValueConvertible, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
         .init(.method(name, { env, args in try callback(Wrap<This>.unwrap(env, jsObject: args.this), A(env, from: args.0), B(env, from: args.1)) }, attributes))
+    }
+
+    /* Instance Properties */
+
+    public static func instanceProperty<This: AnyObject>(_ name: String, getter: @escaping (This) throws -> ValueConvertible, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+        .init(.getSet(name, getter: { env, args in try getter(Wrap<This>.unwrap(env, jsObject: args.this)) }, attributes))
+    }
+
+    public static func instanceProperty<This: AnyObject, A: ValueConvertible>(_ name: String, getter: @escaping (This) throws -> A, setter: @escaping (This, A) throws -> Void, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+        .init(.getSet(name,
+                      getter: { env, args in try getter(Wrap<This>.unwrap(env, jsObject: args.this)) },
+                      setter: { env, args in try setter(Wrap<This>.unwrap(env, jsObject: args.this), A(env, from: args.0)); return Value.undefined },
+                      attributes))
+    }
+
+    public static func instanceProperty<This: AnyObject>(_ name: String, keyPath: KeyPath<This, ValueConvertible>, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+        .instanceProperty(name, getter: { (obj: This) in obj[keyPath: keyPath] }, attributes: attributes)
+    }
+
+    public static func instanceProperty<This: AnyObject, A: ValueConvertible>(_ name: String, keyPath: ReferenceWritableKeyPath<This, A>, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+        .instanceProperty(name,
+                          getter: { (obj: This) in obj[keyPath: keyPath] },
+                          setter: { (obj: This, new: A) in obj[keyPath: keyPath] = new },
+                          attributes: attributes)
+    }
+
+    public static func property(_ name: String, getter: @escaping () throws -> ValueConvertible, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+        .init(.getSet(name, getter: { env, args in try getter() }, attributes))
+    }
+
+    public static func property<A: ValueConvertible>(_ name: String, getter: @escaping () throws -> A, setter: @escaping (A) throws -> Void, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+        .init(.getSet(name,
+                      getter: { env, args in try getter() },
+                      setter: { env, args in try setter(A(env, from: args.0)); return nil },
+                      attributes))
     }
 }

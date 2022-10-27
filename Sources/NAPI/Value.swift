@@ -36,6 +36,16 @@ class CallbackData {
     }
 }
 
+class GetSetCallbackData {
+    let getter: Callback
+    let setter: Callback?
+
+    init(getter: @escaping Callback, setter: Callback?) {
+        self.getter = getter
+        self.setter = setter
+    }
+}
+
 func swiftNAPICallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) -> napi_value? {
     var args = NullableArguments(nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, 10, nil)
     let dataPointer = UnsafeMutablePointer<UnsafeMutableRawPointer?>.allocate(capacity: 1)
@@ -45,6 +55,40 @@ func swiftNAPICallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) -> napi_
 
     do {
         return try data.callback(env, args as! Arguments)?.napiValue(env)
+    } catch NAPI.Error.pendingException {
+        return nil
+    } catch {
+        if try! exceptionIsPending(env) == false { try! throwError(env, error) }
+        return nil
+    }
+}
+
+func swiftNAPIGetterCallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) -> napi_value? {
+    var args = NullableArguments(nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, 10, nil)
+    let dataPointer = UnsafeMutablePointer<UnsafeMutableRawPointer?>.allocate(capacity: 1)
+
+    napi_get_cb_info(env, cbinfo, &args.length, &args.0, &args.this, dataPointer)
+    let data = Unmanaged<GetSetCallbackData>.fromOpaque(dataPointer.pointee!).takeUnretainedValue()
+
+    do {
+        return try data.getter(env, args as! Arguments)?.napiValue(env)
+    } catch NAPI.Error.pendingException {
+        return nil
+    } catch {
+        if try! exceptionIsPending(env) == false { try! throwError(env, error) }
+        return nil
+    }
+}
+
+func swiftNAPISetterCallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) -> napi_value? {
+    var args = NullableArguments(nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, 10, nil)
+    let dataPointer = UnsafeMutablePointer<UnsafeMutableRawPointer?>.allocate(capacity: 1)
+
+    napi_get_cb_info(env, cbinfo, &args.length, &args.0, &args.this, dataPointer)
+    let data = Unmanaged<GetSetCallbackData>.fromOpaque(dataPointer.pointee!).takeUnretainedValue()
+
+    do {
+        return try data.setter!(env, args as! Arguments)?.napiValue(env)
     } catch NAPI.Error.pendingException {
         return nil
     } catch {
