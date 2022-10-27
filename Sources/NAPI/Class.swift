@@ -40,3 +40,11 @@ public class Class: ValueConvertible {
         }
     }
 }
+
+public protocol JSClassDefinable: AnyObject {
+    init(env: napi_env)
+    static var jsName: String { get }
+    static var jsProperties: [PropertyDescriptor] { get }
+    static var jsFunctions: [PropertyDescriptor] { get }
+    static var jsAttributes: napi_property_attributes { get }
+}

@@ -45,6 +45,10 @@ public struct PropertyDescriptor {
         .init(.value(name, Class(named: name, { env, args in let native = try constructor(env); try Wrap<This>.wrap(env, jsObject: args.this, nativeObject: native); return nil }, properties), attributes))
     }
 
+    public static func `class`<This: JSClassDefinable>(_ type: This.Type) -> PropertyDescriptor {
+        .class(This.jsName, { env in This(env: env) }, This.jsProperties + This.jsFunctions, attributes: This.jsAttributes)
+    }
+
     /* (...) -> Void */
 
     public static func function(_ name: String, _ callback: @escaping () throws -> Void, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
