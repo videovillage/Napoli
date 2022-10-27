@@ -103,7 +103,7 @@ public struct PropertyDescriptor {
 
     /* Instance Properties */
 
-    public static func instancePropertyReadOnly<This: AnyObject>(_ name: String, getter: @escaping (This) throws -> ValueConvertible, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+    public static func instancePropertyReadOnly<This: AnyObject, A: ValueConvertible>(_ name: String, getter: @escaping (This) throws -> A, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
         .init(.getSet(name, getter: { env, args in try getter(Wrap<This>.unwrap(env, jsObject: args.this)) }, attributes))
     }
 
@@ -114,7 +114,7 @@ public struct PropertyDescriptor {
                       attributes))
     }
 
-    public static func instancePropertyReadOnly<This: AnyObject>(_ name: String, keyPath: KeyPath<This, ValueConvertible>, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+    public static func instancePropertyReadOnly<This: AnyObject, A: ValueConvertible>(_ name: String, keyPath: KeyPath<This, A>, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
         .instancePropertyReadOnly(name, getter: { (obj: This) in obj[keyPath: keyPath] }, attributes: attributes)
     }
 
@@ -125,7 +125,7 @@ public struct PropertyDescriptor {
                           attributes: attributes)
     }
 
-    public static func propertyReadOnly(_ name: String, getter: @escaping () throws -> ValueConvertible, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+    public static func propertyReadOnly<A: ValueConvertible>(_ name: String, getter: @escaping () throws -> A, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
         .init(.getSet(name, getter: { env, args in try getter() }, attributes))
     }
 
