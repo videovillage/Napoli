@@ -98,6 +98,36 @@ func swiftNAPISetterCallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) ->
     }
 }
 
+func swiftNAPIThreadsafeFinalize(_: napi_env!, pointer: UnsafeMutableRawPointer?, hint _: UnsafeMutableRawPointer?) {
+
+}
+
+func swiftNAPIThreadsafeCallback(_ env: napi_env?, _ js_callback: napi_value?, _ context: UnsafeMutableRawPointer?, _ data: UnsafeMutableRawPointer!) {
+    let callbackData = Unmanaged<ThreadsafeFunction.CallbackData>.fromOpaque(data).takeRetainedValue()
+
+    var result: napi_value?
+
+    if let env {
+        do {
+            let this = try callbackData.this.napiValue(env)
+            let args: [napi_value?] = try callbackData.args.map { try $0.napiValue(env) }
+            try args.withUnsafeBufferPointer { argsBytes in
+                napi_call_function(env, this, js_callback, args.count, argsBytes.baseAddress, &result)
+            }.throwIfError()
+
+            try callbackData.continuation.resume(returning: callbackData.resultConstructor(env, result!))
+        } catch {
+            if try! exceptionIsPending(env) {
+                var errorResult: napi_value! = nil
+                try! napi_get_and_clear_last_exception(env, &errorResult).throwIfError()
+                callbackData.continuation.resume(throwing: JSException(value: errorResult))
+            } else {
+                callbackData.continuation.resume(throwing: error)
+            }
+        }
+    }
+}
+
 public enum Value: ValueConvertible {
     case `class`(Class)
     case function(Function)

@@ -72,8 +72,8 @@ func runThreadsafeCallback(env: OpaquePointer, fn: Function) throws -> Void {
 
     Task {
         do {
-            let value: Bool = try await tsfn.call("hello world")
-            assert(value)
+            let value: String = try await tsfn.call("hello world")
+            try assertEqual(expected: "message", actual: value)
         } catch {
             print("runThreadsafeCallback error: \(error)")
         }

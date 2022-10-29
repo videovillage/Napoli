@@ -45,6 +45,10 @@ public enum Error: Swift.Error {
     }
 }
 
+public struct JSException: Swift.Error {
+    let value: napi_value
+}
+
 extension Error {
     func napi_throw(_ env: napi_env) -> napi_status {
         switch self {

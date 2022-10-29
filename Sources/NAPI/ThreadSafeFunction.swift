@@ -2,7 +2,7 @@ import Foundation
 import NAPIC
 
 public class ThreadsafeFunction {
-    fileprivate class CallbackData {
+    class CallbackData {
         typealias Continuation = CheckedContinuation<ValueConvertible, Swift.Error>
         typealias ResultConstructor = (napi_env, napi_value) throws -> ValueConvertible
         let this: ValueConvertible
@@ -32,7 +32,7 @@ public class ThreadsafeFunction {
         try napi_create_threadsafe_function(env,
                                             function.napiValue(env),
                                             nil,
-                                            Value.string("ThreadsafeWrapper\(id)").napiValue(env),
+                                            "ThreadsafeWrapper".napiValue(env),
                                             0,
                                             1,
                                             nil,
@@ -40,6 +40,12 @@ public class ThreadsafeFunction {
                                             nil,
                                             swiftNAPIThreadsafeCallback,
                                             &tsfn).throwIfError()
+    }
+
+    deinit {
+        if let tsfn {
+            napi_release_threadsafe_function(tsfn, napi_tsfn_release)
+        }
     }
 }
 
@@ -50,29 +56,6 @@ private class ThreadsafeData {
     init(this: napi_value, args: [napi_value?]) {
         self.this = this
         self.args = args
-    }
-}
-
-func swiftNAPIThreadsafeFinalize(_: napi_env!, pointer: UnsafeMutableRawPointer?, hint _: UnsafeMutableRawPointer?) {
-    
-}
-
-func swiftNAPIThreadsafeCallback(_ env: napi_env?, _ js_callback: napi_value?, _ context: UnsafeMutableRawPointer?, _ data: UnsafeMutableRawPointer!) {
-    let callbackData = Unmanaged<ThreadsafeFunction.CallbackData>.fromOpaque(data).takeRetainedValue()
-
-    var result: napi_value?
-
-    if let env {
-        do {
-            let this = try callbackData.this.napiValue(env)
-            let args: [napi_value?] = try callbackData.args.map { try $0.napiValue(env) }
-            try args.withUnsafeBufferPointer { argsBytes in
-                napi_call_function(env, this, js_callback, args.count, argsBytes.baseAddress, &result)
-            }.throwIfError()
-            try callbackData.continuation.resume(returning: callbackData.resultConstructor(env, result!))
-        } catch {
-            callbackData.continuation.resume(throwing: error)
-        }
     }
 }
 
