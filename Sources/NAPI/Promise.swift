@@ -1,6 +1,44 @@
 import NAPIC
 import Foundation
 
+public class Promise: ValueConvertible {
+    public typealias Closure = () async throws -> ValueConvertible
+    public typealias NoResultClosure = () async throws -> Void
+
+    public required init(_ env: napi_env, from: napi_value) throws {
+        fatalError("not implemented")
+    }
+
+    let deferred: ThreadSafeDeferred
+    let closure: Closure
+
+    public init(_ env: napi_env, _ closure: @escaping Closure) throws {
+        self.deferred = try .init(env)
+        self.closure = closure
+    }
+
+    public init(_ env: napi_env, _ closure: @escaping NoResultClosure) throws {
+        self.deferred = try .init(env)
+        self.closure = {
+            try await closure()
+            return Value.undefined
+        }
+    }
+
+    public func napiValue(_ env: napi_env) throws -> napi_value {
+        Task {
+            do {
+                let result = try await closure()
+                try! await deferred.resolve(result)
+            } catch {
+                try! await deferred.reject(error)
+            }
+        }
+
+        return deferred.promise
+    }
+}
+
 public class ThreadSafeDeferred {
     private class Storage {
         var result: Result<ValueConvertible, Swift.Error>?
