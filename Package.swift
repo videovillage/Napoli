@@ -3,11 +3,11 @@
 import PackageDescription
 
 let package = Package(
-    name: "NAPI",
+    name: "swift-napi-bindings",
     platforms: [.macOS(.v10_15)],
     products: [
-        .library(name: "NAPI", type: .static, targets: ["NAPI"]),
-        .library(name: "NAPIC", type: .static, targets: ["NAPIC"]),
+        .library(name: "NAPI", targets: ["NAPI"]),
+        .library(name: "NAPIC", targets: ["NAPIC"]),
     ],
     targets: [
         .target(name: "NAPI", dependencies: ["NAPIC"]),
