@@ -1,17 +1,21 @@
 import NAPIC
 
-fileprivate func createFunction(_ env: napi_env, named name: String, _ function: @escaping Callback) throws -> napi_value {
+private func createFunction(_ env: napi_env, named name: String, _ function: @escaping Callback) throws -> napi_value {
+    print("createFunction: \(name)")
     var result: napi_value?
     let nameData = name.data(using: .utf8)!
 
     let data = CallbackData(callback: function)
-    let dataPointer = Unmanaged.passRetained(data).toOpaque()
+    let unmanagedData = Unmanaged.passRetained(data)
 
-    let status = nameData.withUnsafeBytes { nameBytes in
-        napi_create_function(env, nameBytes, nameData.count, swiftNAPICallback, dataPointer, &result)
+    do {
+        try nameData.withUnsafeBytes {
+            napi_create_function(env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, swiftNAPICallback, unmanagedData.toOpaque(), &result)
+        }.throwIfError()
+    } catch {
+        unmanagedData.release()
+        throw error
     }
-
-    guard status == napi_ok else { throw NAPI.Error(status) }
 
     return result!
 }
@@ -19,6 +23,7 @@ fileprivate func createFunction(_ env: napi_env, named name: String, _ function:
 fileprivate enum InternalFunction {
     case javascript(napi_value)
     case swift(String, Callback)
+//    case swiftAsync(String, AsyncCallback)
 }
 
 public class Function: ValueConvertible {
@@ -32,10 +37,15 @@ public class Function: ValueConvertible {
         self.value = .swift(name, callback)
     }
 
+//    public init(named name: String, _ callback: @escaping AsyncCallback) {
+//        value = .swiftAsync(name, callback)
+//    }
+
     public func napiValue(_ env: napi_env) throws -> napi_value {
         switch value {
-            case .swift(let name, let callback): return try createFunction(env, named: name, callback)
-            case .javascript(let value): return value
+        case let .swift(name, callback): return try createFunction(env, named: name, callback)
+//        case let .swiftAsync(name, callback): return try createFunction(env, named: name, { env, args in return try callAsyncFunction(env, args: args, callback) })
+        case let .javascript(value): return value
         }
     }
 }

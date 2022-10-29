@@ -67,6 +67,19 @@ func throwError() throws {
     throw TestError(message: "Error message", code: "ETEST")
 }
 
+func runThreadsafeCallback(env: OpaquePointer, fn: Function) throws -> Void {
+    let tsfn = ThreadsafeFunction(fn)
+    _ = tsfn.napiValue(env)
+
+    Task {
+        do {
+            try await tsfn.call("hello world")
+        } catch {
+            print("runThreadsafeCallback error: \(error)")
+        }
+    }
+}
+
 @_cdecl("_init_napi_tests")
 func initNAPITests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointer? {
     return initModule(env, exports, [

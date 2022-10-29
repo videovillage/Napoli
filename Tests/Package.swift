@@ -1,9 +1,10 @@
-// swift-tools-version:4.2
+// swift-tools-version:5.7
 
 import PackageDescription
 
 let package = Package(
     name: "NAPITests",
+    platforms: [.macOS(.v10_15)],
     products: [
         .library(name: "NAPITests", type: .dynamic, targets: ["NAPITests"]),
     ],
@@ -11,7 +12,12 @@ let package = Package(
         .package(path: "../"),
     ],
     targets: [
-        .target(name: "Trampoline", dependencies: ["NAPIC"]),
-        .target(name: "NAPITests", dependencies: ["NAPI", "Trampoline"]),
+        .target(name: "Trampoline",
+                dependencies: [.product(name: "NAPIC", package: "swift-napi-bindings")]
+               ),
+        .target(name: "NAPITests",
+                dependencies: ["Trampoline",
+                               .product(name: "NAPI", package: "swift-napi-bindings")]
+               ),
     ]
 )

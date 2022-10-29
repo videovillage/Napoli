@@ -6,15 +6,18 @@ fileprivate func defineClass(_ env: napi_env, named name: String, _ constructor:
     let props = try properties.map { try $0.value(env) }
 
     let data = CallbackData(callback: constructor)
-    let dataPointer = Unmanaged.passRetained(data).toOpaque()
+    let unmanagedData = Unmanaged.passRetained(data)
 
-    let status = nameData.withUnsafeBytes { nameBytes in
-        props.withUnsafeBufferPointer { propertiesBytes in
-            napi_define_class(env, nameBytes, nameData.count, swiftNAPICallback, dataPointer, properties.count, propertiesBytes.baseAddress, &result)
-        }
+    do {
+        try nameData.withUnsafeBytes { nameBytes in
+            props.withUnsafeBufferPointer { propertiesBytes in
+                napi_define_class(env, nameBytes.baseAddress?.assumingMemoryBound(to: UInt8.self), nameBytes.count, swiftNAPICallback, unmanagedData.toOpaque(), properties.count, propertiesBytes.baseAddress, &result)
+            }
+        }.throwIfError()
+    } catch {
+        unmanagedData.release()
+        throw error
     }
-
-    guard status == napi_ok else { throw NAPI.Error(status) }
 
     return result!
 }

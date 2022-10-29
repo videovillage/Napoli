@@ -31,6 +31,7 @@ fileprivate func exceptionIsPending(_ env: napi_env) throws -> Bool {
     return result
 }
 
+public typealias AsyncCallback = (napi_env, Arguments) async throws -> ValueConvertible?
 public typealias Callback = (napi_env, Arguments) throws -> ValueConvertible?
 
 class CallbackData {

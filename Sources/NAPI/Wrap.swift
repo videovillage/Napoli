@@ -7,9 +7,14 @@ func swiftNAPIDeinit(_ env: napi_env!, pointer: UnsafeMutableRawPointer?, hint: 
 
 class Wrap<T: AnyObject> {
     static func wrap(_ env: napi_env, jsObject: napi_value, nativeObject: T) throws {
-        let pointer = Unmanaged.passRetained(nativeObject).toOpaque()
-        let status = napi_wrap(env, jsObject, pointer, swiftNAPIDeinit, nil, nil)
-        guard status == napi_ok else { throw NAPI.Error(status) }
+        let pointerData = Unmanaged.passRetained(nativeObject)
+
+        do {
+            try napi_wrap(env, jsObject, pointerData.toOpaque(), swiftNAPIDeinit, nil, nil).throwIfError()
+        } catch {
+            pointerData.release()
+            throw error
+        }
     }
 
     static func unwrap(_ env: napi_env, jsObject: napi_value) throws -> T {
