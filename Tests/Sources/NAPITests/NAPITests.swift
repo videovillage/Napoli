@@ -1,3 +1,4 @@
+import Foundation
 import NAPI
 
 struct TestError: Swift.Error, ErrorConvertible {
@@ -80,6 +81,26 @@ func runThreadsafeCallback(env: OpaquePointer, fn: Function) throws -> Void {
     }
 }
 
+func returnSuccessfulPromise(env: OpaquePointer, msg: String) throws -> Promise {
+    try Promise(env) {
+        try await Task.sleep(seconds: 0.2)
+        return msg + " hello"
+    }
+}
+
+func returnThrowingPromise(env: OpaquePointer, msg: String) throws -> Promise {
+    func asyncThrow() async throws -> Void {
+        enum Error: Swift.Error {
+            case genericError
+        }
+
+        try await Task.sleep(seconds: 0.2)
+        throw Error.genericError
+    }
+
+    return try Promise(env, asyncThrow)
+}
+
 @_cdecl("_init_napi_tests")
 func initNAPITests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointer? {
     initModule(env, exports, [
@@ -100,6 +121,19 @@ func initNAPITests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointer?
         .function("takeOptionalBoolean", takeOptionalBoolean),
 
         .function("throwError", throwError),
-        .value("runThreadsafeCallback", Function(named: "runThreadsafeCallback", runThreadsafeCallback))
+        .function("runThreadsafeCallback", runThreadsafeCallback),
+        .function("returnSuccessfulPromise", returnSuccessfulPromise),
+        .function("returnThrowingPromise", returnThrowingPromise)
     ])
+}
+
+enum TimeIntervalSleepError: Swift.Error {
+    case negativeTimeInterval
+}
+
+public extension Task where Success == Never, Failure == Never {
+    static func sleep(seconds: TimeInterval) async throws {
+        guard seconds >= 0 else { throw TimeIntervalSleepError.negativeTimeInterval }
+        try await sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+    }
 }

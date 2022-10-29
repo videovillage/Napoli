@@ -63,6 +63,18 @@ public struct PropertyDescriptor {
         .init(.method(name, { env, args in try callback(A(env, from: args.0), B(env, from: args.1)); return Value.undefined }, attributes))
     }
 
+    public static func function(_ name: String, _ callback: @escaping (napi_env) throws -> Void, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+        .init(.method(name, { env, _ in try callback(env); return Value.undefined }, attributes))
+    }
+
+    public static func function<A: ValueConvertible>(_ name: String, _ callback: @escaping (napi_env, A) throws -> Void, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+        .init(.method(name, { env, args in try callback(env, A(env, from: args.0)); return Value.undefined }, attributes))
+    }
+
+    public static func function<A: ValueConvertible, B: ValueConvertible>(_ name: String, _ callback: @escaping (napi_env, A, B) throws -> Void, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+        .init(.method(name, { env, args in try callback(env, A(env, from: args.0), B(env, from: args.1)); return Value.undefined }, attributes))
+    }
+
     /* (...) -> ValueConvertible */
 
     public static func function(_ name: String, _ callback: @escaping () throws -> ValueConvertible, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
@@ -75,6 +87,18 @@ public struct PropertyDescriptor {
 
     public static func function<A: ValueConvertible, B: ValueConvertible>(_ name: String, _ callback: @escaping (A, B) throws -> ValueConvertible, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
         .init(.method(name, { env, args in try callback(A(env, from: args.0), B(env, from: args.1)) }, attributes))
+    }
+
+    public static func function(_ name: String, _ callback: @escaping (napi_env) throws -> ValueConvertible, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+        .init(.method(name, { env, _ in try callback(env) }, attributes))
+    }
+
+    public static func function<A: ValueConvertible>(_ name: String, _ callback: @escaping (napi_env, A) throws -> ValueConvertible, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+        .init(.method(name, { env, args in try callback(env, A(env, from: args.0)) }, attributes))
+    }
+
+    public static func function<A: ValueConvertible, B: ValueConvertible>(_ name: String, _ callback: @escaping (napi_env, A, B) throws -> ValueConvertible, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+        .init(.method(name, { env, args in try callback(env, A(env, from: args.0), B(env, from: args.1)) }, attributes))
     }
 
     /* (this, ...) -> Void */
@@ -91,6 +115,18 @@ public struct PropertyDescriptor {
         .init(.method(name, { env, args in try callback(Wrap<This>.unwrap(env, jsObject: args.this), A(env, from: args.0), B(env, from: args.1)); return Value.undefined }, attributes))
     }
 
+    public static func instanceMethod<This: AnyObject>(_ name: String, _ callback: @escaping (napi_env, This) throws -> Void, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+        .init(.method(name, { env, args in try callback(env, Wrap<This>.unwrap(env, jsObject: args.this)); return Value.undefined }, attributes))
+    }
+
+    public static func instanceMethod<This: AnyObject, A: ValueConvertible>(_ name: String, _ callback: @escaping (napi_env, This, A) throws -> Void, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+        .init(.method(name, { env, args in try callback(env, Wrap<This>.unwrap(env, jsObject: args.this), A(env, from: args.0)); return Value.undefined }, attributes))
+    }
+
+    public static func instanceMethod<This: AnyObject, A: ValueConvertible, B: ValueConvertible>(_ name: String, _ callback: @escaping (napi_env, This, A, B) throws -> Void, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+        .init(.method(name, { env, args in try callback(env, Wrap<This>.unwrap(env, jsObject: args.this), A(env, from: args.0), B(env, from: args.1)); return Value.undefined }, attributes))
+    }
+
     /* (this, ...) -> ValueConvertible */
 
     public static func instanceMethod<This: AnyObject>(_ name: String, _ callback: @escaping (This) throws -> ValueConvertible, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
@@ -103,6 +139,18 @@ public struct PropertyDescriptor {
 
     public static func instanceMethod<This: AnyObject, A: ValueConvertible, B: ValueConvertible>(_ name: String, _ callback: @escaping (This, A, B) throws -> ValueConvertible, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
         .init(.method(name, { env, args in try callback(Wrap<This>.unwrap(env, jsObject: args.this), A(env, from: args.0), B(env, from: args.1)) }, attributes))
+    }
+
+    public static func instanceMethod<This: AnyObject>(_ name: String, _ callback: @escaping (napi_env, This) throws -> ValueConvertible, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+        .init(.method(name, { env, args in try callback(env, Wrap<This>.unwrap(env, jsObject: args.this)) }, attributes))
+    }
+
+    public static func instanceMethod<This: AnyObject, A: ValueConvertible>(_ name: String, _ callback: @escaping (napi_env, This, A) throws -> ValueConvertible, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+        .init(.method(name, { env, args in try callback(env, Wrap<This>.unwrap(env, jsObject: args.this), A(env, from: args.0)) }, attributes))
+    }
+
+    public static func instanceMethod<This: AnyObject, A: ValueConvertible, B: ValueConvertible>(_ name: String, _ callback: @escaping (napi_env, This, A, B) throws -> ValueConvertible, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+        .init(.method(name, { env, args in try callback(env, Wrap<This>.unwrap(env, jsObject: args.this), A(env, from: args.0), B(env, from: args.1)) }, attributes))
     }
 
     /* Instance Properties */

@@ -49,7 +49,7 @@ public class ThreadSafeDeferred {
     private let storage: Storage
 
     public init(_ env: napi_env) throws {
-        var storage = Storage()
+        let storage = Storage()
         var deferred: napi_deferred! = nil
         try napi_create_promise(env, &deferred, &promise).throwIfError()
 
@@ -58,9 +58,14 @@ public class ThreadSafeDeferred {
         finalize = try .init(env, Function(named: "ThreadSafeDeferred", { (env: napi_env) in
             do {
                 let success = try storage.result!.get().napiValue(env)
-                try napi_resolve_deferred(env, deferred, success).throwIfError()
+                try! napi_resolve_deferred(env, deferred, success).throwIfError()
             } catch {
-                try napi_reject_deferred(env, deferred, Value.undefined.napiValue(env)).throwIfError()
+                var jsError: napi_value! = nil
+                try! napi_create_error(env,
+                                       "swift_promise_internal".napiValue(env),
+                                       error.localizedDescription.napiValue(env),
+                                       &jsError).throwIfError()
+                try! napi_reject_deferred(env, deferred, jsError).throwIfError()
             }
         }))
     }

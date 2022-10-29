@@ -11,4 +11,13 @@ describe('Callbacks:', function () {
       return 'message'
     })
   })
+
+  it('returns successful promise', async function () {
+    const result = await addon.returnSuccessfulPromise('cool')
+    assert.strictEqual(result, 'cool hello')
+  })
+
+  it('returns throwing promise', async function () {
+    await assert.rejects(addon.returnThrowingPromise('cool'))
+  })
 })
