@@ -40,7 +40,7 @@ public enum Error: Swift.Error {
         case 15: self = .queueFull
         case 16: self = .closing
         case 17: self = .bigintExpected
-        default: self = .unknown(napiStatus.rawValue)
+        default: self = .unknown(UInt32(napiStatus.rawValue))
         }
     }
 }
@@ -56,7 +56,15 @@ extension Error {
         case .booleanExpected: return napi_throw_type_error(env, nil, "Expected boolean")
         case .arrayExpected: return napi_throw_type_error(env, nil, "Expected array")
         case .bigintExpected: return napi_throw_type_error(env, nil, "Expected BigInt")
-        default: return napi_throw_error(env, nil, self.localizedDescription)
+        default: return napi_throw_error(env, nil, localizedDescription)
+        }
+    }
+}
+
+extension napi_status {
+    func throwIfError() throws {
+        guard self == napi_ok else {
+            throw NAPI.Error(self)
         }
     }
 }

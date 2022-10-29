@@ -20,7 +20,7 @@ private func createFunction(_ env: napi_env, named name: String, _ function: @es
     return result!
 }
 
-fileprivate enum InternalFunction {
+private enum InternalFunction {
     case javascript(napi_value)
     case swift(String, Callback)
 //    case swiftAsync(String, AsyncCallback)
@@ -29,12 +29,12 @@ fileprivate enum InternalFunction {
 public class Function: ValueConvertible {
     fileprivate let value: InternalFunction
 
-    public required init(_ env: napi_env, from: napi_value) throws {
-        self.value = .javascript(from)
+    public required init(_: napi_env, from: napi_value) throws {
+        value = .javascript(from)
     }
 
     public init(named name: String, _ callback: @escaping Callback) {
-        self.value = .swift(name, callback)
+        value = .swift(name, callback)
     }
 
 //    public init(named name: String, _ callback: @escaping AsyncCallback) {
@@ -51,86 +51,82 @@ public class Function: ValueConvertible {
 }
 
 /* constructor overloads */
-extension Function {
+public extension Function {
     /* (...) -> Void */
 
-    public convenience init(named name: String, _ callback: @escaping () throws -> Void) {
-        self.init(named: name, { (_, _) in try callback(); return Value.undefined })
+    convenience init(named name: String, _ callback: @escaping () throws -> Void) {
+        self.init(named: name) { _, _ in try callback(); return Value.undefined }
     }
 
-    public convenience init<A: ValueConvertible>(named name: String, _ callback: @escaping (A) throws -> Void) {
-        self.init(named: name, { (env, args) in try callback(A(env, from: args.0)); return Value.undefined })
+    convenience init<A: ValueConvertible>(named name: String, _ callback: @escaping (A) throws -> Void) {
+        self.init(named: name) { env, args in try callback(A(env, from: args.0)); return Value.undefined }
     }
 
-    public convenience init<A: ValueConvertible, B: ValueConvertible>(named name: String, _ callback: @escaping (A, B) throws -> Void) {
-        self.init(named: name, { (env, args) in try callback(A(env, from: args.0), B(env, from: args.1)); return Value.undefined })
+    convenience init<A: ValueConvertible, B: ValueConvertible>(named name: String, _ callback: @escaping (A, B) throws -> Void) {
+        self.init(named: name) { env, args in try callback(A(env, from: args.0), B(env, from: args.1)); return Value.undefined }
     }
 
     /* (env, ...) -> Void */
 
-    public convenience init(named name: String, _ callback: @escaping (napi_env) throws -> Void) {
-        self.init(named: name, { (env, _) in try callback(env); return Value.undefined })
+    convenience init(named name: String, _ callback: @escaping (napi_env) throws -> Void) {
+        self.init(named: name) { env, _ in try callback(env); return Value.undefined }
     }
 
-    public convenience init<A: ValueConvertible>(named name: String, _ callback: @escaping (napi_env, A) throws -> Void) {
-        self.init(named: name, { (env, args) in try callback(env, A(env, from: args.0)); return Value.undefined })
+    convenience init<A: ValueConvertible>(named name: String, _ callback: @escaping (napi_env, A) throws -> Void) {
+        self.init(named: name) { env, args in try callback(env, A(env, from: args.0)); return Value.undefined }
     }
 
-    public convenience init<A: ValueConvertible, B: ValueConvertible>(named name: String, _ callback: @escaping (napi_env, A, B) throws -> Void) {
-        self.init(named: name, { (env, args) in try callback(env, A(env, from: args.0), B(env, from: args.1)); return Value.undefined })
+    convenience init<A: ValueConvertible, B: ValueConvertible>(named name: String, _ callback: @escaping (napi_env, A, B) throws -> Void) {
+        self.init(named: name) { env, args in try callback(env, A(env, from: args.0), B(env, from: args.1)); return Value.undefined }
     }
 }
 
 /* call(...) */
-extension Function {
-    fileprivate func _call(_ env: napi_env, this: napi_value, args: [napi_value?]) throws -> Void {
-        let handle = try self.napiValue(env)
+public extension Function {
+    private func _call(_ env: napi_env, this: napi_value, args: [napi_value?]) throws {
+        let handle = try napiValue(env)
 
-        let status = args.withUnsafeBufferPointer { argsBytes in
+        try args.withUnsafeBufferPointer { argsBytes in
             napi_call_function(env, this, handle, args.count, argsBytes.baseAddress, nil)
-        }
-
-        guard status == napi_ok else { throw NAPI.Error(status) }
+        }.throwIfError()
     }
 
-    fileprivate func _call<Result: ValueConvertible>(_ env: napi_env, this: napi_value, args: [napi_value?]) throws -> Result {
-        let handle = try self.napiValue(env)
+    private func _call<Result: ValueConvertible>(_ env: napi_env, this: napi_value, args: [napi_value?]) throws -> Result {
+        let handle = try napiValue(env)
 
         var result: napi_value?
-        let status = args.withUnsafeBufferPointer { argsBytes in
+        try args.withUnsafeBufferPointer { argsBytes in
             napi_call_function(env, this, handle, args.count, argsBytes.baseAddress, &result)
-        }
-
-        guard status == napi_ok else { throw NAPI.Error(status) }
+        }.throwIfError()
 
         return try Result(env, from: result!)
     }
 
     /* (...) -> Void */
 
-    public func call(_ env: napi_env) throws -> Void {
-        return try _call(env, this: Value.undefined.napiValue(env), args: [])
+    func call(_ env: napi_env) throws {
+        try _call(env, this: Value.undefined.napiValue(env), args: [])
     }
 
-    public func call<A: ValueConvertible>(_ env: napi_env, _ a: A) throws -> Void {
-        return try _call(env, this: Value.undefined.napiValue(env), args: [a.napiValue(env)])
+    func call<A: ValueConvertible>(_ env: napi_env, _ a: A) throws -> Void {
+        try _call(env, this: Value.undefined.napiValue(env), args: [a.napiValue(env)])
     }
 
-    public func call<A: ValueConvertible, B: ValueConvertible>(_ env: napi_env, _ a: A, _ b: B) throws -> Void {
-        return try _call(env, this: Value.undefined.napiValue(env), args: [a.napiValue(env), b.napiValue(env)])
+    func call<A: ValueConvertible, B: ValueConvertible>(_ env: napi_env, _ a: A, _ b: B) throws -> Void {
+        try _call(env, this: Value.undefined.napiValue(env), args: [a.napiValue(env), b.napiValue(env)])
     }
 
     /* (...) -> ValueConvertible */
 
-    public func call<Result: ValueConvertible>(_ env: napi_env) throws -> Result {
-        return try _call(env, this: Value.undefined.napiValue(env), args: [])
+    func call<Result: ValueConvertible>(_ env: napi_env) throws -> Result {
+        try _call(env, this: Value.undefined.napiValue(env), args: [])
     }
 
-    public func call<Result: ValueConvertible, A: ValueConvertible>(_ env: napi_env, _ a: A) throws -> Result {
-        return try _call(env, this: Value.undefined.napiValue(env), args: [a.napiValue(env)])
+    func call<Result: ValueConvertible, A: ValueConvertible>(_ env: napi_env, _ a: A) throws -> Result {
+        try _call(env, this: Value.undefined.napiValue(env), args: [a.napiValue(env)])
     }
 
-    public func call<Result: ValueConvertible, A: ValueConvertible, B: ValueConvertible>(_ env: napi_env, _ a: A, _ b: B) throws -> Result {
-        return try _call(env, this: Value.undefined.napiValue(env), args: [a.napiValue(env), b.napiValue(env)])
+    func call<Result: ValueConvertible, A: ValueConvertible, B: ValueConvertible>(_ env: napi_env, _ a: A, _ b: B) throws -> Result {
+        try _call(env, this: Value.undefined.napiValue(env), args: [a.napiValue(env), b.napiValue(env)])
     }
 }

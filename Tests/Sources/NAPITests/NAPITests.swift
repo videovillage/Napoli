@@ -12,23 +12,23 @@ func assertEqual<T: Equatable & CustomStringConvertible>(expected: T, actual: T)
 }
 
 func returnString() -> String {
-    return "a string"
+    "a string"
 }
 
 func returnNumber() -> Double {
-    return 1337
+    1337
 }
 
 func returnBoolean() -> Bool {
-    return true
+    true
 }
 
 func returnNull() -> Value {
-    return .null
+    .null
 }
 
 func returnUndefined() -> Value {
-    return .undefined
+    .undefined
 }
 
 func takeString(value: String) throws {
@@ -52,15 +52,15 @@ func takeUndefined(value: Undefined) throws {
 }
 
 func takeOptionalString(value: String?) -> String {
-    return value ?? "a string"
+    value ?? "a string"
 }
 
 func takeOptionalNumber(value: Double?) -> Double {
-    return value ?? 1337
+    value ?? 1337
 }
 
 func takeOptionalBoolean(value: Bool?) -> Bool {
-    return value ?? true
+    value ?? true
 }
 
 func throwError() throws {
@@ -82,7 +82,7 @@ func runThreadsafeCallback(env: OpaquePointer, fn: Function) throws -> Void {
 
 @_cdecl("_init_napi_tests")
 func initNAPITests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointer? {
-    return initModule(env, exports, [
+    initModule(env, exports, [
         .function("returnString", returnString),
         .function("returnNumber", returnNumber),
         .function("returnBoolean", returnBoolean),

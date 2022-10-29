@@ -1,21 +1,17 @@
 import Foundation
 import NAPIC
 
-fileprivate func setTimeout(_ env: napi_env, _ fn: Function, _ ms: Double) throws {
-    var status: napi_status!
-
+private func setTimeout(_ env: napi_env, _ fn: Function, _ ms: Double) throws {
     var global: napi_value!
-    status = napi_get_global(env, &global)
-    guard status == napi_ok else { throw NAPI.Error(status) }
+    try napi_get_global(env, &global).throwIfError()
 
     var setTimeout: napi_value!
-    status = napi_get_named_property(env, global, "setTimeout", &setTimeout)
-    guard status == napi_ok else { throw NAPI.Error(status) }
+    try napi_get_named_property(env, global, "setTimeout", &setTimeout).throwIfError()
 
     try Function(env, from: setTimeout).call(env, fn, ms)
 }
 
-public class RunLoop {
+public enum RunLoop {
     private static var refCount = 0
     private static var scheduled = false
 
@@ -25,7 +21,8 @@ public class RunLoop {
             return
         }
 
-        CFRunLoopRunInMode(.defaultMode, 0.02, false)
+        _ = Foundation.RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.02))
+
         try setTimeout(env, Function(named: "tick", RunLoop.tick), 0)
     }
 
