@@ -1,7 +1,7 @@
 import Foundation
 import NAPIC
 
-public class ThreadsafeFunction: ValueConvertible {
+public class ThreadsafeFunction {
     fileprivate class CallbackData {
         typealias Continuation = CheckedContinuation<ValueConvertible, Swift.Error>
         typealias ResultConstructor = (napi_env, napi_value) throws -> ValueConvertible
@@ -26,27 +26,13 @@ public class ThreadsafeFunction: ValueConvertible {
     }
 
     private let id = UUID().uuidString
-    fileprivate let function: Function
     fileprivate var tsfn: napi_threadsafe_function! = nil
 
-    public required init(_ env: napi_env, from: napi_value) throws {
-        function = try Function(env, from: from)
-    }
-
-    public init(named name: String, _ callback: @escaping Callback) {
-        function = Function(named: name, callback)
-    }
-
-    public init(_ function: Function) {
-        self.function = function
-    }
-
-    public func napiValue(_ env: napi_env) throws -> napi_value {
-        print("createThreadsafeFunction")
+    public init(_ env: napi_env, _ function: Function) throws {
         try napi_create_threadsafe_function(env,
                                             function.napiValue(env),
                                             nil,
-                                            nil,
+                                            Value.string("ThreadsafeWrapper\(id)").napiValue(env),
                                             0,
                                             1,
                                             nil,
@@ -54,8 +40,6 @@ public class ThreadsafeFunction: ValueConvertible {
                                             nil,
                                             swiftNAPIThreadsafeCallback,
                                             &tsfn).throwIfError()
-
-        return try Value.undefined.napiValue(env)
     }
 }
 
@@ -70,7 +54,7 @@ private class ThreadsafeData {
 }
 
 func swiftNAPIThreadsafeFinalize(_: napi_env!, pointer: UnsafeMutableRawPointer?, hint _: UnsafeMutableRawPointer?) {
-
+    
 }
 
 func swiftNAPIThreadsafeCallback(_ env: napi_env?, _ js_callback: napi_value?, _ context: UnsafeMutableRawPointer?, _ data: UnsafeMutableRawPointer!) {
@@ -89,37 +73,6 @@ func swiftNAPIThreadsafeCallback(_ env: napi_env?, _ js_callback: napi_value?, _
         } catch {
             callbackData.continuation.resume(throwing: error)
         }
-    }
-}
-
-/* constructor overloads */
-public extension ThreadsafeFunction {
-    /* (...) -> Void */
-
-    convenience init(named name: String, _ callback: @escaping () throws -> Void) {
-        self.init(named: name) { _, _ in try callback(); return Value.undefined }
-    }
-
-    convenience init<A: ValueConvertible>(named name: String, _ callback: @escaping (A) throws -> Void) {
-        self.init(named: name) { env, args in try callback(A(env, from: args.0)); return Value.undefined }
-    }
-
-    convenience init<A: ValueConvertible, B: ValueConvertible>(named name: String, _ callback: @escaping (A, B) throws -> Void) {
-        self.init(named: name) { env, args in try callback(A(env, from: args.0), B(env, from: args.1)); return Value.undefined }
-    }
-
-    /* (env, ...) -> Void */
-
-    convenience init(named name: String, _ callback: @escaping (napi_env) throws -> Void) {
-        self.init(named: name) { env, _ in try callback(env); return Value.undefined }
-    }
-
-    convenience init<A: ValueConvertible>(named name: String, _ callback: @escaping (napi_env, A) throws -> Void) {
-        self.init(named: name) { env, args in try callback(env, A(env, from: args.0)); return Value.undefined }
-    }
-
-    convenience init<A: ValueConvertible, B: ValueConvertible>(named name: String, _ callback: @escaping (napi_env, A, B) throws -> Void) {
-        self.init(named: name) { env, args in try callback(env, A(env, from: args.0), B(env, from: args.1)); return Value.undefined }
     }
 }
 

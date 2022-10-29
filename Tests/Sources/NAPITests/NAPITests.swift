@@ -68,12 +68,12 @@ func throwError() throws {
 }
 
 func runThreadsafeCallback(env: OpaquePointer, fn: Function) throws -> Void {
-    let tsfn = ThreadsafeFunction(fn)
-    _ = tsfn.napiValue(env)
+    let tsfn = try ThreadsafeFunction(env, fn)
 
     Task {
         do {
-            try await tsfn.call("hello world")
+            let value: Bool = try await tsfn.call("hello world")
+            assert(value)
         } catch {
             print("runThreadsafeCallback error: \(error)")
         }
@@ -100,5 +100,6 @@ func initNAPITests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointer?
         .function("takeOptionalBoolean", takeOptionalBoolean),
 
         .function("throwError", throwError),
+        .value("runThreadsafeCallback", Function(named: "runThreadsafeCallback", runThreadsafeCallback))
     ])
 }
