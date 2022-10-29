@@ -1,7 +1,6 @@
 import NAPIC
 
 private func createFunction(_ env: napi_env, named name: String, _ function: @escaping Callback) throws -> napi_value {
-    print("createFunction: \(name)")
     var result: napi_value?
     let nameData = name.data(using: .utf8)!
 

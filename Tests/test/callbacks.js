@@ -8,7 +8,7 @@ describe('Callbacks:', function () {
     addon.runThreadsafeCallback(function (msg) {
       assert.strictEqual(msg, 'hello world')
       done()
-      throw new Error('wonderful error')
+      return 'message'
     })
   })
 })
