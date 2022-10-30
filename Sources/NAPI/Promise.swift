@@ -9,16 +9,14 @@ public class Promise: ValueConvertible {
         fatalError("not implemented")
     }
 
-    let deferred: ThreadSafeDeferred
-    let closure: Closure
+    private var deferred: ThreadSafeDeferred!
+    private let closure: Closure
 
-    public init(_ env: napi_env, _ closure: @escaping Closure) throws {
-        self.deferred = try .init(env)
+    public init(_ closure: @escaping Closure) throws {
         self.closure = closure
     }
 
-    public init(_ env: napi_env, _ closure: @escaping NoResultClosure) throws {
-        self.deferred = try .init(env)
+    public init(_ closure: @escaping NoResultClosure) throws {
         self.closure = {
             try await closure()
             return Value.undefined
@@ -26,6 +24,8 @@ public class Promise: ValueConvertible {
     }
 
     public func napiValue(_ env: napi_env) throws -> napi_value {
+        var promise: napi_value! = nil
+        self.deferred = try .init(env, &promise)
         Task {
             do {
                 let result = try await closure()
@@ -35,23 +35,22 @@ public class Promise: ValueConvertible {
             }
         }
 
-        return deferred.promise
+        return promise
     }
 }
 
-public class ThreadSafeDeferred {
+public actor ThreadSafeDeferred {
     private class Storage {
         var result: Result<ValueConvertible, Swift.Error>?
     }
 
     private let finalize: ThreadsafeFunction
-    private(set) var promise: napi_value! = nil
     private let storage: Storage
 
-    public init(_ env: napi_env) throws {
+    public init(_ env: napi_env, _ promise: UnsafeMutablePointer<napi_value?>!) throws {
         let storage = Storage()
         var deferred: napi_deferred! = nil
-        try napi_create_promise(env, &deferred, &promise).throwIfError()
+        try napi_create_promise(env, &deferred, promise).throwIfError()
 
         self.storage = storage
 

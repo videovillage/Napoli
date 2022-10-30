@@ -13,8 +13,9 @@ describe('Callbacks:', function () {
   })
 
   it('returns successful promise', async function () {
-    const result = await addon.returnSuccessfulPromise('cool')
-    assert.strictEqual(result, 'cool hello')
+    let promise = addon.returnSuccessfulPromise('cool')
+    assert.strictEqual(await promise, 'cool hello')
+    assert.strictEqual(await promise, 'cool hello')
   })
 
   it('returns throwing promise', async function () {
