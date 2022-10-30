@@ -13,11 +13,9 @@ let package = Package(
     ],
     targets: [
         .target(name: "Trampoline",
-                dependencies: [.product(name: "NAPIC", package: "swift-napi-bindings")]
-               ),
+                dependencies: [.product(name: "NAPIC", package: "swift-napi-bindings")]),
         .target(name: "NAPITests",
                 dependencies: ["Trampoline",
-                               .product(name: "NAPI", package: "swift-napi-bindings")]
-               ),
+                               .product(name: "NAPI", package: "swift-napi-bindings")]),
     ]
 )

@@ -45,7 +45,7 @@ public struct PropertyDescriptor {
         .init(.value(name, Class(named: name, { env, args in let native = try constructor(env); try Wrap<This>.wrap(env, jsObject: args.this, nativeObject: native); return nil }, properties), attributes))
     }
 
-    public static func `class`<This: JSClassDefinable>(_ type: This.Type) -> PropertyDescriptor {
+    public static func `class`<This: JSClassDefinable>(_: This.Type) -> PropertyDescriptor {
         .class(This.jsName, { env in This(env: env) }, This.jsProperties + This.jsFunctions, attributes: This.jsAttributes)
     }
 
@@ -178,12 +178,12 @@ public struct PropertyDescriptor {
     }
 
     public static func propertyReadOnly<A: ValueConvertible>(_ name: String, getter: @escaping () throws -> A, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
-        .init(.getSet(name, getter: { env, args in try getter() }, attributes))
+        .init(.getSet(name, getter: { _, _ in try getter() }, attributes))
     }
 
     public static func property<A: ValueConvertible>(_ name: String, getter: @escaping () throws -> A, setter: @escaping (A) throws -> Void, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
         .init(.getSet(name,
-                      getter: { env, args in try getter() },
+                      getter: { _, _ in try getter() },
                       setter: { env, args in try setter(A(env, from: args.0)); return nil },
                       attributes))
     }

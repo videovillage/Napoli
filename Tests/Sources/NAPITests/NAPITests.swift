@@ -68,7 +68,7 @@ func throwError() throws {
     throw TestError(message: "Error message", code: "ETEST")
 }
 
-func runThreadsafeCallback(tsfn: ThreadsafeFunction) throws -> Void {
+func runThreadsafeCallback(tsfn: ThreadsafeFunction) throws {
     Task {
         do {
             let value: String = try await tsfn.call("hello world")
@@ -79,15 +79,15 @@ func runThreadsafeCallback(tsfn: ThreadsafeFunction) throws -> Void {
     }
 }
 
-func returnSuccessfulPromise(msg: String) throws -> Promise {
+func returnSuccessfulPromise(msg: String) throws -> Promise<String> {
     try Promise {
         try await Task.sleep(seconds: 0.1)
         return msg + " hello"
     }
 }
 
-func returnThrowingPromise(msg: String) throws -> Promise {
-    try Promise { () -> Void in
+func returnThrowingPromise(msg _: String) throws -> Promise<Void> {
+    try Promise {
         enum Error: Swift.Error {
             case genericError
         }
@@ -119,7 +119,7 @@ func initNAPITests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointer?
         .function("throwError", throwError),
         .function("runThreadsafeCallback", runThreadsafeCallback),
         .function("returnSuccessfulPromise", returnSuccessfulPromise),
-        .function("returnThrowingPromise", returnThrowingPromise)
+        .function("returnThrowingPromise", returnThrowingPromise),
     ])
 }
 

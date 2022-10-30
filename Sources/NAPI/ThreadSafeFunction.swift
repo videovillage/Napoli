@@ -10,23 +10,23 @@ public class ThreadsafeFunction: ValueConvertible {
         let continuation: Continuation
         let resultConstructor: ResultConstructor
 
-        init<Result: ValueConvertible>(this: ValueConvertible, args: [ValueConvertible], continuation: Continuation, resultType: Result.Type) {
+        init<Result: ValueConvertible>(this: ValueConvertible, args: [ValueConvertible], continuation: Continuation, resultType _: Result.Type) {
             self.this = this
             self.args = args
             self.continuation = continuation
-            self.resultConstructor = { env, val in try Result(env, from: val) }
+            resultConstructor = { env, val in try Result(env, from: val) }
         }
 
         init(this: ValueConvertible, args: [ValueConvertible], continuation: Continuation) {
             self.this = this
             self.args = args
             self.continuation = continuation
-            self.resultConstructor = { _, _ in Value.undefined }
+            resultConstructor = { _, _ in Value.undefined }
         }
     }
 
     private let id = UUID().uuidString
-    fileprivate var tsfn: napi_threadsafe_function! = nil
+    fileprivate var tsfn: napi_threadsafe_function!
 
     public required convenience init(_ env: napi_env, from: napi_value) throws {
         let function = try Function(env, from: from)

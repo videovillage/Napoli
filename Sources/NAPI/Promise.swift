@@ -1,22 +1,21 @@
-import NAPIC
 import Foundation
+import NAPIC
 
-public class Promise: ValueConvertible {
+public class Promise<Result>: ValueConvertible {
     public typealias Closure = () async throws -> ValueConvertible
-    public typealias NoResultClosure = () async throws -> Void
 
-    public required init(_ env: napi_env, from: napi_value) throws {
+    public required init(_: napi_env, from _: napi_value) throws {
         fatalError("not implemented")
     }
 
     private var deferred: ThreadSafeDeferred!
     private let closure: Closure
 
-    public init(_ closure: @escaping Closure) throws {
+    public init(_ closure: @escaping Closure) throws where Result: ValueConvertible {
         self.closure = closure
     }
 
-    public init(_ closure: @escaping NoResultClosure) throws {
+    public init(_ closure: @escaping () async throws -> Void) throws where Result == Void {
         self.closure = {
             try await closure()
             return Value.undefined
@@ -24,8 +23,8 @@ public class Promise: ValueConvertible {
     }
 
     public func napiValue(_ env: napi_env) throws -> napi_value {
-        var promise: napi_value! = nil
-        self.deferred = try .init(env, &promise)
+        var promise: napi_value!
+        deferred = try .init(env, &promise)
         Task {
             do {
                 let result = try await closure()
@@ -49,24 +48,24 @@ public actor ThreadSafeDeferred {
 
     public init(_ env: napi_env, _ promise: UnsafeMutablePointer<napi_value?>!) throws {
         let storage = Storage()
-        var deferred: napi_deferred! = nil
+        var deferred: napi_deferred!
         try napi_create_promise(env, &deferred, promise).throwIfError()
 
         self.storage = storage
 
-        finalize = try .init(env, Function(named: "ThreadSafeDeferred", { (env: napi_env) in
+        finalize = try .init(env, Function(named: "ThreadSafeDeferred") { (env: napi_env) in
             do {
                 let success = try storage.result!.get().napiValue(env)
                 try! napi_resolve_deferred(env, deferred, success).throwIfError()
             } catch {
-                var jsError: napi_value! = nil
+                var jsError: napi_value!
                 try! napi_create_error(env,
                                        "swift_promise_internal".napiValue(env),
                                        error.localizedDescription.napiValue(env),
                                        &jsError).throwIfError()
                 try! napi_reject_deferred(env, deferred, jsError).throwIfError()
             }
-        }))
+        })
     }
 
     func resolve(_ value: ValueConvertible) async throws {
