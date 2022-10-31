@@ -1,6 +1,6 @@
 import NAPIC
 
-private func createFunction(_ env: napi_env, named name: String, _ function: @escaping Callback) throws -> napi_value {
+func createFunction(_ env: napi_env, named name: String, _ function: @escaping Callback) throws -> napi_value {
     var result: napi_value?
     let nameData = name.data(using: .utf8)!
 
@@ -107,11 +107,11 @@ public extension Function {
         try _call(env, this: Value.undefined.napiValue(env), args: [])
     }
 
-    func call<A: ValueConvertible>(_ env: napi_env, _ a: A) throws -> Void {
+    func call(_ env: napi_env, _ a: some ValueConvertible) throws {
         try _call(env, this: Value.undefined.napiValue(env), args: [a.napiValue(env)])
     }
 
-    func call<A: ValueConvertible, B: ValueConvertible>(_ env: napi_env, _ a: A, _ b: B) throws -> Void {
+    func call(_ env: napi_env, _ a: some ValueConvertible, _ b: some ValueConvertible) throws {
         try _call(env, this: Value.undefined.napiValue(env), args: [a.napiValue(env), b.napiValue(env)])
     }
 
@@ -121,11 +121,11 @@ public extension Function {
         try _call(env, this: Value.undefined.napiValue(env), args: [])
     }
 
-    func call<Result: ValueConvertible, A: ValueConvertible>(_ env: napi_env, _ a: A) throws -> Result {
+    func call<Result: ValueConvertible>(_ env: napi_env, _ a: some ValueConvertible) throws -> Result {
         try _call(env, this: Value.undefined.napiValue(env), args: [a.napiValue(env)])
     }
 
-    func call<Result: ValueConvertible, A: ValueConvertible, B: ValueConvertible>(_ env: napi_env, _ a: A, _ b: B) throws -> Result {
+    func call<Result: ValueConvertible>(_ env: napi_env, _ a: some ValueConvertible, _ b: some ValueConvertible) throws -> Result {
         try _call(env, this: Value.undefined.napiValue(env), args: [a.napiValue(env), b.napiValue(env)])
     }
 }

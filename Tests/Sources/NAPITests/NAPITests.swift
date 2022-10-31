@@ -117,6 +117,10 @@ func returnThrowingPromise(msg _: String) throws -> Promise<Void> {
     }
 }
 
+func takeTypedCallback(env: OpaquePointer, fn: TypedFunction2<String, Int32, Bool>) throws {
+    try assertEqual(expected: "23true", actual: try fn.call(env, 23, true))
+}
+
 @_cdecl("_init_napi_tests")
 func initNAPITests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointer? {
     initModule(env, exports, [
@@ -145,6 +149,7 @@ func initNAPITests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointer?
         .function("runThreadsafeCallback", runThreadsafeCallback),
         .function("returnSuccessfulPromise", returnSuccessfulPromise),
         .function("returnThrowingPromise", returnThrowingPromise),
+        .function("takeTypedCallback", takeTypedCallback),
     ])
 }
 

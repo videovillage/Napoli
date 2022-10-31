@@ -12,6 +12,14 @@ describe('Callbacks:', function () {
     })
   })
 
+  it('runs typed callbacks', () => {
+    addon.takeTypedCallback(function (number, bool) {
+      assert.strictEqual(number, 23)
+      assert.strictEqual(bool, true)
+      return `${number}${bool}`
+    })
+  })
+
   it('returns successful promise', async function () {
     const promise = addon.returnSuccessfulPromise('cool')
     assert.strictEqual(await promise, 'cool hello')

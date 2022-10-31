@@ -34,7 +34,7 @@ extension Dictionary: ValueConvertible where Key == String, Value: ValueConverti
         var count: UInt32 = .zero
         try napi_get_array_length(env, namesArray, &count).throwIfError()
 
-        var dict = Self.init(minimumCapacity: Int(count))
+        var dict = Self(minimumCapacity: Int(count))
 
         for i in 0 ..< count {
             var key: napi_value!

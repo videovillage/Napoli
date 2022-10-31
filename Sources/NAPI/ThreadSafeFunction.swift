@@ -96,11 +96,11 @@ public extension ThreadsafeFunction {
         try await _call(this: Value.undefined, args: [])
     }
 
-    func call<A: ValueConvertible>(_ a: A) async throws -> Void {
+    func call(_ a: some ValueConvertible) async throws {
         try await _call(this: Value.undefined, args: [a])
     }
 
-    func call<A: ValueConvertible, B: ValueConvertible>(_ a: A, _ b: B) async throws -> Void {
+    func call(_ a: some ValueConvertible, _ b: some ValueConvertible) async throws {
         try await _call(this: Value.undefined, args: [a, b])
     }
 
@@ -110,11 +110,11 @@ public extension ThreadsafeFunction {
         try await _call(this: Value.undefined, args: [])
     }
 
-    func call<Result: ValueConvertible, A: ValueConvertible>(_ a: A) async throws -> Result {
+    func call<Result: ValueConvertible>(_ a: some ValueConvertible) async throws -> Result {
         try await _call(this: Value.undefined, args: [a])
     }
 
-    func call<Result: ValueConvertible, A: ValueConvertible, B: ValueConvertible>(_ a: A, _ b: B) async throws -> Result {
+    func call<Result: ValueConvertible>(_ a: some ValueConvertible, _ b: some ValueConvertible) async throws -> Result {
         try await _call(this: Value.undefined, args: [a, b])
     }
 }
