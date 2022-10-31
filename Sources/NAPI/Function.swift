@@ -22,7 +22,6 @@ func createFunction(_ env: napi_env, named name: String, _ function: @escaping C
 private enum InternalFunction {
     case javascript(napi_value)
     case swift(String, Callback)
-//    case swiftAsync(String, AsyncCallback)
 }
 
 public class Function: ValueConvertible {
@@ -36,14 +35,9 @@ public class Function: ValueConvertible {
         value = .swift(name, callback)
     }
 
-//    public init(named name: String, _ callback: @escaping AsyncCallback) {
-//        value = .swiftAsync(name, callback)
-//    }
-
     public func napiValue(_ env: napi_env) throws -> napi_value {
         switch value {
         case let .swift(name, callback): return try createFunction(env, named: name, callback)
-//        case let .swiftAsync(name, callback): return try createFunction(env, named: name, { env, args in return try callAsyncFunction(env, args: args, callback) })
         case let .javascript(value): return value
         }
     }
