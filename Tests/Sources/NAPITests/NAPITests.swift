@@ -88,7 +88,7 @@ func throwError() throws {
     throw TestError(message: "Error message", code: "ETEST")
 }
 
-func runThreadsafeCallback(tsfn: ThreadsafeFunction) throws {
+func runThreadsafeCallback(tsfn: ThreadsafeTypedFunction1<String, String>) throws {
     Task {
         do {
             let value: String = try await tsfn.call("hello world")

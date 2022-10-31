@@ -25,7 +25,6 @@ public class ThreadsafeFunction: ValueConvertible {
         }
     }
 
-    private let id = UUID().uuidString
     fileprivate var tsfn: napi_threadsafe_function!
 
     public required convenience init(_ env: napi_env, from: napi_value) throws {
