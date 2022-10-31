@@ -67,6 +67,9 @@ extension Error {
         case .booleanExpected: return napi_throw_type_error(env, nil, "Expected boolean")
         case .arrayExpected: return napi_throw_type_error(env, nil, "Expected array")
         case .bigintExpected: return napi_throw_type_error(env, nil, "Expected BigInt")
+        case .dateExpected: return napi_throw_type_error(env, nil, "Expected Date")
+        case .arrayBufferExpected: return napi_throw_type_error(env, nil, "Expected Array Buffer")
+        case .detachableArrayBufferExpected: return napi_throw_type_error(env, nil, "Expected Detachable Array Buffer")
         default: return napi_throw_error(env, nil, localizedDescription)
         }
     }
