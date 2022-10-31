@@ -26,27 +26,27 @@ public enum Error: Swift.Error {
 
     public init(_ napiStatus: napi_status) {
         switch napiStatus.rawValue {
-        case 1: self = .invalidArg
-        case 2: self = .objectExpected
-        case 3: self = .stringExpected
-        case 4: self = .nameExpected
-        case 5: self = .functionExpected
-        case 6: self = .numberExpected
-        case 7: self = .booleanExpected
-        case 8: self = .arrayExpected
-        case 9: self = .genericFailure
-        case 10: self = .pendingException
-        case 11: self = .cancelled
-        case 12: self = .escapeCalledTwice
-        case 13: self = .handleScopeMismatch
-        case 14: self = .callbackScopeMismatch
-        case 15: self = .queueFull
-        case 16: self = .closing
-        case 17: self = .bigintExpected
-        case 18: self = .dateExpected
-        case 19: self = .arrayBufferExpected
-        case 20: self = .detachableArrayBufferExpected
-        case 21: self = .wouldDeadlock
+        case napi_invalid_arg.rawValue: self = .invalidArg
+        case napi_object_expected.rawValue: self = .objectExpected
+        case napi_string_expected.rawValue: self = .stringExpected
+        case napi_name_expected.rawValue: self = .nameExpected
+        case napi_function_expected.rawValue: self = .functionExpected
+        case napi_number_expected.rawValue: self = .numberExpected
+        case napi_boolean_expected.rawValue: self = .booleanExpected
+        case napi_array_expected.rawValue: self = .arrayExpected
+        case napi_generic_failure.rawValue: self = .genericFailure
+        case napi_pending_exception.rawValue: self = .pendingException
+        case napi_cancelled.rawValue: self = .cancelled
+        case napi_escape_called_twice.rawValue: self = .escapeCalledTwice
+        case napi_handle_scope_mismatch.rawValue: self = .handleScopeMismatch
+        case napi_callback_scope_mismatch.rawValue: self = .callbackScopeMismatch
+        case napi_queue_full.rawValue: self = .queueFull
+        case napi_closing.rawValue: self = .closing
+        case napi_bigint_expected.rawValue: self = .bigintExpected
+        case napi_date_expected.rawValue: self = .dateExpected
+        case napi_arraybuffer_expected.rawValue: self = .arrayBufferExpected
+        case napi_detachable_arraybuffer_expected.rawValue: self = .detachableArrayBufferExpected
+        case napi_would_deadlock.rawValue: self = .wouldDeadlock
         default: self = .unknown(UInt32(napiStatus.rawValue))
         }
     }
