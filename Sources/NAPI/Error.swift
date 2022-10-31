@@ -18,7 +18,10 @@ public enum Error: Swift.Error {
     case queueFull
     case closing
     case bigintExpected
-
+    case dateExpected
+    case arrayBufferExpected
+    case detachableArrayBufferExpected
+    case wouldDeadlock
     case unknown(UInt32)
 
     public init(_ napiStatus: napi_status) {
@@ -40,6 +43,10 @@ public enum Error: Swift.Error {
         case 15: self = .queueFull
         case 16: self = .closing
         case 17: self = .bigintExpected
+        case 18: self = .dateExpected
+        case 19: self = .arrayBufferExpected
+        case 20: self = .detachableArrayBufferExpected
+        case 21: self = .wouldDeadlock
         default: self = .unknown(UInt32(napiStatus.rawValue))
         }
     }

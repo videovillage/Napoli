@@ -27,8 +27,25 @@ extension Optional: ValueConvertible where Wrapped: ValueConvertible {
 }
 
 extension Dictionary: ValueConvertible where Key == String, Value: ValueConvertible {
-    public init(_: napi_env, from _: napi_value) throws {
-        fatalError("Not implemented")
+    public init(_ env: napi_env, from: napi_value) throws {
+        var namesArray: napi_value!
+        try napi_get_property_names(env, from, &namesArray).throwIfError()
+
+        var count: UInt32 = .zero
+        try napi_get_array_length(env, namesArray, &count).throwIfError()
+
+        var dict = Self.init(minimumCapacity: Int(count))
+
+        for i in 0 ..< count {
+            var key: napi_value!
+            try napi_get_element(env, namesArray, i, &key).throwIfError()
+            var value: napi_value!
+            try napi_get_property(env, from, key, &value).throwIfError()
+
+            try dict[String(env, from: key)] = Value(env, from: value)
+        }
+
+        self = dict
     }
 
     public func napiValue(_ env: napi_env) throws -> napi_value {
@@ -45,8 +62,20 @@ extension Dictionary: ValueConvertible where Key == String, Value: ValueConverti
 }
 
 extension Array: ValueConvertible where Element: ValueConvertible {
-    public init(_: napi_env, from _: napi_value) throws {
-        fatalError("Not implemented")
+    public init(_ env: napi_env, from: napi_value) throws {
+        var count: UInt32 = .zero
+        try napi_get_array_length(env, from, &count).throwIfError()
+
+        var array = [Element]()
+        array.reserveCapacity(Int(count))
+
+        for i in 0 ..< count {
+            var result: napi_value!
+            try napi_get_element(env, from, i, &result).throwIfError()
+            try array.append(Element(env, from: result))
+        }
+
+        self = array
     }
 
     public func napiValue(_ env: napi_env) throws -> napi_value {
@@ -86,6 +115,20 @@ extension String: ValueConvertible {
         }.throwIfError()
 
         return result!
+    }
+}
+
+extension Date: ValueConvertible {
+    public init(_ env: napi_env, from: napi_value) throws {
+        var timeInterval: Double!
+        try napi_get_date_value(env, from, &timeInterval).throwIfError()
+        self = Date(timeIntervalSince1970: timeInterval)
+    }
+
+    public func napiValue(_ env: napi_env) throws -> napi_value {
+        var result: napi_value!
+        try napi_create_date(env, timeIntervalSince1970, &result).throwIfError()
+        return result
     }
 }
 
