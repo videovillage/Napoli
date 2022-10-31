@@ -120,7 +120,7 @@ extension String: ValueConvertible {
 
 extension Date: ValueConvertible {
     public init(_ env: napi_env, from: napi_value) throws {
-        var timeInterval: Double!
+        var timeInterval: Double = .nan
         try napi_get_date_value(env, from, &timeInterval).throwIfError()
         self = Date(timeIntervalSince1970: timeInterval)
     }

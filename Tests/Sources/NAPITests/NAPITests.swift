@@ -16,7 +16,7 @@ func returnString() -> String {
     "a string"
 }
 
-func returnNumber() -> Double {
+func returnDouble() -> Double {
     1337
 }
 
@@ -24,19 +24,23 @@ func returnBoolean() -> Bool {
     true
 }
 
-func returnNull() -> Value {
-    .null
+func returnNull() -> Null {
+    Null.default
 }
 
-func returnUndefined() -> Value {
-    .undefined
+func returnUndefined() -> Undefined {
+    Undefined.default
+}
+
+func returnDate() -> Date {
+    .init(timeIntervalSince1970: 1000)
 }
 
 func takeString(value: String) throws {
     try assertEqual(expected: "a string", actual: value)
 }
 
-func takeNumber(value: Double) throws {
+func takeDouble(value: Double) throws {
     try assertEqual(expected: 1337, actual: value)
 }
 
@@ -52,11 +56,15 @@ func takeUndefined(value: Undefined) throws {
     try assertEqual(expected: Undefined.default, actual: value)
 }
 
+func takeDate(date: Date) throws {
+    try assertEqual(expected: 1000, actual: date.timeIntervalSince1970)
+}
+
 func takeOptionalString(value: String?) -> String {
     value ?? "a string"
 }
 
-func takeOptionalNumber(value: Double?) -> Double {
+func takeOptionalDouble(value: Double?) -> Double {
     value ?? 1337
 }
 
@@ -101,19 +109,21 @@ func returnThrowingPromise(msg _: String) throws -> Promise<Void> {
 func initNAPITests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointer? {
     initModule(env, exports, [
         .function("returnString", returnString),
-        .function("returnNumber", returnNumber),
+        .function("returnDouble", returnDouble),
         .function("returnBoolean", returnBoolean),
+        .function("returnDate", returnDate),
         .function("returnNull", returnNull),
         .function("returnUndefined", returnUndefined),
 
         .function("takeString", takeString),
-        .function("takeNumber", takeNumber),
+        .function("takeDouble", takeDouble),
         .function("takeBoolean", takeBoolean),
+        .function("takeDate", takeDate),
         .function("takeNull", takeNull),
         .function("takeUndefined", takeUndefined),
 
         .function("takeOptionalString", takeOptionalString),
-        .function("takeOptionalNumber", takeOptionalNumber),
+        .function("takeOptionalDouble", takeOptionalDouble),
         .function("takeOptionalBoolean", takeOptionalBoolean),
 
         .function("throwError", throwError),

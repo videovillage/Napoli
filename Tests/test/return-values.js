@@ -9,11 +9,15 @@ describe('Return Values', () => {
   })
 
   it('returns numbers', () => {
-    assert.strictEqual(addon.returnNumber(), 1337)
+    assert.strictEqual(addon.returnDouble(), 1337)
   })
 
-  it('returns bolleans', () => {
+  it('returns booleans', () => {
     assert.strictEqual(addon.returnBoolean(), true)
+  })
+
+  it('returns dates', () => {
+    assert.strictEqual(addon.returnDate().getTime(), 1000)
   })
 
   it('returns null', () => {

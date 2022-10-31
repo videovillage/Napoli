@@ -11,11 +11,11 @@ describe('Optional Values', () => {
     assert.strictEqual(addon.takeOptionalString('a string'), 'a string')
   })
 
-  it('takes optional numbers', () => {
-    assert.strictEqual(addon.takeOptionalNumber(), 1337)
-    assert.strictEqual(addon.takeOptionalNumber(null), 1337)
-    assert.strictEqual(addon.takeOptionalNumber(undefined), 1337)
-    assert.strictEqual(addon.takeOptionalNumber(1337), 1337)
+  it('takes optional doubles', () => {
+    assert.strictEqual(addon.takeOptionalDouble(), 1337)
+    assert.strictEqual(addon.takeOptionalDouble(null), 1337)
+    assert.strictEqual(addon.takeOptionalDouble(undefined), 1337)
+    assert.strictEqual(addon.takeOptionalDouble(1337), 1337)
   })
 
   it('takes optional booleans', () => {

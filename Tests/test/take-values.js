@@ -8,12 +8,17 @@ describe('Take Values', () => {
     addon.takeString('a string')
   })
 
-  it('takes numbers', () => {
-    addon.takeNumber(1337)
+  it('takes doubles', () => {
+    addon.takeDouble(1337)
   })
 
   it('takes booleans', () => {
     addon.takeBoolean(true)
+  })
+
+  it('takes dates', () => {
+    const date = new Date(1000)
+    addon.takeDate(date)
   })
 
   it('takes null', () => {
@@ -33,12 +38,12 @@ describe('Take Values', () => {
       assert.throws(() => addon.takeString(), (err) => err instanceof TypeError && err.message === 'Expected string')
     })
 
-    it('expects numbers', () => {
-      assert.throws(() => addon.takeNumber('a string'), (err) => err instanceof TypeError && err.message === 'Expected number')
-      assert.throws(() => addon.takeNumber(true), (err) => err instanceof TypeError && err.message === 'Expected number')
-      assert.throws(() => addon.takeNumber(null), (err) => err instanceof TypeError && err.message === 'Expected number')
-      assert.throws(() => addon.takeNumber(undefined), (err) => err instanceof TypeError && err.message === 'Expected number')
-      assert.throws(() => addon.takeNumber(), (err) => err instanceof TypeError && err.message === 'Expected number')
+    it('expects doubles', () => {
+      assert.throws(() => addon.takeDouble('a string'), (err) => err instanceof TypeError && err.message === 'Expected number')
+      assert.throws(() => addon.takeDouble(true), (err) => err instanceof TypeError && err.message === 'Expected number')
+      assert.throws(() => addon.takeDouble(null), (err) => err instanceof TypeError && err.message === 'Expected number')
+      assert.throws(() => addon.takeDouble(undefined), (err) => err instanceof TypeError && err.message === 'Expected number')
+      assert.throws(() => addon.takeDouble(), (err) => err instanceof TypeError && err.message === 'Expected number')
     })
 
     it('expects booleans', () => {
