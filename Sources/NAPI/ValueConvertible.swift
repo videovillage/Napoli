@@ -89,28 +89,51 @@ extension String: ValueConvertible {
     }
 }
 
-extension Double: ValueConvertible {
-    public init(_ env: napi_env, from: napi_value) throws {
-        self = .nan
-        try napi_get_value_double(env, from, &self).throwIfError()
-    }
-
-    public func napiValue(_ env: napi_env) throws -> napi_value {
-        var result: napi_value?
-        try napi_create_double(env, self, &result).throwIfError()
-        return result!
-    }
+extension Double: PrimitiveValueConvertible {
+    static let defaultValue = Self.nan
+    static let initWithValue = napi_get_value_double
+    static let getValue = napi_create_double
 }
 
-extension Bool: ValueConvertible {
+extension Int32: PrimitiveValueConvertible {
+    static let defaultValue = Self.max
+    static let initWithValue = napi_get_value_int32
+    static let getValue = napi_create_int32
+}
+
+extension UInt32: PrimitiveValueConvertible {
+    static let defaultValue = Self.max
+    static let initWithValue = napi_get_value_uint32
+    static let getValue = napi_create_uint32
+}
+
+extension Int64: PrimitiveValueConvertible {
+    static let defaultValue = Self.max
+    static let initWithValue = napi_get_value_int64
+    static let getValue = napi_create_int64
+}
+
+extension Bool: PrimitiveValueConvertible {
+    static let defaultValue = false
+    static let initWithValue = napi_get_value_bool
+    static let getValue = napi_get_boolean
+}
+
+protocol PrimitiveValueConvertible: ValueConvertible {
+    static var defaultValue: Self { get }
+    static var initWithValue: (_ env: napi_env?, _ value: napi_value?, _ result: UnsafeMutablePointer<Self>?) -> napi_status { get }
+    static var getValue: (_ env: napi_env?, _ value: Self, _ result: UnsafeMutablePointer<napi_value?>?) -> napi_status { get }
+}
+
+extension PrimitiveValueConvertible {
     public init(_ env: napi_env, from: napi_value) throws {
-        self = false
-        try napi_get_value_bool(env, from, &self).throwIfError()
+        self = Self.defaultValue
+        try Self.initWithValue(env, from, &self).throwIfError()
     }
 
     public func napiValue(_ env: napi_env) throws -> napi_value {
         var result: napi_value?
-        try napi_get_boolean(env, self, &result).throwIfError()
+        try Self.getValue(env, self, &result).throwIfError()
         return result!
     }
 }
