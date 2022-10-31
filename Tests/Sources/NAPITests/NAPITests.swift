@@ -108,12 +108,8 @@ func returnSuccessfulPromise(msg: String) throws -> Promise<String> {
 
 func returnThrowingPromise(msg _: String) throws -> Promise<Void> {
     try Promise {
-        enum Error: Swift.Error {
-            case genericError
-        }
-
         try await Task.sleep(seconds: 0.1)
-        throw Error.genericError
+        try throwError()
     }
 }
 

@@ -3,18 +3,18 @@ import NAPIC
 public class TypedFunction<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8, P9>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible, P9: ValueConvertible {
     fileprivate enum InternalTypedFunction {
         case javascript(napi_value)
-        case swift(String, TypedCallback)
+        case swift(String, TypedClosure)
     }
 
     public typealias TypedArgs = (P0, P1, P2, P3, P4, P5, P6, P7, P8, P9)
-    public typealias TypedCallback = (napi_env, TypedArgs) throws -> Result
+    public typealias TypedClosure = (napi_env, TypedArgs) throws -> Result
     fileprivate let value: InternalTypedFunction
 
     public required init(_: napi_env, from: napi_value) throws {
         value = .javascript(from)
     }
 
-    fileprivate init(named name: String, _ callback: @escaping TypedCallback) {
+    fileprivate init(named name: String, _ callback: @escaping TypedClosure) {
         value = .swift(name, callback)
     }
 
@@ -44,30 +44,8 @@ public class TypedFunction<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8, P9>: Valu
     }
 }
 
-public typealias TypedFunction0<Result> = TypedFunction<Result, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined> where Result: ValueConvertible
-
-public typealias TypedFunction1<Result, P0> = TypedFunction<Result, P0, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined> where Result: ValueConvertible, P0: ValueConvertible
-
-public typealias TypedFunction2<Result, P0, P1> = TypedFunction<Result, P0, P1, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined> where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible
-
-public typealias TypedFunction3<Result, P0, P1, P2> = TypedFunction<Result, P0, P1, P2, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined> where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible
-
-public typealias TypedFunction4<Result, P0, P1, P2, P3> = TypedFunction<Result, P0, P1, P2, P3, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined> where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible
-
-public typealias TypedFunction5<Result, P0, P1, P2, P3, P4> = TypedFunction<Result, P0, P1, P2, P3, P4, Undefined, Undefined, Undefined, Undefined, Undefined> where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible
-
-public typealias TypedFunction6<Result, P0, P1, P2, P3, P4, P5> = TypedFunction<Result, P0, P1, P2, P3, P4, P5, Undefined, Undefined, Undefined, Undefined> where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible
-
-public typealias TypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6> = TypedFunction<Result, P0, P0, P1, P2, P3, P4, P5, P6, Undefined, Undefined> where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible
-
-public typealias TypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7> = TypedFunction<Result, P0, P1, P2, P3, P4, P5, P6, P7, Undefined, Undefined> where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible
-
-public typealias TypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8> = TypedFunction<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8, Undefined> where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible
-
-public typealias TypedFunction10 = TypedFunction
-
-extension TypedFunction {
-    private func _call(_ env: napi_env, this: ValueConvertible, args: [ValueConvertible]) throws where Result == Undefined {
+fileprivate extension TypedFunction {
+    func _call(_ env: napi_env, this: ValueConvertible, args: [ValueConvertible]) throws where Result == Undefined {
         let handle = try napiValue(env)
 
         let args: [napi_value?] = try args.map { try $0.napiValue(env) }
@@ -77,7 +55,7 @@ extension TypedFunction {
         }.throwIfError()
     }
 
-    private func _call(_ env: napi_env, this: ValueConvertible, args: [ValueConvertible]) throws -> Result {
+    func _call(_ env: napi_env, this: ValueConvertible, args: [ValueConvertible]) throws -> Result {
         let handle = try napiValue(env)
 
         let args: [napi_value?] = try args.map { try $0.napiValue(env) }
@@ -91,78 +69,330 @@ extension TypedFunction {
     }
 }
 
-public extension TypedFunction0 {
-    typealias Callback0 = () throws -> Result
-    typealias VoidCallback0 = () throws -> Void
+public class TypedFunction0<Result>: TypedFunction<Result, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined> where Result: ValueConvertible {
+    public typealias Callback = () throws -> Result
+    public typealias VoidCallback = () throws -> Void
 
-    convenience init(named name: String, _ callback: @escaping Callback0) {
-        self.init(named: name) { (_: napi_env, _: TypedArgs) -> Result in
+    public required init(_ env: napi_env, from: napi_value) throws {
+        try super.init(env, from: from)
+    }
+
+    public init(named name: String, _ callback: @escaping Callback) {
+        super.init(named: name) { (_: napi_env, _: TypedArgs) -> Result in
             try callback()
         }
     }
 
-    convenience init(named name: String, _ callback: @escaping VoidCallback0) where Result == Undefined {
-        self.init(named: name) { (_: napi_env, _: TypedArgs) in
+    public init(named name: String, _ callback: @escaping VoidCallback) where Result == Undefined {
+        super.init(named: name) { (_: napi_env, _: TypedArgs) in
             try callback()
             return Undefined.default
         }
     }
 
-    func call(_ env: napi_env) throws where Result == Undefined {
+    public func call(_ env: napi_env) throws where Result == Undefined {
         try _call(env, this: Undefined.default, args: [])
     }
 
-    func call(_ env: napi_env) throws -> Result {
+    public func call(_ env: napi_env) throws -> Result {
         try _call(env, this: Undefined.default, args: [])
     }
 }
 
-public extension TypedFunction1 {
-    typealias Callback1 = (P0) throws -> Result
-    typealias VoidCallback1 = (P0) throws -> Void
-    convenience init(named name: String, _ callback: @escaping Callback1) {
-        self.init(named: name) { _, args in
+public class TypedFunction1<Result, P0>: TypedFunction<Result, P0, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined> where Result: ValueConvertible, P0: ValueConvertible {
+    public typealias Callback = (P0) throws -> Result
+    public typealias VoidCallback = (P0) throws -> Void
+
+    public required init(_ env: napi_env, from: napi_value) throws {
+        try super.init(env, from: from)
+    }
+
+    public init(named name: String, _ callback: @escaping Callback) {
+        super.init(named: name) { _, args in
             try callback(args.0)
         }
     }
 
-    convenience init(named name: String, _ callback: @escaping VoidCallback1) where Result == Undefined {
-        self.init(named: name) { _, args in
+    public init(named name: String, _ callback: @escaping VoidCallback) where Result == Undefined {
+        super.init(named: name) { _, args in
             try callback(args.0)
             return Undefined.default
         }
     }
 
-    func call(_ env: napi_env, _ p0: P0) throws where Result == Undefined {
+    public func call(_ env: napi_env, _ p0: P0) throws where Result == Undefined {
         try _call(env, this: Undefined.default, args: [p0])
     }
 
-    func call(_ env: napi_env, _ p0: P0) throws -> Result {
+    public func call(_ env: napi_env, _ p0: P0) throws -> Result {
         try _call(env, this: Undefined.default, args: [p0])
     }
 }
 
-public extension TypedFunction2 {
-    typealias Callback2 = (P0, P1) throws -> Result
-    typealias VoidCallback2 = (P0, P1) throws -> Void
-    convenience init(named name: String, _ callback: @escaping Callback2) {
-        self.init(named: name) { _, args in
+public class TypedFunction2<Result, P0, P1>: TypedFunction<Result, P0, P1, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined> where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible {
+    public typealias Callback = (P0, P1) throws -> Result
+    public typealias VoidCallback = (P0, P1) throws -> Void
+
+    public required init(_ env: napi_env, from: napi_value) throws {
+        try super.init(env, from: from)
+    }
+
+    public init(named name: String, _ callback: @escaping Callback) {
+        super.init(named: name) { _, args in
             try callback(args.0, args.1)
         }
     }
 
-    convenience init(named name: String, _ callback: @escaping VoidCallback2) where Result == Undefined {
-        self.init(named: name) { _, args in
+    public init(named name: String, _ callback: @escaping VoidCallback) where Result == Undefined {
+        super.init(named: name) { _, args in
             try callback(args.0, args.1)
             return Undefined.default
         }
     }
 
-    func call(_ env: napi_env, _ p0: P0, _ p1: P1) throws where Result == Undefined {
+    public func call(_ env: napi_env, _ p0: P0, _ p1: P1) throws where Result == Undefined {
         try _call(env, this: Undefined.default, args: [p0, p1])
     }
 
-    func call(_ env: napi_env, _ p0: P0, _ p1: P1) throws -> Result {
+    public func call(_ env: napi_env, _ p0: P0, _ p1: P1) throws -> Result {
         try _call(env, this: Undefined.default, args: [p0, p1])
+    }
+}
+
+public class TypedFunction3<Result, P0, P1, P2>: TypedFunction<Result, P0, P1, P2, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined> where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
+    public typealias Callback = (P0, P1, P2) throws -> Result
+    public typealias VoidCallback = (P0, P1, P2) throws -> Void
+
+    public required init(_ env: napi_env, from: napi_value) throws {
+        try super.init(env, from: from)
+    }
+
+    public init(named name: String, _ callback: @escaping Callback) {
+        super.init(named: name) { _, args in
+            try callback(args.0, args.1, args.2)
+        }
+    }
+
+    public init(named name: String, _ callback: @escaping VoidCallback) where Result == Undefined {
+        super.init(named: name) { _, args in
+            try callback(args.0, args.1, args.2)
+            return Undefined.default
+        }
+    }
+
+    public func call(_ env: napi_env, _ p0: P0, _ p1: P1, _ p2: P2) throws where Result == Undefined {
+        try _call(env, this: Undefined.default, args: [p0, p1, p2])
+    }
+
+    public func call(_ env: napi_env, _ p0: P0, _ p1: P1, _ p2: P2) throws -> Result {
+        try _call(env, this: Undefined.default, args: [p0, p1, p2])
+    }
+}
+
+public class TypedFunction4<Result, P0, P1, P2, P3>: TypedFunction<Result, P0, P1, P2, P3, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined> where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
+    public typealias Callback = (P0, P1, P2, P3) throws -> Result
+    public typealias VoidCallback = (P0, P1, P2, P3) throws -> Void
+
+    public required init(_ env: napi_env, from: napi_value) throws {
+        try super.init(env, from: from)
+    }
+
+    public init(named name: String, _ callback: @escaping Callback) {
+        super.init(named: name) { _, args in
+            try callback(args.0, args.1, args.2, args.3)
+        }
+    }
+
+    public init(named name: String, _ callback: @escaping VoidCallback) where Result == Undefined {
+        super.init(named: name) { _, args in
+            try callback(args.0, args.1, args.2, args.3)
+            return Undefined.default
+        }
+    }
+
+    public func call(_ env: napi_env, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3) throws where Result == Undefined {
+        try _call(env, this: Undefined.default, args: [p0, p1, p2, p3])
+    }
+
+    public func call(_ env: napi_env, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3) throws -> Result {
+        try _call(env, this: Undefined.default, args: [p0, p1, p2, p3])
+    }
+}
+
+public class TypedFunction5<Result, P0, P1, P2, P3, P4>: TypedFunction<Result, P0, P1, P2, P3, P4, Undefined, Undefined, Undefined, Undefined, Undefined> where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
+    public typealias Callback = (P0, P1, P2, P3, P4) throws -> Result
+    public typealias VoidCallback = (P0, P1, P2, P3, P4) throws -> Void
+
+    public required init(_ env: napi_env, from: napi_value) throws {
+        try super.init(env, from: from)
+    }
+
+    public init(named name: String, _ callback: @escaping Callback) {
+        super.init(named: name) { _, args in
+            try callback(args.0, args.1, args.2, args.3, args.4)
+        }
+    }
+
+    public init(named name: String, _ callback: @escaping VoidCallback) where Result == Undefined {
+        super.init(named: name) { _, args in
+            try callback(args.0, args.1, args.2, args.3, args.4)
+            return Undefined.default
+        }
+    }
+
+    public func call(_ env: napi_env, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4) throws where Result == Undefined {
+        try _call(env, this: Undefined.default, args: [p0, p1, p2, p3, p4])
+    }
+
+    public func call(_ env: napi_env, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4) throws -> Result {
+        try _call(env, this: Undefined.default, args: [p0, p1, p2, p3, p4])
+    }
+}
+
+public class TypedFunction6<Result, P0, P1, P2, P3, P4, P5>: TypedFunction<Result, P0, P1, P2, P3, P4, P5, Undefined, Undefined, Undefined, Undefined> where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
+    public typealias Callback = (P0, P1, P2, P3, P4, P5) throws -> Result
+    public typealias VoidCallback = (P0, P1, P2, P3, P4, P5) throws -> Void
+
+    public required init(_ env: napi_env, from: napi_value) throws {
+        try super.init(env, from: from)
+    }
+
+    public init(named name: String, _ callback: @escaping Callback) {
+        super.init(named: name) { _, args in
+            try callback(args.0, args.1, args.2, args.3, args.4, args.5)
+        }
+    }
+
+    public init(named name: String, _ callback: @escaping VoidCallback) where Result == Undefined {
+        super.init(named: name) { _, args in
+            try callback(args.0, args.1, args.2, args.3, args.4, args.5)
+            return Undefined.default
+        }
+    }
+
+    public func call(_ env: napi_env, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5) throws where Result == Undefined {
+        try _call(env, this: Undefined.default, args: [p0, p1, p2, p3, p4, p5])
+    }
+
+    public func call(_ env: napi_env, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5) throws -> Result {
+        try _call(env, this: Undefined.default, args: [p0, p1, p2, p3, p4, p5])
+    }
+}
+
+public class TypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: TypedFunction<Result, P0, P1, P2, P3, P4, P5, P6, Undefined, Undefined, Undefined> where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
+    public typealias Callback = (P0, P1, P2, P3, P4, P5, P6) throws -> Result
+    public typealias VoidCallback = (P0, P1, P2, P3, P4, P5, P6) throws -> Void
+
+    public required init(_ env: napi_env, from: napi_value) throws {
+        try super.init(env, from: from)
+    }
+
+    public init(named name: String, _ callback: @escaping Callback) {
+        super.init(named: name) { _, args in
+            try callback(args.0, args.1, args.2, args.3, args.4, args.5, args.6)
+        }
+    }
+
+    public init(named name: String, _ callback: @escaping VoidCallback) where Result == Undefined {
+        super.init(named: name) { _, args in
+            try callback(args.0, args.1, args.2, args.3, args.4, args.5, args.6)
+            return Undefined.default
+        }
+    }
+
+    public func call(_ env: napi_env, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6) throws where Result == Undefined {
+        try _call(env, this: Undefined.default, args: [p0, p1, p2, p3, p4, p5, p6])
+    }
+
+    public func call(_ env: napi_env, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6) throws -> Result {
+        try _call(env, this: Undefined.default, args: [p0, p1, p2, p3, p4, p5, p6])
+    }
+}
+
+public class TypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: TypedFunction<Result, P0, P1, P2, P3, P4, P5, P6, P7, Undefined, Undefined> where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
+    public typealias Callback = (P0, P1, P2, P3, P4, P5, P6, P7) throws -> Result
+    public typealias VoidCallback = (P0, P1, P2, P3, P4, P5, P6, P7) throws -> Void
+
+    public required init(_ env: napi_env, from: napi_value) throws {
+        try super.init(env, from: from)
+    }
+
+    public init(named name: String, _ callback: @escaping Callback) {
+        super.init(named: name) { _, args in
+            try callback(args.0, args.1, args.2, args.3, args.4, args.5, args.6, args.7)
+        }
+    }
+
+    public init(named name: String, _ callback: @escaping VoidCallback) where Result == Undefined {
+        super.init(named: name) { _, args in
+            try callback(args.0, args.1, args.2, args.3, args.4, args.5, args.6, args.7)
+            return Undefined.default
+        }
+    }
+
+    public func call(_ env: napi_env, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7) throws where Result == Undefined {
+        try _call(env, this: Undefined.default, args: [p0, p1, p2, p3, p4, p5, p6, p7])
+    }
+
+    public func call(_ env: napi_env, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7) throws -> Result {
+        try _call(env, this: Undefined.default, args: [p0, p1, p2, p3, p4, p5, p6, p7])
+    }
+}
+
+public class TypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>: TypedFunction<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8, Undefined> where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
+    public typealias Callback = (P0, P1, P2, P3, P4, P5, P6, P7, P8) throws -> Result
+    public typealias VoidCallback = (P0, P1, P2, P3, P4, P5, P6, P7, P8) throws -> Void
+
+    public required init(_ env: napi_env, from: napi_value) throws {
+        try super.init(env, from: from)
+    }
+
+    public init(named name: String, _ callback: @escaping Callback) {
+        super.init(named: name) { _, args in
+            try callback(args.0, args.1, args.2, args.3, args.4, args.5, args.6, args.7, args.8)
+        }
+    }
+
+    public init(named name: String, _ callback: @escaping VoidCallback) where Result == Undefined {
+        super.init(named: name) { _, args in
+            try callback(args.0, args.1, args.2, args.3, args.4, args.5, args.6, args.7, args.8)
+            return Undefined.default
+        }
+    }
+
+    public func call(_ env: napi_env, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7, _ p8: P8) throws where Result == Undefined {
+        try _call(env, this: Undefined.default, args: [p0, p1, p2, p3, p4, p5, p6, p7, p8])
+    }
+
+    public func call(_ env: napi_env, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7, _ p8: P8) throws -> Result {
+        try _call(env, this: Undefined.default, args: [p0, p1, p2, p3, p4, p5, p6, p7, p8])
+    }
+}
+
+public typealias TypedFunction10 = TypedFunction
+
+public extension TypedFunction10 {
+    typealias Callback10 = (P0, P1, P2, P3, P4, P5, P6, P7, P8, P9) throws -> Result
+    typealias VoidCallback10 = (P0, P1, P2, P3, P4, P5, P6, P7, P8, P9) throws -> Void
+
+    convenience init(named name: String, _ callback: @escaping Callback10) {
+        self.init(named: name) { _, args in
+            try callback(args.0, args.1, args.2, args.3, args.4, args.5, args.6, args.7, args.8, args.9)
+        }
+    }
+
+    convenience init(named name: String, _ callback: @escaping VoidCallback10) where Result == Undefined {
+        self.init(named: name) { _, args in
+            try callback(args.0, args.1, args.2, args.3, args.4, args.5, args.6, args.7, args.8, args.9)
+            return Undefined.default
+        }
+    }
+
+    func call(_ env: napi_env, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7, _ p8: P8, _ p9: P9) throws where Result == Undefined {
+        try _call(env, this: Undefined.default, args: [p0, p1, p2, p3, p4, p5, p6, p7, p8, p9])
+    }
+
+    func call(_ env: napi_env, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7, _ p8: P8, _ p9: P9) throws -> Result {
+        try _call(env, this: Undefined.default, args: [p0, p1, p2, p3, p4, p5, p6, p7, p8, p9])
     }
 }
