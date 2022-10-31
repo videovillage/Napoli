@@ -20,6 +20,18 @@ func returnDouble() -> Double {
     1337
 }
 
+func returnInt32() -> Int32 {
+    Int32.min
+}
+
+func returnUInt32() -> UInt32 {
+    UInt32.max
+}
+
+func returnInt64() -> Int64 {
+    .jsSafeRange.lowerBound
+}
+
 func returnBoolean() -> Bool {
     true
 }
@@ -112,6 +124,9 @@ func initNAPITests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointer?
         .function("returnDouble", returnDouble),
         .function("returnBoolean", returnBoolean),
         .function("returnDate", returnDate),
+        .function("returnInt64", returnInt64),
+        .function("returnInt32", returnInt32),
+        .function("returnUInt32", returnUInt32),
         .function("returnNull", returnNull),
         .function("returnUndefined", returnUndefined),
 
