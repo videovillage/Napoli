@@ -58,7 +58,7 @@ public class ThreadsafeTypedFunction<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8,
     }
 }
 
-fileprivate extension ThreadsafeTypedFunction {
+private extension ThreadsafeTypedFunction {
     func _call(this: ValueConvertible, args: [ValueConvertible]) async throws where Result == Undefined {
         try napi_acquire_threadsafe_function(tsfn).throwIfError()
         defer { napi_release_threadsafe_function(tsfn, napi_tsfn_release) }

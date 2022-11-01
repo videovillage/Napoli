@@ -99,15 +99,15 @@ func runThreadsafeCallback(tsfn: ThreadsafeTypedFunction1<String, String>) throw
     }
 }
 
-func returnSuccessfulPromise(msg: String) throws -> Promise<String> {
-    try Promise {
+func returnSuccessfulPromise(msg: String) -> Promise<String> {
+    Promise {
         try await Task.sleep(seconds: 0.1)
         return msg + " hello"
     }
 }
 
-func returnThrowingPromise(msg _: String) throws -> Promise<Void> {
-    try Promise {
+func returnThrowingPromise(msg _: String) -> Promise<Void> {
+    Promise {
         try await Task.sleep(seconds: 0.1)
         try throwError()
     }

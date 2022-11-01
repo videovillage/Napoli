@@ -11,11 +11,11 @@ public class Promise<Result>: ValueConvertible {
     private var deferred: ThreadSafeDeferred!
     private let closure: Closure
 
-    public init(_ closure: @escaping Closure) throws where Result: ValueConvertible {
+    public init(_ closure: @escaping Closure) where Result: ValueConvertible {
         self.closure = closure
     }
 
-    public init(_ closure: @escaping () async throws -> Void) throws where Result == Void {
+    public init(_ closure: @escaping () async throws -> Void) where Result == Void {
         self.closure = {
             try await closure()
             return Value.undefined

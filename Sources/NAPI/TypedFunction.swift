@@ -44,7 +44,7 @@ public class TypedFunction<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8, P9>: Valu
     }
 }
 
-fileprivate extension TypedFunction {
+private extension TypedFunction {
     func _call(_ env: napi_env, this: ValueConvertible, args: [ValueConvertible]) throws where Result == Undefined {
         let handle = try napiValue(env)
 
