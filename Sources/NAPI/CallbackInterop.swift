@@ -26,8 +26,8 @@ private func exceptionIsPending(_ env: napi_env) throws -> Bool {
     return result
 }
 
-public typealias AsyncCallback = (napi_env, Arguments) async throws -> ValueConvertible?
-public typealias Callback = (napi_env, Arguments) throws -> ValueConvertible?
+public typealias AsyncCallback = (napi_env, Arguments) async throws -> ValueConvertible
+public typealias Callback = (napi_env, Arguments) throws -> ValueConvertible
 
 class CallbackData {
     let callback: Callback
@@ -55,7 +55,7 @@ func swiftNAPICallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) -> napi_
     let data = Unmanaged<CallbackData>.fromOpaque(dataPointer.pointee!).takeUnretainedValue()
 
     do {
-        return try data.callback(env, args as! Arguments)?.napiValue(env)
+        return try data.callback(env, args as! Arguments).napiValue(env)
     } catch NAPI.Error.pendingException {
         return nil
     } catch {
@@ -72,7 +72,7 @@ func swiftNAPIGetterCallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) ->
     let data = Unmanaged<GetSetCallbackData>.fromOpaque(dataPointer.pointee!).takeUnretainedValue()
 
     do {
-        return try data.getter(env, args as! Arguments)?.napiValue(env)
+        return try data.getter(env, args as! Arguments).napiValue(env)
     } catch NAPI.Error.pendingException {
         return nil
     } catch {
@@ -89,7 +89,7 @@ func swiftNAPISetterCallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) ->
     let data = Unmanaged<GetSetCallbackData>.fromOpaque(dataPointer.pointee!).takeUnretainedValue()
 
     do {
-        return try data.setter!(env, args as! Arguments)?.napiValue(env)
+        return try data.setter!(env, args as! Arguments).napiValue(env)
     } catch NAPI.Error.pendingException {
         return nil
     } catch {

@@ -38,15 +38,15 @@ public struct PropertyDescriptor {
     }
 
     public static func `class`<This: AnyObject>(_ name: String, _ constructor: @escaping () throws -> This, _ properties: [PropertyDescriptor], attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
-        .init(.value(name, Class(named: name, { env, args in let native = try constructor(); try Wrap<This>.wrap(env, jsObject: args.this, nativeObject: native); return nil }, properties), attributes))
+        .init(.value(name, Class(named: name, { env, args in let native = try constructor(); try Wrap<This>.wrap(env, jsObject: args.this, nativeObject: native); return Undefined.default }, properties), attributes))
     }
 
     public static func `class`<This: AnyObject>(_ name: String, _ constructor: @escaping (napi_env) throws -> This, _ properties: [PropertyDescriptor], attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
-        .init(.value(name, Class(named: name, { env, args in let native = try constructor(env); try Wrap<This>.wrap(env, jsObject: args.this, nativeObject: native); return nil }, properties), attributes))
+        .init(.value(name, Class(named: name, { env, args in let native = try constructor(env); try Wrap<This>.wrap(env, jsObject: args.this, nativeObject: native); return Undefined.default }, properties), attributes))
     }
 
     public static func `class`<This: JSClassDefinable>(_: This.Type) -> PropertyDescriptor {
-        .class(This.jsName, { env in This(env: env) }, This.jsProperties + This.jsFunctions, attributes: This.jsAttributes)
+        .class(This.jsName, { env in This() }, This.jsProperties + This.jsFunctions, attributes: This.jsAttributes)
     }
 
     /* (...) -> Void */
@@ -155,7 +155,7 @@ public struct PropertyDescriptor {
 
     /* Instance Properties */
 
-    public static func instancePropertyReadOnly<This: AnyObject>(_ name: String, getter: @escaping (This) throws -> some ValueConvertible, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+    public static func instanceProperty<This: AnyObject>(_ name: String, getter: @escaping (This) throws -> some ValueConvertible, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
         .init(.getSet(name, getter: { env, args in try getter(Wrap<This>.unwrap(env, jsObject: args.this)) }, attributes))
     }
 
@@ -166,8 +166,8 @@ public struct PropertyDescriptor {
                       attributes))
     }
 
-    public static func instancePropertyReadOnly<This: AnyObject>(_ name: String, keyPath: KeyPath<This, some ValueConvertible>, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
-        .instancePropertyReadOnly(name, getter: { (obj: This) in obj[keyPath: keyPath] }, attributes: attributes)
+    public static func instanceProperty<This: AnyObject>(_ name: String, keyPath: KeyPath<This, some ValueConvertible>, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
+        .instanceProperty(name, getter: { (obj: This) in obj[keyPath: keyPath] }, attributes: attributes)
     }
 
     public static func instanceProperty<This: AnyObject, A: ValueConvertible>(_ name: String, keyPath: ReferenceWritableKeyPath<This, A>, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
@@ -184,7 +184,7 @@ public struct PropertyDescriptor {
     public static func property<A: ValueConvertible>(_ name: String, getter: @escaping () throws -> A, setter: @escaping (A) throws -> Void, attributes: napi_property_attributes = napi_default) -> PropertyDescriptor {
         .init(.getSet(name,
                       getter: { _, _ in try getter() },
-                      setter: { env, args in try setter(A(env, from: args.0)); return nil },
+                      setter: { env, args in try setter(A(env, from: args.0)); return Undefined.default },
                       attributes))
     }
 }

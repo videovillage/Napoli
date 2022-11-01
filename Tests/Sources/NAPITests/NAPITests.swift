@@ -117,6 +117,37 @@ func takeTypedCallback(env: OpaquePointer, fn: TypedFunction2<String, Int32, Boo
     try assertEqual(expected: "23true", actual: try fn.call(env, 23, true))
 }
 
+class TestClass1: JSClassDefinable {
+    var testString: String = "Cool"
+    var testNumber: Double = 1234
+
+    var readOnlyTestString: String {
+        "ReadOnlyTest"
+    }
+
+    func reset() {
+        testString = "Cool"
+        testNumber = 1234
+    }
+
+    func testThrowError() throws {
+        try throwError()
+    }
+
+    required init() { }
+
+    static let jsName = "TestClass1"
+    static let jsProperties: [PropertyDescriptor] = [
+        .instanceProperty("testString", keyPath: \TestClass1.testString),
+        .instanceProperty("testNumber", keyPath: \TestClass1.testNumber),
+        .instanceProperty("readOnlyTestString", keyPath: \TestClass1.readOnlyTestString)
+    ]
+    static let jsFunctions: [PropertyDescriptor] = [
+        .instanceMethod("reset", { (me: TestClass1) in me.reset() }),
+        .instanceMethod("testThrowError", { (me: TestClass1) in try me.testThrowError() })
+    ]
+}
+
 @_cdecl("_init_napi_tests")
 func initNAPITests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointer? {
     initModule(env, exports, [
@@ -146,6 +177,7 @@ func initNAPITests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointer?
         .function("returnSuccessfulPromise", returnSuccessfulPromise),
         .function("returnThrowingPromise", returnThrowingPromise),
         .function("takeTypedCallback", takeTypedCallback),
+        .class(TestClass1.self)
     ])
 }
 
