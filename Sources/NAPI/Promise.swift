@@ -57,6 +57,13 @@ public actor ThreadSafeDeferred {
             do {
                 let success = try storage.result!.get().napiValue(env)
                 try! napi_resolve_deferred(env, deferred, success).throwIfError()
+            } catch let error as ErrorConvertible {
+                var jsError: napi_value!
+                try! napi_create_error(env,
+                                       error.code.napiValue(env),
+                                       error.message.napiValue(env),
+                                       &jsError).throwIfError()
+                try! napi_reject_deferred(env, deferred, jsError).throwIfError()
             } catch {
                 var jsError: napi_value!
                 try! napi_create_error(env,

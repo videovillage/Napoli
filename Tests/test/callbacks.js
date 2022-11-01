@@ -27,6 +27,10 @@ describe('Callbacks:', function () {
   })
 
   it('returns throwing promise', async function () {
-    await assert.rejects(addon.returnThrowingPromise('cool'))
+    await assert.rejects(addon.returnThrowingPromise('cool'), (err) => {
+      assert.strictEqual(err.code, 'ETEST')
+      assert.strictEqual(err.message, 'Error message')
+      return true
+    })
   })
 })
