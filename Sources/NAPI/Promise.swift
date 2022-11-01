@@ -18,7 +18,7 @@ public class Promise<Result>: ValueConvertible {
     public init(_ closure: @escaping () async throws -> Void) where Result == Void {
         self.closure = {
             try await closure()
-            return Value.undefined
+            return Undefined.default
         }
     }
 

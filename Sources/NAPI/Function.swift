@@ -48,29 +48,29 @@ public extension Function {
     /* (...) -> Void */
 
     convenience init(named name: String, _ callback: @escaping () throws -> Void) {
-        self.init(named: name) { _, _ in try callback(); return Value.undefined }
+        self.init(named: name) { _, _ in try callback(); return Undefined.default }
     }
 
     convenience init<A: ValueConvertible>(named name: String, _ callback: @escaping (A) throws -> Void) {
-        self.init(named: name) { env, args in try callback(A(env, from: args.0)); return Value.undefined }
+        self.init(named: name) { env, args in try callback(A(env, from: args.0)); return Undefined.default }
     }
 
     convenience init<A: ValueConvertible, B: ValueConvertible>(named name: String, _ callback: @escaping (A, B) throws -> Void) {
-        self.init(named: name) { env, args in try callback(A(env, from: args.0), B(env, from: args.1)); return Value.undefined }
+        self.init(named: name) { env, args in try callback(A(env, from: args.0), B(env, from: args.1)); return Undefined.default }
     }
 
     /* (env, ...) -> Void */
 
     convenience init(named name: String, _ callback: @escaping (napi_env) throws -> Void) {
-        self.init(named: name) { env, _ in try callback(env); return Value.undefined }
+        self.init(named: name) { env, _ in try callback(env); return Undefined.default }
     }
 
     convenience init<A: ValueConvertible>(named name: String, _ callback: @escaping (napi_env, A) throws -> Void) {
-        self.init(named: name) { env, args in try callback(env, A(env, from: args.0)); return Value.undefined }
+        self.init(named: name) { env, args in try callback(env, A(env, from: args.0)); return Undefined.default }
     }
 
     convenience init<A: ValueConvertible, B: ValueConvertible>(named name: String, _ callback: @escaping (napi_env, A, B) throws -> Void) {
-        self.init(named: name) { env, args in try callback(env, A(env, from: args.0), B(env, from: args.1)); return Value.undefined }
+        self.init(named: name) { env, args in try callback(env, A(env, from: args.0), B(env, from: args.1)); return Undefined.default }
     }
 }
 
@@ -98,28 +98,28 @@ public extension Function {
     /* (...) -> Void */
 
     func call(_ env: napi_env) throws {
-        try _call(env, this: Value.undefined.napiValue(env), args: [])
+        try _call(env, this: Undefined.default.napiValue(env), args: [])
     }
 
     func call(_ env: napi_env, _ a: some ValueConvertible) throws {
-        try _call(env, this: Value.undefined.napiValue(env), args: [a.napiValue(env)])
+        try _call(env, this: Undefined.default.napiValue(env), args: [a.napiValue(env)])
     }
 
     func call(_ env: napi_env, _ a: some ValueConvertible, _ b: some ValueConvertible) throws {
-        try _call(env, this: Value.undefined.napiValue(env), args: [a.napiValue(env), b.napiValue(env)])
+        try _call(env, this: Undefined.default.napiValue(env), args: [a.napiValue(env), b.napiValue(env)])
     }
 
     /* (...) -> ValueConvertible */
 
     func call<Result: ValueConvertible>(_ env: napi_env) throws -> Result {
-        try _call(env, this: Value.undefined.napiValue(env), args: [])
+        try _call(env, this: Undefined.default.napiValue(env), args: [])
     }
 
     func call<Result: ValueConvertible>(_ env: napi_env, _ a: some ValueConvertible) throws -> Result {
-        try _call(env, this: Value.undefined.napiValue(env), args: [a.napiValue(env)])
+        try _call(env, this: Undefined.default.napiValue(env), args: [a.napiValue(env)])
     }
 
     func call<Result: ValueConvertible>(_ env: napi_env, _ a: some ValueConvertible, _ b: some ValueConvertible) throws -> Result {
-        try _call(env, this: Value.undefined.napiValue(env), args: [a.napiValue(env), b.napiValue(env)])
+        try _call(env, this: Undefined.default.napiValue(env), args: [a.napiValue(env), b.napiValue(env)])
     }
 }

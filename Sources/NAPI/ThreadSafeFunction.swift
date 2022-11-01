@@ -21,7 +21,7 @@ public class ThreadsafeFunction: ValueConvertible {
             self.this = this
             self.args = args
             self.continuation = continuation
-            resultConstructor = { _, _ in Value.undefined }
+            resultConstructor = { _, _ in Undefined.default }
         }
     }
 
@@ -92,28 +92,28 @@ public extension ThreadsafeFunction {
 //    /* (...) -> Void */
 
     func call() async throws {
-        try await _call(this: Value.undefined, args: [])
+        try await _call(this: Undefined.default, args: [])
     }
 
     func call(_ a: some ValueConvertible) async throws {
-        try await _call(this: Value.undefined, args: [a])
+        try await _call(this: Undefined.default, args: [a])
     }
 
     func call(_ a: some ValueConvertible, _ b: some ValueConvertible) async throws {
-        try await _call(this: Value.undefined, args: [a, b])
+        try await _call(this: Undefined.default, args: [a, b])
     }
 
 //    /* (...) -> ValueConvertible */
 
     func call<Result: ValueConvertible>() async throws -> Result {
-        try await _call(this: Value.undefined, args: [])
+        try await _call(this: Undefined.default, args: [])
     }
 
     func call<Result: ValueConvertible>(_ a: some ValueConvertible) async throws -> Result {
-        try await _call(this: Value.undefined, args: [a])
+        try await _call(this: Undefined.default, args: [a])
     }
 
     func call<Result: ValueConvertible>(_ a: some ValueConvertible, _ b: some ValueConvertible) async throws -> Result {
-        try await _call(this: Value.undefined, args: [a, b])
+        try await _call(this: Undefined.default, args: [a, b])
     }
 }

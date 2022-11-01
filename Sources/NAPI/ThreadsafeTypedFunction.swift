@@ -22,7 +22,7 @@ public class ThreadsafeTypedFunction<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8,
             self.this = this
             self.args = args
             self.continuation = continuation
-            resultConstructor = { _, _ in Value.undefined }
+            resultConstructor = { _, _ in Undefined.default }
         }
     }
 
