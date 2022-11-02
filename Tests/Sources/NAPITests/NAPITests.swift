@@ -134,17 +134,17 @@ class TestClass1: JSClassDefinable {
         try throwError()
     }
 
-    required init() { }
+    required init() {}
 
     static let jsName = "TestClass1"
     static let jsProperties: [PropertyDescriptor] = [
         .instanceProperty("testString", keyPath: \TestClass1.testString),
         .instanceProperty("testNumber", keyPath: \TestClass1.testNumber),
-        .instanceProperty("readOnlyTestString", keyPath: \TestClass1.readOnlyTestString)
+        .instanceProperty("readOnlyTestString", keyPath: \TestClass1.readOnlyTestString),
     ]
     static let jsFunctions: [PropertyDescriptor] = [
-        .instanceMethod("reset", { (me: TestClass1) in me.reset() }),
-        .instanceMethod("testThrowError", { (me: TestClass1) in try me.testThrowError() })
+        .instanceMethod("reset") { (me: TestClass1) in me.reset() },
+        .instanceMethod("testThrowError") { (me: TestClass1) in try me.testThrowError() },
     ]
 }
 
@@ -177,7 +177,7 @@ func initNAPITests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointer?
         .function("returnSuccessfulPromise", returnSuccessfulPromise),
         .function("returnThrowingPromise", returnThrowingPromise),
         .function("takeTypedCallback", takeTypedCallback),
-        .class(TestClass1.self)
+        .class(TestClass1.self),
     ])
 }
 

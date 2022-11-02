@@ -46,7 +46,7 @@ public struct PropertyDescriptor {
     }
 
     public static func `class`<This: JSClassDefinable>(_: This.Type) -> PropertyDescriptor {
-        .class(This.jsName, { env in This() }, This.jsProperties + This.jsFunctions, attributes: This.jsAttributes)
+        .class(This.jsName, { _ in This() }, This.jsProperties + This.jsFunctions, attributes: This.jsAttributes)
     }
 
     /* (...) -> Void */
