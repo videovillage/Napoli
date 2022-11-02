@@ -33,6 +33,7 @@ struct Codegen: ParsableCommand {
     mutating func run() throws {
         try TypedFunction.generate(maxParams: 10).result().write(to: generatedFile(named: "TypedFunction"), atomically: true, encoding: .utf8)
         try ThreadsafeTypedFunction.generate(maxParams: 10).result().write(to: generatedFile(named: "ThreadsafeTypedFunction"), atomically: true, encoding: .utf8)
+        try Method.generate(maxParams: 10).result().write(to: generatedFile(named: "Method"), atomically: true, encoding: .utf8)
     }
 }
 

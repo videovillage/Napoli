@@ -30,3 +30,16 @@ public func initModule(_ env: napi_env, _ exports: napi_value, _ properties: [Pr
     try! defineProperties(env, exports, properties)
     return exports
 }
+
+public func defineProperties(_ env: napi_env, _ object: napi_value, _ properties: [PropertyDescribable]) throws {
+    let props = try properties.map { try $0.propertyDescriptor(env) }
+
+    try props.withUnsafeBufferPointer { propertiesBytes in
+        napi_define_properties(env, object, properties.count, propertiesBytes.baseAddress)
+    }.throwIfError()
+}
+
+public func initModule(_ env: napi_env, _ exports: napi_value, _ properties: [PropertyDescribable]) -> napi_value {
+    try! defineProperties(env, exports, properties)
+    return exports
+}

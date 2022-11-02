@@ -197,7 +197,7 @@ extension Collection<Generic> {
     }
 }
 
-extension Array<Generic> {
+extension [Generic] {
     init(prefix: String, count: Int) {
         self = (0 ..< count).map { .init(type: "\(prefix)\($0)") }
     }

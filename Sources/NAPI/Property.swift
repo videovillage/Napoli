@@ -8,14 +8,14 @@ public class Property: PropertyDescribable {
     private let getter: Callback
     private let setter: Callback?
 
-    fileprivate init(name: String, attributes: napi_property_attributes, getter: @escaping Callback, setter: Callback?) {
+    fileprivate init(_ name: String, attributes: napi_property_attributes, getter: @escaping Callback, setter: Callback?) {
         self.name = name
         self.attributes = attributes
         self.getter = getter
         self.setter = setter
     }
 
-    public init<V: ValueConvertible>(name: String, attributes: napi_property_attributes = napi_default, getter: @escaping () -> V, setter: ((V) -> Void)? = nil) {
+    public init<V: ValueConvertible>(_ name: String, attributes: napi_property_attributes = napi_default, getter: @escaping () -> V, setter: ((V) -> Void)? = nil) {
         self.name = name
         self.attributes = attributes
 
@@ -42,8 +42,8 @@ public class Property: PropertyDescribable {
 }
 
 public class InstanceProperty<This: AnyObject>: Property {
-    public init<V: ValueConvertible>(name: String, attributes: napi_property_attributes = napi_default, keyPath: ReferenceWritableKeyPath<This, V>) {
-        super.init(name: name,
+    public init<V: ValueConvertible>(_ name: String, attributes: napi_property_attributes = napi_default, keyPath: ReferenceWritableKeyPath<This, V>) {
+        super.init(name,
                    attributes: attributes,
                    getter: { env, args in
                        try Wrap<This>.unwrap(env, jsObject: args.this)[keyPath: keyPath]
@@ -54,8 +54,8 @@ public class InstanceProperty<This: AnyObject>: Property {
                    })
     }
 
-    public init<V: ValueConvertible>(name: String, attributes: napi_property_attributes = napi_default, keyPath: KeyPath<This, V>) {
-        super.init(name: name,
+    public init<V: ValueConvertible>(_ name: String, attributes: napi_property_attributes = napi_default, keyPath: KeyPath<This, V>) {
+        super.init(name,
                    attributes: attributes,
                    getter: { env, args in
                        try Wrap<This>.unwrap(env, jsObject: args.this)[keyPath: keyPath]

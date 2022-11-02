@@ -7,49 +7,49 @@ enum TypedFunction {
         source.add("import NAPIC")
         source.newline()
         source.add("""
-            public typealias TypedFunctionCallback = (napi_env, napi_value, [napi_value]) throws -> ValueConvertible
+        public typealias TypedFunctionCallback = (napi_env, napi_value, [napi_value]) throws -> ValueConvertible
 
-            class TypedFunctionCallbackData {
-                let callback: TypedFunctionCallback
-                let argCount: Int
+        class TypedFunctionCallbackData {
+            let callback: TypedFunctionCallback
+            let argCount: Int
 
-                init(callback: @escaping TypedFunctionCallback, argCount: Int) {
-                    self.callback = callback
-                    self.argCount = argCount
+            init(callback: @escaping TypedFunctionCallback, argCount: Int) {
+                self.callback = callback
+                self.argCount = argCount
+            }
+        }
+
+        func newNAPICallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) -> napi_value? {
+            var this: napi_value!
+            let dataPointer = UnsafeMutablePointer<UnsafeMutableRawPointer?>.allocate(capacity: 1)
+            napi_get_cb_info(env, cbinfo, nil, nil, &this, dataPointer)
+            let data = Unmanaged<TypedFunctionCallbackData>.fromOpaque(dataPointer.pointee!).takeUnretainedValue()
+
+            let usedArgs: [napi_value]
+            if data.argCount > 0 {
+                var args = [napi_value?](repeating: nil, count: data.argCount)
+                var argCount = data.argCount
+
+                args.withUnsafeMutableBufferPointer {
+                    _ = napi_get_cb_info(env, cbinfo, &argCount, $0.baseAddress, nil, nil)
                 }
+
+                assert(argCount == data.argCount)
+                usedArgs = args.map { $0! }
+            } else {
+                usedArgs = []
             }
 
-            func newNAPICallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) -> napi_value? {
-                var this: napi_value!
-                let dataPointer = UnsafeMutablePointer<UnsafeMutableRawPointer?>.allocate(capacity: 1)
-                napi_get_cb_info(env, cbinfo, nil, nil, &this, dataPointer)
-                let data = Unmanaged<TypedFunctionCallbackData>.fromOpaque(dataPointer.pointee!).takeUnretainedValue()
-
-                let usedArgs: [napi_value]
-                if data.argCount > 0 {
-                    var args = [napi_value?](repeating: nil, count: data.argCount)
-                    var argCount = data.argCount
-
-                    args.withUnsafeMutableBufferPointer {
-                        _ = napi_get_cb_info(env, cbinfo, &argCount, $0.baseAddress, nil, nil)
-                    }
-
-                    assert(argCount == data.argCount)
-                    usedArgs = args.map { $0! }
-                } else {
-                    usedArgs = []
-                }
-
-                do {
-                    return try data.callback(env, this, usedArgs).napiValue(env)
-                } catch NAPI.Error.pendingException {
-                    return nil
-                } catch {
-                    if try! exceptionIsPending(env) == false { try! throwError(env, error) }
-                    return nil
-                }
+            do {
+                return try data.callback(env, this, usedArgs).napiValue(env)
+            } catch NAPI.Error.pendingException {
+                return nil
+            } catch {
+                if try! exceptionIsPending(env) == false { try! throwError(env, error) }
+                return nil
             }
-            """)
+        }
+        """)
         source.newline()
 
         for i in (0 ..< maxParams).reversed() {

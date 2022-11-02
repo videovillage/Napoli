@@ -7,77 +7,77 @@ enum ThreadsafeTypedFunction {
         source.add("import NAPIC")
         source.newline()
         source.add("""
-            class ThreadsafeFunctionCallbackData {
-                typealias Continuation = CheckedContinuation<ValueConvertible, Swift.Error>
-                typealias ResultConstructor = (napi_env, napi_value) throws -> ValueConvertible
-                let this: ValueConvertible
-                let args: [ValueConvertible]
-                let continuation: Continuation
-                let resultConstructor: ResultConstructor
+        class ThreadsafeFunctionCallbackData {
+            typealias Continuation = CheckedContinuation<ValueConvertible, Swift.Error>
+            typealias ResultConstructor = (napi_env, napi_value) throws -> ValueConvertible
+            let this: ValueConvertible
+            let args: [ValueConvertible]
+            let continuation: Continuation
+            let resultConstructor: ResultConstructor
 
-                init<Result: ValueConvertible>(this: ValueConvertible, args: [ValueConvertible], continuation: Continuation, resultType _: Result.Type) {
-                    self.this = this
-                    self.args = args
-                    self.continuation = continuation
-                    resultConstructor = { env, val in try Result(env, from: val) }
-                }
-
-                init(this: ValueConvertible, args: [ValueConvertible], continuation: Continuation) {
-                    self.this = this
-                    self.args = args
-                    self.continuation = continuation
-                    resultConstructor = { _, _ in Undefined.default }
-                }
+            init<Result: ValueConvertible>(this: ValueConvertible, args: [ValueConvertible], continuation: Continuation, resultType _: Result.Type) {
+                self.this = this
+                self.args = args
+                self.continuation = continuation
+                resultConstructor = { env, val in try Result(env, from: val) }
             }
 
-            func newNAPIThreadsafeFinalize(_: napi_env!, pointer _: UnsafeMutableRawPointer?, hint _: UnsafeMutableRawPointer?) {}
+            init(this: ValueConvertible, args: [ValueConvertible], continuation: Continuation) {
+                self.this = this
+                self.args = args
+                self.continuation = continuation
+                resultConstructor = { _, _ in Undefined.default }
+            }
+        }
 
-            func newNAPIThreadsafeCallback(_ env: napi_env?, _ js_callback: napi_value?, _: UnsafeMutableRawPointer?, _ data: UnsafeMutableRawPointer!) {
-                let callbackData = Unmanaged<ThreadsafeFunctionCallbackData>.fromOpaque(data).takeRetainedValue()
+        func newNAPIThreadsafeFinalize(_: napi_env!, pointer _: UnsafeMutableRawPointer?, hint _: UnsafeMutableRawPointer?) {}
 
-                var result: napi_value?
+        func newNAPIThreadsafeCallback(_ env: napi_env?, _ js_callback: napi_value?, _: UnsafeMutableRawPointer?, _ data: UnsafeMutableRawPointer!) {
+            let callbackData = Unmanaged<ThreadsafeFunctionCallbackData>.fromOpaque(data).takeRetainedValue()
 
-                if let env {
-                    do {
-                        let this = try callbackData.this.napiValue(env)
-                        let args: [napi_value?] = try callbackData.args.map { try $0.napiValue(env) }
-                        try args.withUnsafeBufferPointer { argsBytes in
-                            napi_call_function(env, this, js_callback, args.count, argsBytes.baseAddress, &result)
-                        }.throwIfError()
+            var result: napi_value?
 
-                        try callbackData.continuation.resume(returning: callbackData.resultConstructor(env, result!))
-                    } catch {
-                        if try! exceptionIsPending(env) {
-                            var errorResult: napi_value!
-                            try! napi_get_and_clear_last_exception(env, &errorResult).throwIfError()
-                            callbackData.continuation.resume(throwing: JSException(value: errorResult))
-                        } else {
-                            callbackData.continuation.resume(throwing: error)
-                        }
+            if let env {
+                do {
+                    let this = try callbackData.this.napiValue(env)
+                    let args: [napi_value?] = try callbackData.args.map { try $0.napiValue(env) }
+                    try args.withUnsafeBufferPointer { argsBytes in
+                        napi_call_function(env, this, js_callback, args.count, argsBytes.baseAddress, &result)
+                    }.throwIfError()
+
+                    try callbackData.continuation.resume(returning: callbackData.resultConstructor(env, result!))
+                } catch {
+                    if try! exceptionIsPending(env) {
+                        var errorResult: napi_value!
+                        try! napi_get_and_clear_last_exception(env, &errorResult).throwIfError()
+                        callbackData.continuation.resume(throwing: JSException(value: errorResult))
+                    } else {
+                        callbackData.continuation.resume(throwing: error)
                     }
                 }
             }
+        }
 
-            private func _call(tsfn: napi_threadsafe_function, this: ValueConvertible, args: [ValueConvertible]) async throws {
-                try napi_acquire_threadsafe_function(tsfn).throwIfError()
-                defer { napi_release_threadsafe_function(tsfn, napi_tsfn_release) }
+        private func _call(tsfn: napi_threadsafe_function, this: ValueConvertible, args: [ValueConvertible]) async throws {
+            try napi_acquire_threadsafe_function(tsfn).throwIfError()
+            defer { napi_release_threadsafe_function(tsfn, napi_tsfn_release) }
 
-                _ = try await withCheckedThrowingContinuation { continuation in
-                    let unmanagedData = Unmanaged.passRetained(ThreadsafeFunctionCallbackData(this: this, args: args, continuation: continuation))
-                    napi_call_threadsafe_function(tsfn, unmanagedData.toOpaque(), napi_tsfn_nonblocking)
-                }
+            _ = try await withCheckedThrowingContinuation { continuation in
+                let unmanagedData = Unmanaged.passRetained(ThreadsafeFunctionCallbackData(this: this, args: args, continuation: continuation))
+                napi_call_threadsafe_function(tsfn, unmanagedData.toOpaque(), napi_tsfn_nonblocking)
             }
+        }
 
-            private func _call<Result: ValueConvertible>(tsfn: napi_threadsafe_function, this: ValueConvertible, args: [ValueConvertible], resultType: Result.Type) async throws -> Result {
-                try napi_acquire_threadsafe_function(tsfn).throwIfError()
-                defer { napi_release_threadsafe_function(tsfn, napi_tsfn_release) }
+        private func _call<Result: ValueConvertible>(tsfn: napi_threadsafe_function, this: ValueConvertible, args: [ValueConvertible], resultType: Result.Type) async throws -> Result {
+            try napi_acquire_threadsafe_function(tsfn).throwIfError()
+            defer { napi_release_threadsafe_function(tsfn, napi_tsfn_release) }
 
-                return try await withCheckedThrowingContinuation { continuation in
-                    let unmanagedData = Unmanaged.passRetained(ThreadsafeFunctionCallbackData(this: this, args: args, continuation: continuation, resultType: resultType))
-                    napi_call_threadsafe_function(tsfn, unmanagedData.toOpaque(), napi_tsfn_nonblocking)
-                } as! Result
-            }
-            """)
+            return try await withCheckedThrowingContinuation { continuation in
+                let unmanagedData = Unmanaged.passRetained(ThreadsafeFunctionCallbackData(this: this, args: args, continuation: continuation, resultType: resultType))
+                napi_call_threadsafe_function(tsfn, unmanagedData.toOpaque(), napi_tsfn_nonblocking)
+            } as! Result
+        }
+        """)
         source.newline()
 
         for i in (0 ..< maxParams).reversed() {
