@@ -38,7 +38,7 @@ public class Promise<Result>: ValueConvertible {
     }
 }
 
-public actor ThreadSafeDeferred {
+private actor ThreadSafeDeferred {
     private class Storage {
         var result: Result<ValueConvertible, Swift.Error>?
     }

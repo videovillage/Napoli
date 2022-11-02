@@ -9,7 +9,7 @@ enum TypedFunction {
         source.add("""
             public typealias TypedFunctionCallback = (napi_env, napi_value, [napi_value]) throws -> ValueConvertible
 
-            private class TypedFunctionCallbackData {
+            class TypedFunctionCallbackData {
                 let callback: TypedFunctionCallback
                 let argCount: Int
 
@@ -73,12 +73,30 @@ enum TypedFunction {
             inGenericsAsArgs = ""
         }
 
+        let argListAsParams: String
+        if paramCount > 0 {
+            argListAsParams = inGenerics.enumerated().map { "\($0.element.type)(env, from: args[\($0.offset)])" }.commaSeparated
+        } else {
+            argListAsParams = ""
+        }
+
+        let argListAssignedToValues: String
+        if paramCount > 0 {
+            argListAssignedToValues = inGenerics.enumerated().map { "let \($0.element.type.lowercased()) = try \($0.element.type)(env, from: args[\($0.offset)])" }.joined(separator: "; ")
+        } else {
+            argListAssignedToValues = ""
+        }
+
+        let argValueList = inGenerics.map { $0.type.lowercased() }.commaSeparated
+
         let inGenericsAsNAPI = inGenerics.map { "\($0.type.lowercased()).napiValue(env)" }.commaSeparated
 
         try source.declareClass(.public, "TypedFunction\(paramCount)", genericParams: allGenerics, conformsTo: Types.valueConvertible, wheres: wheres) { source in
             source.add("""
             public typealias ConvenienceCallback = (\(commaSeparatedInGenerics)) throws -> Result
             public typealias ConvenienceVoidCallback = (\(commaSeparatedInGenerics)) throws -> Void
+            public typealias AsyncConvenienceCallback<R: ValueConvertible> = (\(commaSeparatedInGenerics)) async throws -> R
+            public typealias AsyncConvenienceVoidCallback = (\(commaSeparatedInGenerics)) async throws -> Void
 
             fileprivate enum InternalTypedFunction {
                 case javascript(napi_value)
@@ -93,6 +111,37 @@ enum TypedFunction {
 
             public init(named name: String, _ callback: @escaping TypedFunctionCallback) {
                 value = .swift(name, callback)
+            }
+
+            public convenience init(named name: String, _ callback: @escaping ConvenienceCallback) {
+                self.init(named: name) { env, _, args in
+                    try callback(\(argListAsParams))
+                }
+            }
+
+            public convenience init(named name: String, _ callback: @escaping ConvenienceVoidCallback) where Result == Undefined {
+                self.init(named: name) { env, _, args in
+                    try callback(\(argListAsParams))
+                    return Undefined.default
+                }
+            }
+
+            public convenience init<R: ValueConvertible>(named name: String, _ callback: @escaping AsyncConvenienceCallback<R>) where Result == Promise<R> {
+                self.init(named: name) { env, _, args in
+                    \(argListAssignedToValues)
+                    return Promise<R> {
+                        return try await callback(\(argValueList))
+                    }
+                }
+            }
+
+            public convenience init(named name: String, _ callback: @escaping AsyncConvenienceVoidCallback) where Result == Promise<Void> {
+                self.init(named: name) { env, this, args in
+                    \(argListAssignedToValues)
+                    return Promise<Void> {
+                        try await callback(\(argValueList))
+                    }
+                }
             }
 
             public func napiValue(_ env: napi_env) throws -> napi_value {

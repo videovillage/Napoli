@@ -215,6 +215,14 @@ enum Where {
 }
 
 extension String {
+    func prefixCommaIfNotEmpty() -> String {
+        if !isEmpty {
+            return ", " + self
+        } else {
+            return self
+        }
+    }
+
     func spaceIfNotEmpty() -> String {
         if !isEmpty {
             return self + " "

@@ -53,4 +53,13 @@ public class InstanceProperty<This: AnyObject>: Property {
                        return Undefined.default
                    })
     }
+
+    public init<V: ValueConvertible>(name: String, attributes: napi_property_attributes = napi_default, keyPath: KeyPath<This, V>) {
+        super.init(name: name,
+                   attributes: attributes,
+                   getter: { env, args in
+                       try Wrap<This>.unwrap(env, jsObject: args.this)[keyPath: keyPath]
+                   },
+                   setter: nil)
+    }
 }
