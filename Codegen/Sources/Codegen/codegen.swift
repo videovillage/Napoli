@@ -11,16 +11,54 @@ public enum Codegen {
     }
 }
 
+enum Types {
+    static let valueConvertible = "ValueConvertible"
+}
+
 enum TypedFunction {
     static func generate(maxParams: Int) throws -> Source {
         let resultGeneric = "Result"
         let inGenerics = buildGenericParams(prefix: "P", count: maxParams)
         let allGenerics = [resultGeneric] + inGenerics
 
+        let wheres = buildConformances(allGenerics, to: Types.valueConvertible)
+
         var source = Source()
 
-        try source.declareFunction(.public, "testFunction", genericParams: allGenerics, args: [.named("test", "Int")]) { source in
+        try source.declareClass(.public, "TypedFunction", genericParams: allGenerics, conformsTo: Types.valueConvertible, wheres: wheres) { source in
+            source.add("""
+                       fileprivate enum InternalTypedFunction {
+                           case javascript(napi_value)
+                           case swift(String, TypedClosure)
+                       }
 
+                       public typealias TypedArgs = (\(inGenerics.joined(separator: ", ")))
+                       public typealias TypedClosure = (napi_env, TypedArgs) throws -> Result
+                       fileprivate let value: InternalTypedFunction
+
+                       public required init(_: napi_env, from: napi_value) throws {
+                           value = .javascript(from)
+                       }
+
+                       fileprivate init(named name: String, _ callback: @escaping TypedClosure) {
+                           value = .swift(name, callback)
+                       }
+
+                       public func napiValue(_ env: napi_env) throws -> napi_value {
+                           switch value {
+                           case let .swift(name, callback):
+                               return try createFunction(env, named: name) { env, args in
+                                   try callback(env, Self.resolveArgs(env, args: args))
+                               }
+                           case let .javascript(value):
+                               return value
+                           }
+                       }
+
+                       public static func resolveArgs(_ env: napi_env, args: Arguments) throws -> TypedArgs {
+                           try (\(inGenerics.enumerated().map { "\($0.element)(env, from: args.\($0.offset))" }.joined(separator: ", ")))
+                       }
+                       """)
         }
 
         return source
@@ -54,8 +92,20 @@ struct Source {
 
     mutating func declareFunction(_ access: Access = .default, _ symbol: String, genericParams: [String], args: [Arg] = [], wheres: [Where] = [], builder: Builder) throws {
         try addSymbol(symbol)
+        add("\(access.value.spaceIfNotEmpty())func \(symbol)\(genericParamsValue(genericParams))(\(args.value))\(wheres.value.backspaceIfNotEmpty())")
+        try buildClosure(builder)
+    }
 
-        add("\(access.value.spaceIfNotEmpty())func \(symbol)(\(args.value))\(wheres.value)")
+    @discardableResult
+    mutating func declareClass(_ access: Access = .default, _ symbol: String, genericParams: [String], conformsTo: String = "", wheres: [Where] = [], builder: Builder) throws -> Class {
+        let c = Class(access: access, symbol: symbol, genericParams: genericParams, conformsTo: conformsTo, wheres: wheres)
+        try declareClass(c, builder: builder)
+        return c
+    }
+
+    mutating func declareClass(_ c: Class, builder: Builder) throws {
+        try addSymbol(c.symbol)
+        add(c.value)
         try buildClosure(builder)
     }
 
@@ -69,6 +119,20 @@ struct Source {
         } else {
             lines.append(contentsOf: new.lines)
             add("}")
+        }
+
+        newline()
+    }
+
+    mutating func newLineIfNotEmpty() {
+        if !(lines.last?.isEmpty ?? true) {
+            newline()
+        }
+    }
+
+    mutating func newline(_ count: Int = 1) {
+        for _ in 0 ..< count {
+            lines.append("")
         }
     }
 
@@ -134,6 +198,26 @@ struct Arg {
     }
 }
 
+struct Class {
+    var access: Access
+    var symbol: String
+    var genericParams: [String]
+    var conformsTo: String
+    var wheres: [Where]
+
+    private var conformsString: String {
+        if conformsTo.isEmpty {
+            return ""
+        } else {
+            return ": \(conformsTo)"
+        }
+    }
+
+    var value: String {
+        "\(access.value.spaceIfNotEmpty())class \(symbol)\(genericParamsValue(genericParams))\(conformsString)\(wheres.value.backspaceIfNotEmpty())"
+    }
+}
+
 extension Collection where Element == Arg {
     var value: String {
         if isEmpty {
@@ -173,10 +257,34 @@ extension String {
             return self
         }
     }
+
+    func backspaceIfNotEmpty() -> String {
+        if !isEmpty {
+            return " " + self
+        } else {
+            return self
+        }
+    }
+
+    func spaceEachSideIfNotEmpty() -> String {
+        if !isEmpty {
+            return " \(self) "
+        } else {
+            return self
+        }
+    }
 }
 
 func buildGenericParams(prefix: String, count: Int) -> [String] {
     (0 ..< count).map { "\(prefix)\($0)" }
+}
+
+func genericParamsValue(_ params: [String]) -> String {
+    if params.isEmpty {
+        return ""
+    } else {
+        return "<\(params.joined(separator: ", "))>"
+    }
 }
 
 func buildConformances(_ symbols: [String], to conform: String) -> [Where] {
