@@ -24,7 +24,6 @@ public class TypedFunction<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8, P9>: Valu
             return try createFunction(env, named: name) { env, args in
                 try callback(env, Self.resolveArgs(env, args: args))
             }
-//        case let .swiftAsync(name, callback): return try createFunction(env, named: name, { env, args in return try callAsyncFunction(env, args: args, callback) })
         case let .javascript(value):
             return value
         }
