@@ -45,6 +45,8 @@ enum Method {
         let allGenerics = [resultGeneric] + inGenerics
         let wheres = allGenerics.conforming(to: Types.valueConvertible).value
 
+        let voidWheres = ([resultGeneric].equals("Undefined") + inGenerics.conforming(to: Types.valueConvertible)).value
+
         let allGenericsAsyncCallback = [resultGeneric] + inGenerics + [.init(type: "R")]
         let wheresAsyncCallback = allGenericsAsyncCallback.conforming(to: Types.valueConvertible).value
 
@@ -73,7 +75,7 @@ enum Method {
                  }
              }
 
-             convenience init\(allGenerics.bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction\(paramCount)\(allGenerics.bracketedOrNone).ConvenienceVoidCallback)\(wheres.backspaceIfNotEmpty()) {
+             convenience init\(allGenerics.bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction\(paramCount)\(allGenerics.bracketedOrNone).ConvenienceVoidCallback)\(voidWheres.backspaceIfNotEmpty()) {
                  self.init(name, attributes: attributes, argCount: \(paramCount)) { env, this, args in
                      try callback(\(argListAsParams))
                      return Undefined.default
@@ -89,7 +91,7 @@ enum Method {
                 }
              }
 
-             convenience init\(allGenerics.bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction\(paramCount)\(allGenerics.bracketedOrNone).AsyncConvenienceVoidCallback)\(wheres.backspaceIfNotEmpty()) {
+             convenience init\(allGenerics.bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction\(paramCount)\(allGenerics.bracketedOrNone).AsyncConvenienceVoidCallback)\(voidWheres.backspaceIfNotEmpty()) {
                 self.init(name, attributes: attributes, argCount: \(paramCount)) { env, this, args in
                     \(argListAssignedToValues)
                     return Promise<Undefined> {

@@ -32,7 +32,7 @@ public extension Method {
         }
     }
 
-    convenience init<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>.ConvenienceVoidCallback) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
+    convenience init<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>.ConvenienceVoidCallback) where Result == Undefined, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 9) { env, _, args in
             try callback(P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]), P6(env, from: args[6]), P7(env, from: args[7]), P8(env, from: args[8]))
             return Undefined.default
@@ -48,7 +48,7 @@ public extension Method {
         }
     }
 
-    convenience init<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>.AsyncConvenienceVoidCallback) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
+    convenience init<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>.AsyncConvenienceVoidCallback) where Result == Undefined, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 9) { env, _, args in
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4]); let p5 = try P5(env, from: args[5]); let p6 = try P6(env, from: args[6]); let p7 = try P7(env, from: args[7]); let p8 = try P8(env, from: args[8])
             return Promise<Undefined> {
@@ -67,7 +67,7 @@ public extension Method {
         }
     }
 
-    convenience init<Result, P0, P1, P2, P3, P4, P5, P6, P7>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>.ConvenienceVoidCallback) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
+    convenience init<Result, P0, P1, P2, P3, P4, P5, P6, P7>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>.ConvenienceVoidCallback) where Result == Undefined, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 8) { env, _, args in
             try callback(P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]), P6(env, from: args[6]), P7(env, from: args[7]))
             return Undefined.default
@@ -83,7 +83,7 @@ public extension Method {
         }
     }
 
-    convenience init<Result, P0, P1, P2, P3, P4, P5, P6, P7>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>.AsyncConvenienceVoidCallback) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
+    convenience init<Result, P0, P1, P2, P3, P4, P5, P6, P7>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>.AsyncConvenienceVoidCallback) where Result == Undefined, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 8) { env, _, args in
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4]); let p5 = try P5(env, from: args[5]); let p6 = try P6(env, from: args[6]); let p7 = try P7(env, from: args[7])
             return Promise<Undefined> {
@@ -102,7 +102,7 @@ public extension Method {
         }
     }
 
-    convenience init<Result, P0, P1, P2, P3, P4, P5, P6>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>.ConvenienceVoidCallback) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
+    convenience init<Result, P0, P1, P2, P3, P4, P5, P6>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>.ConvenienceVoidCallback) where Result == Undefined, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 7) { env, _, args in
             try callback(P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]), P6(env, from: args[6]))
             return Undefined.default
@@ -118,7 +118,7 @@ public extension Method {
         }
     }
 
-    convenience init<Result, P0, P1, P2, P3, P4, P5, P6>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>.AsyncConvenienceVoidCallback) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
+    convenience init<Result, P0, P1, P2, P3, P4, P5, P6>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>.AsyncConvenienceVoidCallback) where Result == Undefined, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 7) { env, _, args in
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4]); let p5 = try P5(env, from: args[5]); let p6 = try P6(env, from: args[6])
             return Promise<Undefined> {
@@ -137,7 +137,7 @@ public extension Method {
         }
     }
 
-    convenience init<Result, P0, P1, P2, P3, P4, P5>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction6<Result, P0, P1, P2, P3, P4, P5>.ConvenienceVoidCallback) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
+    convenience init<Result, P0, P1, P2, P3, P4, P5>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction6<Result, P0, P1, P2, P3, P4, P5>.ConvenienceVoidCallback) where Result == Undefined, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 6) { env, _, args in
             try callback(P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]))
             return Undefined.default
@@ -153,7 +153,7 @@ public extension Method {
         }
     }
 
-    convenience init<Result, P0, P1, P2, P3, P4, P5>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction6<Result, P0, P1, P2, P3, P4, P5>.AsyncConvenienceVoidCallback) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
+    convenience init<Result, P0, P1, P2, P3, P4, P5>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction6<Result, P0, P1, P2, P3, P4, P5>.AsyncConvenienceVoidCallback) where Result == Undefined, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 6) { env, _, args in
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4]); let p5 = try P5(env, from: args[5])
             return Promise<Undefined> {
@@ -172,7 +172,7 @@ public extension Method {
         }
     }
 
-    convenience init<Result, P0, P1, P2, P3, P4>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction5<Result, P0, P1, P2, P3, P4>.ConvenienceVoidCallback) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
+    convenience init<Result, P0, P1, P2, P3, P4>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction5<Result, P0, P1, P2, P3, P4>.ConvenienceVoidCallback) where Result == Undefined, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 5) { env, _, args in
             try callback(P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]))
             return Undefined.default
@@ -188,7 +188,7 @@ public extension Method {
         }
     }
 
-    convenience init<Result, P0, P1, P2, P3, P4>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction5<Result, P0, P1, P2, P3, P4>.AsyncConvenienceVoidCallback) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
+    convenience init<Result, P0, P1, P2, P3, P4>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction5<Result, P0, P1, P2, P3, P4>.AsyncConvenienceVoidCallback) where Result == Undefined, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 5) { env, _, args in
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4])
             return Promise<Undefined> {
@@ -207,7 +207,7 @@ public extension Method {
         }
     }
 
-    convenience init<Result, P0, P1, P2, P3>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction4<Result, P0, P1, P2, P3>.ConvenienceVoidCallback) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
+    convenience init<Result, P0, P1, P2, P3>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction4<Result, P0, P1, P2, P3>.ConvenienceVoidCallback) where Result == Undefined, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 4) { env, _, args in
             try callback(P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]))
             return Undefined.default
@@ -223,7 +223,7 @@ public extension Method {
         }
     }
 
-    convenience init<Result, P0, P1, P2, P3>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction4<Result, P0, P1, P2, P3>.AsyncConvenienceVoidCallback) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
+    convenience init<Result, P0, P1, P2, P3>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction4<Result, P0, P1, P2, P3>.AsyncConvenienceVoidCallback) where Result == Undefined, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 4) { env, _, args in
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3])
             return Promise<Undefined> {
@@ -242,7 +242,7 @@ public extension Method {
         }
     }
 
-    convenience init<Result, P0, P1, P2>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction3<Result, P0, P1, P2>.ConvenienceVoidCallback) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
+    convenience init<Result, P0, P1, P2>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction3<Result, P0, P1, P2>.ConvenienceVoidCallback) where Result == Undefined, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 3) { env, _, args in
             try callback(P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]))
             return Undefined.default
@@ -258,7 +258,7 @@ public extension Method {
         }
     }
 
-    convenience init<Result, P0, P1, P2>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction3<Result, P0, P1, P2>.AsyncConvenienceVoidCallback) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
+    convenience init<Result, P0, P1, P2>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction3<Result, P0, P1, P2>.AsyncConvenienceVoidCallback) where Result == Undefined, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 3) { env, _, args in
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2])
             return Promise<Undefined> {
@@ -277,7 +277,7 @@ public extension Method {
         }
     }
 
-    convenience init<Result, P0, P1>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction2<Result, P0, P1>.ConvenienceVoidCallback) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible {
+    convenience init<Result, P0, P1>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction2<Result, P0, P1>.ConvenienceVoidCallback) where Result == Undefined, P0: ValueConvertible, P1: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 2) { env, _, args in
             try callback(P0(env, from: args[0]), P1(env, from: args[1]))
             return Undefined.default
@@ -293,7 +293,7 @@ public extension Method {
         }
     }
 
-    convenience init<Result, P0, P1>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction2<Result, P0, P1>.AsyncConvenienceVoidCallback) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible {
+    convenience init<Result, P0, P1>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction2<Result, P0, P1>.AsyncConvenienceVoidCallback) where Result == Undefined, P0: ValueConvertible, P1: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 2) { env, _, args in
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1])
             return Promise<Undefined> {
@@ -312,7 +312,7 @@ public extension Method {
         }
     }
 
-    convenience init<Result, P0>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction1<Result, P0>.ConvenienceVoidCallback) where Result: ValueConvertible, P0: ValueConvertible {
+    convenience init<Result, P0>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction1<Result, P0>.ConvenienceVoidCallback) where Result == Undefined, P0: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 1) { env, _, args in
             try callback(P0(env, from: args[0]))
             return Undefined.default
@@ -328,7 +328,7 @@ public extension Method {
         }
     }
 
-    convenience init<Result, P0>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction1<Result, P0>.AsyncConvenienceVoidCallback) where Result: ValueConvertible, P0: ValueConvertible {
+    convenience init<Result, P0>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction1<Result, P0>.AsyncConvenienceVoidCallback) where Result == Undefined, P0: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 1) { env, _, args in
             let p0 = try P0(env, from: args[0])
             return Promise<Undefined> {
@@ -347,7 +347,7 @@ public extension Method {
         }
     }
 
-    convenience init<Result>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction0<Result>.ConvenienceVoidCallback) where Result: ValueConvertible {
+    convenience init<Result>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction0<Result>.ConvenienceVoidCallback) where Result == Undefined {
         self.init(name, attributes: attributes, argCount: 0) { _, _, _ in
             try callback()
             return Undefined.default
@@ -363,7 +363,7 @@ public extension Method {
         }
     }
 
-    convenience init<Result>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction0<Result>.AsyncConvenienceVoidCallback) where Result: ValueConvertible {
+    convenience init<Result>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction0<Result>.AsyncConvenienceVoidCallback) where Result == Undefined {
         self.init(name, attributes: attributes, argCount: 0) { _, _, _ in
 
             Promise<Undefined> {

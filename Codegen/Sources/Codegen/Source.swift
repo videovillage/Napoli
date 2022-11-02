@@ -188,6 +188,10 @@ extension Collection<Generic> {
         map { Where.conforms($0.type, type) }
     }
 
+    func equals(_ type: String) -> [Where] {
+        map { Where.equals($0.type, type) }
+    }
+
     var bracketedOrNone: String {
         if isEmpty {
             return ""
@@ -205,11 +209,14 @@ extension [Generic] {
 
 enum Where {
     case conforms(String, String)
+    case equals(String, String)
 
     var value: String {
         switch self {
         case let .conforms(lhs, rhs):
             return "\(lhs): \(rhs)"
+        case let .equals(lhs, rhs):
+            return "\(lhs) == \(rhs)"
         }
     }
 }
