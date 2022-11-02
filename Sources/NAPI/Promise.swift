@@ -43,7 +43,7 @@ private actor ThreadSafeDeferred {
         var result: Result<ValueConvertible, Swift.Error>?
     }
 
-    private let finalize: ThreadsafeFunction
+    private let finalize: ThreadsafeTypedFunction0<Undefined>
     private let storage: Storage
 
     public init(_ env: napi_env, _ promise: UnsafeMutablePointer<napi_value?>!) throws {
@@ -53,7 +53,7 @@ private actor ThreadSafeDeferred {
 
         self.storage = storage
 
-        finalize = try .init(env, Function(named: "ThreadSafeDeferred") { (env: napi_env) in
+        finalize = try .init(env, .init(named: "ThreadSafeDeferred") { (env: napi_env, _, _) in
             do {
                 let success = try storage.result!.get().napiValue(env)
                 try! napi_resolve_deferred(env, deferred, success).throwIfError()
@@ -72,6 +72,7 @@ private actor ThreadSafeDeferred {
                                        &jsError).throwIfError()
                 try! napi_reject_deferred(env, deferred, jsError).throwIfError()
             }
+            return Undefined.default
         })
     }
 
