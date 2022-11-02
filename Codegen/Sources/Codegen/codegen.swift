@@ -1,13 +1,37 @@
 import Foundation
+import ArgumentParser
 
 @main
-public enum Codegen {
-    public static func main() {
-        do {
-            print(try TypedFunction.generate(maxParams: 10).result())
-        } catch {
-            print("An error occured: \(error.localizedDescription)")
+struct Codegen: ParsableCommand {
+    enum Error: LocalizedError {
+        case invalidFolderURL
+
+        var errorDescription: String? {
+            switch self {
+            case .invalidFolderURL:
+                return "The specified path must be a valid directory."
+            }
         }
+    }
+
+    @Argument(help: "The folder path to emit *.generated.swift files",
+              transform: URL.init(fileURLWithPath:))
+    var folderURL: URL
+
+    func generatedFile(named name: String) -> URL {
+        folderURL.appending(path: "\(name).generated.swift", directoryHint: .notDirectory)
+    }
+
+    func validate() throws {
+        var isDirectory: ObjCBool = false
+        let fileExists = FileManager.default.fileExists(atPath: folderURL.path, isDirectory: &isDirectory)
+        guard fileExists, isDirectory.boolValue else {
+            throw Error.invalidFolderURL
+        }
+    }
+    
+    mutating func run() throws {
+        try TypedFunction.generate(maxParams: 10).result().write(to: generatedFile(named: "TypedFunction"), atomically: true, encoding: .utf8)
     }
 }
 
@@ -24,6 +48,9 @@ enum TypedFunction {
         let wheres = buildConformances(allGenerics, to: Types.valueConvertible)
 
         var source = Source()
+
+        source.add("import NAPIC")
+        source.newline()
 
         try source.declareClass(.public, "TypedFunction", genericParams: allGenerics, conformsTo: Types.valueConvertible, wheres: wheres) { source in
             source.add("""
@@ -57,6 +84,29 @@ enum TypedFunction {
 
                        public static func resolveArgs(_ env: napi_env, args: Arguments) throws -> TypedArgs {
                            try (\(inGenerics.enumerated().map { "\($0.element)(env, from: args.\($0.offset))" }.joined(separator: ", ")))
+                       }
+
+                       fileprivate func _call(_ env: napi_env, this: ValueConvertible, args: [ValueConvertible]) throws where Result == Undefined {
+                           let handle = try napiValue(env)
+
+                           let args: [napi_value?] = try args.map { try $0.napiValue(env) }
+
+                           try args.withUnsafeBufferPointer { argsBytes in
+                               try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, nil)
+                           }.throwIfError()
+                       }
+
+                       fileprivate func _call(_ env: napi_env, this: ValueConvertible, args: [ValueConvertible]) throws -> Result {
+                           let handle = try napiValue(env)
+
+                           let args: [napi_value?] = try args.map { try $0.napiValue(env) }
+
+                           var result: napi_value?
+                           try args.withUnsafeBufferPointer { argsBytes in
+                               try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, &result)
+                           }.throwIfError()
+
+                           return try Result(env, from: result!)
                        }
                        """)
         }

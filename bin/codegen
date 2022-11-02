@@ -1,4 +1,4 @@
 SCRIPT_DIR="$(cd "$(dirname "$0")"; pwd)"
 
 cd "$SCRIPT_DIR/../codegen/"
-swift run codegen "${SCRIPT_DIR}/../Sources/"
+swift run codegen "${SCRIPT_DIR}/../Sources/NAPI/"
