@@ -6,7 +6,7 @@ public protocol ErrorConvertible: Swift.Error {
     var code: String? { get }
 }
 
-private func throwError(_ env: napi_env, _ error: Swift.Error) throws {
+internal func throwError(_ env: napi_env, _ error: Swift.Error) throws {
     if let error = error as? NAPI.Error {
         try error.napi_throw(env).throwIfError()
     } else if let error = error as? ValueConvertible {
@@ -18,7 +18,7 @@ private func throwError(_ env: napi_env, _ error: Swift.Error) throws {
     }
 }
 
-private func exceptionIsPending(_ env: napi_env) throws -> Bool {
+internal func exceptionIsPending(_ env: napi_env) throws -> Bool {
     var result = false
 
     try napi_is_exception_pending(env, &result).throwIfError()

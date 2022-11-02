@@ -46,11 +46,11 @@ public class InstanceProperty<This: AnyObject>: Property {
         super.init(name: name,
                    attributes: attributes,
                    getter: { env, args in
-            try Wrap<This>.unwrap(env, jsObject: args.this)[keyPath: keyPath]
-        },
+                       try Wrap<This>.unwrap(env, jsObject: args.this)[keyPath: keyPath]
+                   },
                    setter: { env, args in
-            try Wrap<This>.unwrap(env, jsObject: args.this)[keyPath: keyPath] = V(env, from: args.0)
-            return Undefined.default
-        })
+                       try Wrap<This>.unwrap(env, jsObject: args.this)[keyPath: keyPath] = V(env, from: args.0)
+                       return Undefined.default
+                   })
     }
 }

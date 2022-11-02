@@ -1,5 +1,5 @@
-import Foundation
 import ArgumentParser
+import Foundation
 
 @main
 struct Codegen: ParsableCommand {
@@ -29,7 +29,7 @@ struct Codegen: ParsableCommand {
             throw Error.invalidFolderURL
         }
     }
-    
+
     mutating func run() throws {
         try TypedFunction.generate(maxParams: 10).result().write(to: generatedFile(named: "TypedFunction"), atomically: true, encoding: .utf8)
     }
@@ -41,77 +41,156 @@ enum Types {
 
 enum TypedFunction {
     static func generate(maxParams: Int) throws -> Source {
-        let resultGeneric = "Result"
-        let inGenerics = buildGenericParams(prefix: "P", count: maxParams)
-        let allGenerics = [resultGeneric] + inGenerics
-
-        let wheres = buildConformances(allGenerics, to: Types.valueConvertible)
-
         var source = Source()
 
         source.add("import NAPIC")
         source.newline()
+        source.add("""
+            public typealias NewCallback = (napi_env, napi_value, [napi_value]) throws -> ValueConvertible
 
-        try source.declareClass(.public, "TypedFunction", genericParams: allGenerics, conformsTo: Types.valueConvertible, wheres: wheres) { source in
-            source.add("""
-                       fileprivate enum InternalTypedFunction {
-                           case javascript(napi_value)
-                           case swift(String, TypedClosure)
-                       }
+            private class NewCallbackData {
+                let callback: NewCallback
+                let argCount: Int
 
-                       public typealias TypedArgs = (\(inGenerics.joined(separator: ", ")))
-                       public typealias TypedClosure = (napi_env, TypedArgs) throws -> Result
-                       fileprivate let value: InternalTypedFunction
+                init(callback: @escaping NewCallback, argCount: Int) {
+                    self.callback = callback
+                    self.argCount = argCount
+                }
+            }
 
-                       public required init(_: napi_env, from: napi_value) throws {
-                           value = .javascript(from)
-                       }
+            func newNAPICallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) -> napi_value? {
+                var this: napi_value!
+                let dataPointer = UnsafeMutablePointer<UnsafeMutableRawPointer?>.allocate(capacity: 1)
+                napi_get_cb_info(env, cbinfo, nil, nil, &this, dataPointer)
+                let data = Unmanaged<NewCallbackData>.fromOpaque(dataPointer.pointee!).takeUnretainedValue()
 
-                       fileprivate init(named name: String, _ callback: @escaping TypedClosure) {
-                           value = .swift(name, callback)
-                       }
+                let usedArgs: [napi_value]
+                if data.argCount > 0 {
+                    var args = [napi_value?](repeating: nil, count: data.argCount)
+                    var argCount = data.argCount
 
-                       public func napiValue(_ env: napi_env) throws -> napi_value {
-                           switch value {
-                           case let .swift(name, callback):
-                               return try createFunction(env, named: name) { env, args in
-                                   try callback(env, Self.resolveArgs(env, args: args))
-                               }
-                           case let .javascript(value):
-                               return value
-                           }
-                       }
+                    args.withUnsafeMutableBufferPointer {
+                        _ = napi_get_cb_info(env, cbinfo, &argCount, $0.baseAddress, nil, nil)
+                    }
 
-                       public static func resolveArgs(_ env: napi_env, args: Arguments) throws -> TypedArgs {
-                           try (\(inGenerics.enumerated().map { "\($0.element)(env, from: args.\($0.offset))" }.joined(separator: ", ")))
-                       }
+                    assert(argCount == data.argCount)
+                    usedArgs = args.map { $0! }
+                } else {
+                    usedArgs = []
+                }
 
-                       fileprivate func _call(_ env: napi_env, this: ValueConvertible, args: [ValueConvertible]) throws where Result == Undefined {
-                           let handle = try napiValue(env)
+                do {
+                    return try data.callback(env, this, usedArgs).napiValue(env)
+                } catch NAPI.Error.pendingException {
+                    return nil
+                } catch {
+                    if try! exceptionIsPending(env) == false { try! throwError(env, error) }
+                    return nil
+                }
+            }
+            """)
+        source.newline()
 
-                           let args: [napi_value?] = try args.map { try $0.napiValue(env) }
-
-                           try args.withUnsafeBufferPointer { argsBytes in
-                               try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, nil)
-                           }.throwIfError()
-                       }
-
-                       fileprivate func _call(_ env: napi_env, this: ValueConvertible, args: [ValueConvertible]) throws -> Result {
-                           let handle = try napiValue(env)
-
-                           let args: [napi_value?] = try args.map { try $0.napiValue(env) }
-
-                           var result: napi_value?
-                           try args.withUnsafeBufferPointer { argsBytes in
-                               try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, &result)
-                           }.throwIfError()
-
-                           return try Result(env, from: result!)
-                       }
-                       """)
+        for i in (0 ..< maxParams).reversed() {
+            try generateClass(source: &source, paramCount: i)
         }
 
         return source
+    }
+
+    static func generateClass(source: inout Source, paramCount: Int) throws {
+        let resultGeneric = "Result"
+        let inGenerics = buildGenericParams(prefix: "P", count: paramCount)
+        let allGenerics = [resultGeneric] + inGenerics
+        let wheres = buildConformances(allGenerics, to: Types.valueConvertible)
+        let commaSeparatedInGenerics = inGenerics.joined(separator: ", ")
+        let inGenericsAsVals = inGenerics.map { $0.lowercased() }.joined(separator: ", ")
+
+        let inGenericsAsArgs: String
+        if paramCount > 0 {
+            inGenericsAsArgs = ", " + inGenerics.map { "_ \($0.lowercased()): \($0)" }.joined(separator: ", ")
+        } else {
+            inGenericsAsArgs = ""
+        }
+
+
+
+        let inGenericsAsNAPI = inGenerics.map { "\($0.lowercased()).napiValue(env)" }.joined(separator: ", ")
+
+        try source.declareClass(.public, "NewTypedFunction\(paramCount)", genericParams: allGenerics, conformsTo: Types.valueConvertible, wheres: wheres) { source in
+            source.add("""
+            public typealias ConvenienceCallback = (\(commaSeparatedInGenerics)) throws -> Result
+            public typealias ConvenienceVoidCallback = (\(commaSeparatedInGenerics)) throws -> Void
+
+            fileprivate enum InternalTypedFunction {
+                case javascript(napi_value)
+                case swift(String, NewCallback)
+            }
+
+            fileprivate let value: InternalTypedFunction
+
+            public required init(_: napi_env, from: napi_value) throws {
+                value = .javascript(from)
+            }
+
+            public init(named name: String, _ callback: @escaping NewCallback) {
+                value = .swift(name, callback)
+            }
+
+            public func napiValue(_ env: napi_env) throws -> napi_value {
+                switch value {
+                case let .swift(name, callback):
+                    return try Self.createFunction(env, named: name) { env, this, args in
+                        try callback(env, this, args)
+                    }
+                case let .javascript(value):
+                    return value
+                }
+            }
+
+            public func call(_ env: napi_env, this: ValueConvertible = Undefined.default\(inGenericsAsArgs)) throws where Result == Undefined {
+                let handle = try napiValue(env)
+
+                let args: [napi_value?] = \(paramCount > 0 ? "try [\(inGenericsAsNAPI)]" : "[]")
+
+                try args.withUnsafeBufferPointer { argsBytes in
+                    try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, nil)
+                }.throwIfError()
+            }
+
+            public func call(_ env: napi_env, this: ValueConvertible = Undefined.default\(inGenericsAsArgs)) throws -> Result {
+                let handle = try napiValue(env)
+
+                let args: [napi_value?] = \(paramCount > 0 ? "try [\(inGenericsAsNAPI)]" : "[]")
+
+                var result: napi_value?
+                try args.withUnsafeBufferPointer { argsBytes in
+                    try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, &result)
+                }.throwIfError()
+
+                return try Result(env, from: result!)
+            }
+
+            private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping NewCallback) throws -> napi_value {
+                var result: napi_value?
+                let nameData = name.data(using: .utf8)!
+
+                let data = NewCallbackData(callback: callback, argCount: \(paramCount))
+                let unmanagedData = Unmanaged.passRetained(data)
+
+                do {
+                    try nameData.withUnsafeBytes {
+                        napi_create_function(env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, newNAPICallback,  unmanagedData.toOpaque(), &result)
+                    }.throwIfError()
+                } catch {
+                    unmanagedData.release()
+                    throw error
+                }
+
+                return result!
+            }
+            """)
+        }
     }
 }
 
@@ -219,7 +298,7 @@ enum Access {
             return "private"
         case .fileprivate:
             return "fileprivate"
-        case .`default`:
+        case .default:
             return ""
         }
     }
@@ -268,7 +347,7 @@ struct Class {
     }
 }
 
-extension Collection where Element == Arg {
+extension Collection<Arg> {
     var value: String {
         if isEmpty {
             return ""
@@ -278,7 +357,7 @@ extension Collection where Element == Arg {
     }
 }
 
-extension Collection where Element == Where {
+extension Collection<Where> {
     var value: String {
         if isEmpty {
             return ""
