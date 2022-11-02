@@ -103,9 +103,9 @@ enum ThreadsafeTypedFunction {
 
         let inGenericsAsNAPI = inGenerics.map { "\($0.type.lowercased()).napiValue(env)" }.commaSeparated
 
-        try source.declareClass(.public, "NewThreadsafeTypedFunction\(paramCount)", genericParams: allGenerics, conformsTo: Types.valueConvertible, wheres: wheres) { source in
+        try source.declareClass(.public, "ThreadsafeTypedFunction\(paramCount)", genericParams: allGenerics, conformsTo: Types.valueConvertible, wheres: wheres) { source in
             source.add("""
-            public typealias InternalFunction = NewTypedFunction\(paramCount)\(allGenerics.bracketedOrNone)
+            public typealias InternalFunction = TypedFunction\(paramCount)\(allGenerics.bracketedOrNone)
             fileprivate var tsfn: napi_threadsafe_function!
 
             public required convenience init(_ env: napi_env, from: napi_value) throws {

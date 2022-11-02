@@ -1,12 +1,12 @@
 import NAPIC
 
-public typealias NewCallback = (napi_env, napi_value, [napi_value]) throws -> ValueConvertible
+public typealias TypedFunctionCallback = (napi_env, napi_value, [napi_value]) throws -> ValueConvertible
 
-private class NewCallbackData {
-    let callback: NewCallback
+private class TypedFunctionCallbackData {
+    let callback: TypedFunctionCallback
     let argCount: Int
 
-    init(callback: @escaping NewCallback, argCount: Int) {
+    init(callback: @escaping TypedFunctionCallback, argCount: Int) {
         self.callback = callback
         self.argCount = argCount
     }
@@ -16,7 +16,7 @@ func newNAPICallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) -> napi_va
     var this: napi_value!
     let dataPointer = UnsafeMutablePointer<UnsafeMutableRawPointer?>.allocate(capacity: 1)
     napi_get_cb_info(env, cbinfo, nil, nil, &this, dataPointer)
-    let data = Unmanaged<NewCallbackData>.fromOpaque(dataPointer.pointee!).takeUnretainedValue()
+    let data = Unmanaged<TypedFunctionCallbackData>.fromOpaque(dataPointer.pointee!).takeUnretainedValue()
 
     let usedArgs: [napi_value]
     if data.argCount > 0 {
@@ -43,13 +43,13 @@ func newNAPICallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) -> napi_va
     }
 }
 
-public class NewTypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
+public class TypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
     public typealias ConvenienceCallback = (P0, P1, P2, P3, P4, P5, P6, P7, P8) throws -> Result
     public typealias ConvenienceVoidCallback = (P0, P1, P2, P3, P4, P5, P6, P7, P8) throws -> Void
 
     fileprivate enum InternalTypedFunction {
         case javascript(napi_value)
-        case swift(String, NewCallback)
+        case swift(String, TypedFunctionCallback)
     }
 
     fileprivate let value: InternalTypedFunction
@@ -58,7 +58,7 @@ public class NewTypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>: Valu
         value = .javascript(from)
     }
 
-    public init(named name: String, _ callback: @escaping NewCallback) {
+    public init(named name: String, _ callback: @escaping TypedFunctionCallback) {
         value = .swift(name, callback)
     }
 
@@ -96,11 +96,11 @@ public class NewTypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>: Valu
         return try Result(env, from: result!)
     }
 
-    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping NewCallback) throws -> napi_value {
+    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
         var result: napi_value?
         let nameData = name.data(using: .utf8)!
 
-        let data = NewCallbackData(callback: callback, argCount: 9)
+        let data = TypedFunctionCallbackData(callback: callback, argCount: 9)
         let unmanagedData = Unmanaged.passRetained(data)
 
         do {
@@ -116,13 +116,13 @@ public class NewTypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>: Valu
     }
 }
 
-public class NewTypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
+public class TypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
     public typealias ConvenienceCallback = (P0, P1, P2, P3, P4, P5, P6, P7) throws -> Result
     public typealias ConvenienceVoidCallback = (P0, P1, P2, P3, P4, P5, P6, P7) throws -> Void
 
     fileprivate enum InternalTypedFunction {
         case javascript(napi_value)
-        case swift(String, NewCallback)
+        case swift(String, TypedFunctionCallback)
     }
 
     fileprivate let value: InternalTypedFunction
@@ -131,7 +131,7 @@ public class NewTypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: ValueCon
         value = .javascript(from)
     }
 
-    public init(named name: String, _ callback: @escaping NewCallback) {
+    public init(named name: String, _ callback: @escaping TypedFunctionCallback) {
         value = .swift(name, callback)
     }
 
@@ -169,11 +169,11 @@ public class NewTypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: ValueCon
         return try Result(env, from: result!)
     }
 
-    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping NewCallback) throws -> napi_value {
+    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
         var result: napi_value?
         let nameData = name.data(using: .utf8)!
 
-        let data = NewCallbackData(callback: callback, argCount: 8)
+        let data = TypedFunctionCallbackData(callback: callback, argCount: 8)
         let unmanagedData = Unmanaged.passRetained(data)
 
         do {
@@ -189,13 +189,13 @@ public class NewTypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: ValueCon
     }
 }
 
-public class NewTypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
+public class TypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
     public typealias ConvenienceCallback = (P0, P1, P2, P3, P4, P5, P6) throws -> Result
     public typealias ConvenienceVoidCallback = (P0, P1, P2, P3, P4, P5, P6) throws -> Void
 
     fileprivate enum InternalTypedFunction {
         case javascript(napi_value)
-        case swift(String, NewCallback)
+        case swift(String, TypedFunctionCallback)
     }
 
     fileprivate let value: InternalTypedFunction
@@ -204,7 +204,7 @@ public class NewTypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: ValueConvert
         value = .javascript(from)
     }
 
-    public init(named name: String, _ callback: @escaping NewCallback) {
+    public init(named name: String, _ callback: @escaping TypedFunctionCallback) {
         value = .swift(name, callback)
     }
 
@@ -242,11 +242,11 @@ public class NewTypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: ValueConvert
         return try Result(env, from: result!)
     }
 
-    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping NewCallback) throws -> napi_value {
+    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
         var result: napi_value?
         let nameData = name.data(using: .utf8)!
 
-        let data = NewCallbackData(callback: callback, argCount: 7)
+        let data = TypedFunctionCallbackData(callback: callback, argCount: 7)
         let unmanagedData = Unmanaged.passRetained(data)
 
         do {
@@ -262,13 +262,13 @@ public class NewTypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: ValueConvert
     }
 }
 
-public class NewTypedFunction6<Result, P0, P1, P2, P3, P4, P5>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
+public class TypedFunction6<Result, P0, P1, P2, P3, P4, P5>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
     public typealias ConvenienceCallback = (P0, P1, P2, P3, P4, P5) throws -> Result
     public typealias ConvenienceVoidCallback = (P0, P1, P2, P3, P4, P5) throws -> Void
 
     fileprivate enum InternalTypedFunction {
         case javascript(napi_value)
-        case swift(String, NewCallback)
+        case swift(String, TypedFunctionCallback)
     }
 
     fileprivate let value: InternalTypedFunction
@@ -277,7 +277,7 @@ public class NewTypedFunction6<Result, P0, P1, P2, P3, P4, P5>: ValueConvertible
         value = .javascript(from)
     }
 
-    public init(named name: String, _ callback: @escaping NewCallback) {
+    public init(named name: String, _ callback: @escaping TypedFunctionCallback) {
         value = .swift(name, callback)
     }
 
@@ -315,11 +315,11 @@ public class NewTypedFunction6<Result, P0, P1, P2, P3, P4, P5>: ValueConvertible
         return try Result(env, from: result!)
     }
 
-    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping NewCallback) throws -> napi_value {
+    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
         var result: napi_value?
         let nameData = name.data(using: .utf8)!
 
-        let data = NewCallbackData(callback: callback, argCount: 6)
+        let data = TypedFunctionCallbackData(callback: callback, argCount: 6)
         let unmanagedData = Unmanaged.passRetained(data)
 
         do {
@@ -335,13 +335,13 @@ public class NewTypedFunction6<Result, P0, P1, P2, P3, P4, P5>: ValueConvertible
     }
 }
 
-public class NewTypedFunction5<Result, P0, P1, P2, P3, P4>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
+public class TypedFunction5<Result, P0, P1, P2, P3, P4>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
     public typealias ConvenienceCallback = (P0, P1, P2, P3, P4) throws -> Result
     public typealias ConvenienceVoidCallback = (P0, P1, P2, P3, P4) throws -> Void
 
     fileprivate enum InternalTypedFunction {
         case javascript(napi_value)
-        case swift(String, NewCallback)
+        case swift(String, TypedFunctionCallback)
     }
 
     fileprivate let value: InternalTypedFunction
@@ -350,7 +350,7 @@ public class NewTypedFunction5<Result, P0, P1, P2, P3, P4>: ValueConvertible whe
         value = .javascript(from)
     }
 
-    public init(named name: String, _ callback: @escaping NewCallback) {
+    public init(named name: String, _ callback: @escaping TypedFunctionCallback) {
         value = .swift(name, callback)
     }
 
@@ -388,11 +388,11 @@ public class NewTypedFunction5<Result, P0, P1, P2, P3, P4>: ValueConvertible whe
         return try Result(env, from: result!)
     }
 
-    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping NewCallback) throws -> napi_value {
+    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
         var result: napi_value?
         let nameData = name.data(using: .utf8)!
 
-        let data = NewCallbackData(callback: callback, argCount: 5)
+        let data = TypedFunctionCallbackData(callback: callback, argCount: 5)
         let unmanagedData = Unmanaged.passRetained(data)
 
         do {
@@ -408,13 +408,13 @@ public class NewTypedFunction5<Result, P0, P1, P2, P3, P4>: ValueConvertible whe
     }
 }
 
-public class NewTypedFunction4<Result, P0, P1, P2, P3>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
+public class TypedFunction4<Result, P0, P1, P2, P3>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
     public typealias ConvenienceCallback = (P0, P1, P2, P3) throws -> Result
     public typealias ConvenienceVoidCallback = (P0, P1, P2, P3) throws -> Void
 
     fileprivate enum InternalTypedFunction {
         case javascript(napi_value)
-        case swift(String, NewCallback)
+        case swift(String, TypedFunctionCallback)
     }
 
     fileprivate let value: InternalTypedFunction
@@ -423,7 +423,7 @@ public class NewTypedFunction4<Result, P0, P1, P2, P3>: ValueConvertible where R
         value = .javascript(from)
     }
 
-    public init(named name: String, _ callback: @escaping NewCallback) {
+    public init(named name: String, _ callback: @escaping TypedFunctionCallback) {
         value = .swift(name, callback)
     }
 
@@ -461,11 +461,11 @@ public class NewTypedFunction4<Result, P0, P1, P2, P3>: ValueConvertible where R
         return try Result(env, from: result!)
     }
 
-    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping NewCallback) throws -> napi_value {
+    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
         var result: napi_value?
         let nameData = name.data(using: .utf8)!
 
-        let data = NewCallbackData(callback: callback, argCount: 4)
+        let data = TypedFunctionCallbackData(callback: callback, argCount: 4)
         let unmanagedData = Unmanaged.passRetained(data)
 
         do {
@@ -481,13 +481,13 @@ public class NewTypedFunction4<Result, P0, P1, P2, P3>: ValueConvertible where R
     }
 }
 
-public class NewTypedFunction3<Result, P0, P1, P2>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
+public class TypedFunction3<Result, P0, P1, P2>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
     public typealias ConvenienceCallback = (P0, P1, P2) throws -> Result
     public typealias ConvenienceVoidCallback = (P0, P1, P2) throws -> Void
 
     fileprivate enum InternalTypedFunction {
         case javascript(napi_value)
-        case swift(String, NewCallback)
+        case swift(String, TypedFunctionCallback)
     }
 
     fileprivate let value: InternalTypedFunction
@@ -496,7 +496,7 @@ public class NewTypedFunction3<Result, P0, P1, P2>: ValueConvertible where Resul
         value = .javascript(from)
     }
 
-    public init(named name: String, _ callback: @escaping NewCallback) {
+    public init(named name: String, _ callback: @escaping TypedFunctionCallback) {
         value = .swift(name, callback)
     }
 
@@ -534,11 +534,11 @@ public class NewTypedFunction3<Result, P0, P1, P2>: ValueConvertible where Resul
         return try Result(env, from: result!)
     }
 
-    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping NewCallback) throws -> napi_value {
+    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
         var result: napi_value?
         let nameData = name.data(using: .utf8)!
 
-        let data = NewCallbackData(callback: callback, argCount: 3)
+        let data = TypedFunctionCallbackData(callback: callback, argCount: 3)
         let unmanagedData = Unmanaged.passRetained(data)
 
         do {
@@ -554,13 +554,13 @@ public class NewTypedFunction3<Result, P0, P1, P2>: ValueConvertible where Resul
     }
 }
 
-public class NewTypedFunction2<Result, P0, P1>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible {
+public class TypedFunction2<Result, P0, P1>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible {
     public typealias ConvenienceCallback = (P0, P1) throws -> Result
     public typealias ConvenienceVoidCallback = (P0, P1) throws -> Void
 
     fileprivate enum InternalTypedFunction {
         case javascript(napi_value)
-        case swift(String, NewCallback)
+        case swift(String, TypedFunctionCallback)
     }
 
     fileprivate let value: InternalTypedFunction
@@ -569,7 +569,7 @@ public class NewTypedFunction2<Result, P0, P1>: ValueConvertible where Result: V
         value = .javascript(from)
     }
 
-    public init(named name: String, _ callback: @escaping NewCallback) {
+    public init(named name: String, _ callback: @escaping TypedFunctionCallback) {
         value = .swift(name, callback)
     }
 
@@ -607,11 +607,11 @@ public class NewTypedFunction2<Result, P0, P1>: ValueConvertible where Result: V
         return try Result(env, from: result!)
     }
 
-    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping NewCallback) throws -> napi_value {
+    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
         var result: napi_value?
         let nameData = name.data(using: .utf8)!
 
-        let data = NewCallbackData(callback: callback, argCount: 2)
+        let data = TypedFunctionCallbackData(callback: callback, argCount: 2)
         let unmanagedData = Unmanaged.passRetained(data)
 
         do {
@@ -627,13 +627,13 @@ public class NewTypedFunction2<Result, P0, P1>: ValueConvertible where Result: V
     }
 }
 
-public class NewTypedFunction1<Result, P0>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible {
+public class TypedFunction1<Result, P0>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible {
     public typealias ConvenienceCallback = (P0) throws -> Result
     public typealias ConvenienceVoidCallback = (P0) throws -> Void
 
     fileprivate enum InternalTypedFunction {
         case javascript(napi_value)
-        case swift(String, NewCallback)
+        case swift(String, TypedFunctionCallback)
     }
 
     fileprivate let value: InternalTypedFunction
@@ -642,7 +642,7 @@ public class NewTypedFunction1<Result, P0>: ValueConvertible where Result: Value
         value = .javascript(from)
     }
 
-    public init(named name: String, _ callback: @escaping NewCallback) {
+    public init(named name: String, _ callback: @escaping TypedFunctionCallback) {
         value = .swift(name, callback)
     }
 
@@ -680,11 +680,11 @@ public class NewTypedFunction1<Result, P0>: ValueConvertible where Result: Value
         return try Result(env, from: result!)
     }
 
-    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping NewCallback) throws -> napi_value {
+    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
         var result: napi_value?
         let nameData = name.data(using: .utf8)!
 
-        let data = NewCallbackData(callback: callback, argCount: 1)
+        let data = TypedFunctionCallbackData(callback: callback, argCount: 1)
         let unmanagedData = Unmanaged.passRetained(data)
 
         do {
@@ -700,13 +700,13 @@ public class NewTypedFunction1<Result, P0>: ValueConvertible where Result: Value
     }
 }
 
-public class NewTypedFunction0<Result>: ValueConvertible where Result: ValueConvertible {
+public class TypedFunction0<Result>: ValueConvertible where Result: ValueConvertible {
     public typealias ConvenienceCallback = () throws -> Result
     public typealias ConvenienceVoidCallback = () throws -> Void
 
     fileprivate enum InternalTypedFunction {
         case javascript(napi_value)
-        case swift(String, NewCallback)
+        case swift(String, TypedFunctionCallback)
     }
 
     fileprivate let value: InternalTypedFunction
@@ -715,7 +715,7 @@ public class NewTypedFunction0<Result>: ValueConvertible where Result: ValueConv
         value = .javascript(from)
     }
 
-    public init(named name: String, _ callback: @escaping NewCallback) {
+    public init(named name: String, _ callback: @escaping TypedFunctionCallback) {
         value = .swift(name, callback)
     }
 
@@ -753,11 +753,11 @@ public class NewTypedFunction0<Result>: ValueConvertible where Result: ValueConv
         return try Result(env, from: result!)
     }
 
-    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping NewCallback) throws -> napi_value {
+    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
         var result: napi_value?
         let nameData = name.data(using: .utf8)!
 
-        let data = NewCallbackData(callback: callback, argCount: 0)
+        let data = TypedFunctionCallbackData(callback: callback, argCount: 0)
         let unmanagedData = Unmanaged.passRetained(data)
 
         do {

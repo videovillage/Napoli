@@ -71,8 +71,8 @@ private func _call<Result: ValueConvertible>(tsfn: napi_threadsafe_function, thi
     } as! Result
 }
 
-public class NewThreadsafeTypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
-    public typealias InternalFunction = NewTypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>
+public class ThreadsafeTypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
+    public typealias InternalFunction = TypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>
     fileprivate var tsfn: napi_threadsafe_function!
 
     public required convenience init(_ env: napi_env, from: napi_value) throws {
@@ -113,8 +113,8 @@ public class NewThreadsafeTypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7,
     }
 }
 
-public class NewThreadsafeTypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
-    public typealias InternalFunction = NewTypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>
+public class ThreadsafeTypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
+    public typealias InternalFunction = TypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>
     fileprivate var tsfn: napi_threadsafe_function!
 
     public required convenience init(_ env: napi_env, from: napi_value) throws {
@@ -155,8 +155,8 @@ public class NewThreadsafeTypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>
     }
 }
 
-public class NewThreadsafeTypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
-    public typealias InternalFunction = NewTypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>
+public class ThreadsafeTypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
+    public typealias InternalFunction = TypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>
     fileprivate var tsfn: napi_threadsafe_function!
 
     public required convenience init(_ env: napi_env, from: napi_value) throws {
@@ -197,8 +197,8 @@ public class NewThreadsafeTypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: Va
     }
 }
 
-public class NewThreadsafeTypedFunction6<Result, P0, P1, P2, P3, P4, P5>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
-    public typealias InternalFunction = NewTypedFunction6<Result, P0, P1, P2, P3, P4, P5>
+public class ThreadsafeTypedFunction6<Result, P0, P1, P2, P3, P4, P5>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
+    public typealias InternalFunction = TypedFunction6<Result, P0, P1, P2, P3, P4, P5>
     fileprivate var tsfn: napi_threadsafe_function!
 
     public required convenience init(_ env: napi_env, from: napi_value) throws {
@@ -239,8 +239,8 @@ public class NewThreadsafeTypedFunction6<Result, P0, P1, P2, P3, P4, P5>: ValueC
     }
 }
 
-public class NewThreadsafeTypedFunction5<Result, P0, P1, P2, P3, P4>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
-    public typealias InternalFunction = NewTypedFunction5<Result, P0, P1, P2, P3, P4>
+public class ThreadsafeTypedFunction5<Result, P0, P1, P2, P3, P4>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
+    public typealias InternalFunction = TypedFunction5<Result, P0, P1, P2, P3, P4>
     fileprivate var tsfn: napi_threadsafe_function!
 
     public required convenience init(_ env: napi_env, from: napi_value) throws {
@@ -281,8 +281,8 @@ public class NewThreadsafeTypedFunction5<Result, P0, P1, P2, P3, P4>: ValueConve
     }
 }
 
-public class NewThreadsafeTypedFunction4<Result, P0, P1, P2, P3>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
-    public typealias InternalFunction = NewTypedFunction4<Result, P0, P1, P2, P3>
+public class ThreadsafeTypedFunction4<Result, P0, P1, P2, P3>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
+    public typealias InternalFunction = TypedFunction4<Result, P0, P1, P2, P3>
     fileprivate var tsfn: napi_threadsafe_function!
 
     public required convenience init(_ env: napi_env, from: napi_value) throws {
@@ -323,8 +323,8 @@ public class NewThreadsafeTypedFunction4<Result, P0, P1, P2, P3>: ValueConvertib
     }
 }
 
-public class NewThreadsafeTypedFunction3<Result, P0, P1, P2>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
-    public typealias InternalFunction = NewTypedFunction3<Result, P0, P1, P2>
+public class ThreadsafeTypedFunction3<Result, P0, P1, P2>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
+    public typealias InternalFunction = TypedFunction3<Result, P0, P1, P2>
     fileprivate var tsfn: napi_threadsafe_function!
 
     public required convenience init(_ env: napi_env, from: napi_value) throws {
@@ -365,8 +365,8 @@ public class NewThreadsafeTypedFunction3<Result, P0, P1, P2>: ValueConvertible w
     }
 }
 
-public class NewThreadsafeTypedFunction2<Result, P0, P1>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible {
-    public typealias InternalFunction = NewTypedFunction2<Result, P0, P1>
+public class ThreadsafeTypedFunction2<Result, P0, P1>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible {
+    public typealias InternalFunction = TypedFunction2<Result, P0, P1>
     fileprivate var tsfn: napi_threadsafe_function!
 
     public required convenience init(_ env: napi_env, from: napi_value) throws {
@@ -407,8 +407,8 @@ public class NewThreadsafeTypedFunction2<Result, P0, P1>: ValueConvertible where
     }
 }
 
-public class NewThreadsafeTypedFunction1<Result, P0>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible {
-    public typealias InternalFunction = NewTypedFunction1<Result, P0>
+public class ThreadsafeTypedFunction1<Result, P0>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible {
+    public typealias InternalFunction = TypedFunction1<Result, P0>
     fileprivate var tsfn: napi_threadsafe_function!
 
     public required convenience init(_ env: napi_env, from: napi_value) throws {
@@ -449,8 +449,8 @@ public class NewThreadsafeTypedFunction1<Result, P0>: ValueConvertible where Res
     }
 }
 
-public class NewThreadsafeTypedFunction0<Result>: ValueConvertible where Result: ValueConvertible {
-    public typealias InternalFunction = NewTypedFunction0<Result>
+public class ThreadsafeTypedFunction0<Result>: ValueConvertible where Result: ValueConvertible {
+    public typealias InternalFunction = TypedFunction0<Result>
     fileprivate var tsfn: napi_threadsafe_function!
 
     public required convenience init(_ env: napi_env, from: napi_value) throws {

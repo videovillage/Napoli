@@ -7,13 +7,13 @@ enum TypedFunction {
         source.add("import NAPIC")
         source.newline()
         source.add("""
-            public typealias NewCallback = (napi_env, napi_value, [napi_value]) throws -> ValueConvertible
+            public typealias TypedFunctionCallback = (napi_env, napi_value, [napi_value]) throws -> ValueConvertible
 
-            private class NewCallbackData {
-                let callback: NewCallback
+            private class TypedFunctionCallbackData {
+                let callback: TypedFunctionCallback
                 let argCount: Int
 
-                init(callback: @escaping NewCallback, argCount: Int) {
+                init(callback: @escaping TypedFunctionCallback, argCount: Int) {
                     self.callback = callback
                     self.argCount = argCount
                 }
@@ -23,7 +23,7 @@ enum TypedFunction {
                 var this: napi_value!
                 let dataPointer = UnsafeMutablePointer<UnsafeMutableRawPointer?>.allocate(capacity: 1)
                 napi_get_cb_info(env, cbinfo, nil, nil, &this, dataPointer)
-                let data = Unmanaged<NewCallbackData>.fromOpaque(dataPointer.pointee!).takeUnretainedValue()
+                let data = Unmanaged<TypedFunctionCallbackData>.fromOpaque(dataPointer.pointee!).takeUnretainedValue()
 
                 let usedArgs: [napi_value]
                 if data.argCount > 0 {
@@ -75,14 +75,14 @@ enum TypedFunction {
 
         let inGenericsAsNAPI = inGenerics.map { "\($0.type.lowercased()).napiValue(env)" }.commaSeparated
 
-        try source.declareClass(.public, "NewTypedFunction\(paramCount)", genericParams: allGenerics, conformsTo: Types.valueConvertible, wheres: wheres) { source in
+        try source.declareClass(.public, "TypedFunction\(paramCount)", genericParams: allGenerics, conformsTo: Types.valueConvertible, wheres: wheres) { source in
             source.add("""
             public typealias ConvenienceCallback = (\(commaSeparatedInGenerics)) throws -> Result
             public typealias ConvenienceVoidCallback = (\(commaSeparatedInGenerics)) throws -> Void
 
             fileprivate enum InternalTypedFunction {
                 case javascript(napi_value)
-                case swift(String, NewCallback)
+                case swift(String, TypedFunctionCallback)
             }
 
             fileprivate let value: InternalTypedFunction
@@ -91,7 +91,7 @@ enum TypedFunction {
                 value = .javascript(from)
             }
 
-            public init(named name: String, _ callback: @escaping NewCallback) {
+            public init(named name: String, _ callback: @escaping TypedFunctionCallback) {
                 value = .swift(name, callback)
             }
 
@@ -129,11 +129,11 @@ enum TypedFunction {
                 return try Result(env, from: result!)
             }
 
-            private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping NewCallback) throws -> napi_value {
+            private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
                 var result: napi_value?
                 let nameData = name.data(using: .utf8)!
 
-                let data = NewCallbackData(callback: callback, argCount: \(paramCount))
+                let data = TypedFunctionCallbackData(callback: callback, argCount: \(paramCount))
                 let unmanagedData = Unmanaged.passRetained(data)
 
                 do {
