@@ -92,7 +92,6 @@ enum ThreadsafeTypedFunction {
         let inGenerics = [Generic](prefix: "P", count: paramCount)
         let allGenerics = [resultGeneric] + inGenerics
         let wheres = allGenerics.conforming(to: Types.valueConvertible)
-        let commaSeparatedInGenerics = inGenerics.map(\.type).commaSeparated
 
         let inGenericsAsArgs: String
         if paramCount > 0 {
@@ -100,8 +99,6 @@ enum ThreadsafeTypedFunction {
         } else {
             inGenericsAsArgs = ""
         }
-
-        let inGenericsAsNAPI = inGenerics.map { "\($0.type.lowercased()).napiValue(env)" }.commaSeparated
 
         try source.declareClass(.public, "ThreadsafeTypedFunction\(paramCount)", genericParams: allGenerics, conformsTo: Types.valueConvertible, wheres: wheres) { source in
             source.add("""
