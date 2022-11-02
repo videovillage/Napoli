@@ -45,10 +45,9 @@ enum Method {
         let allGenerics = [resultGeneric] + inGenerics
         let wheres = allGenerics.conforming(to: Types.valueConvertible).value
 
-        let voidWheres = ([resultGeneric].equals("Undefined") + inGenerics.conforming(to: Types.valueConvertible)).value
+        let commaSeparatedInGenerics = inGenerics.map(\.type).commaSeparated
 
-        let allGenericsAsyncCallback = [resultGeneric] + inGenerics + [.init(type: "R")]
-        let wheresAsyncCallback = allGenericsAsyncCallback.conforming(to: Types.valueConvertible).value
+        let voidWheres = inGenerics.conforming(to: Types.valueConvertible).value
 
         let argListAsParams: String
         if paramCount > 0 {
@@ -69,29 +68,29 @@ enum Method {
         source.add("""
          // \(paramCount) param methods
          public extension Method {
-             convenience init\(allGenerics.bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction\(paramCount)\(allGenerics.bracketedOrNone).ConvenienceCallback)\(wheres.backspaceIfNotEmpty()) {
+             convenience init\(allGenerics.bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (\(commaSeparatedInGenerics)) throws -> Result)\(wheres.backspaceIfNotEmpty()) {
                  self.init(name, attributes: attributes, argCount: \(paramCount)) { env, this, args in
                      try callback(\(argListAsParams))
                  }
              }
 
-             convenience init\(allGenerics.bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction\(paramCount)\(allGenerics.bracketedOrNone).ConvenienceVoidCallback)\(voidWheres.backspaceIfNotEmpty()) {
+             convenience init\(inGenerics.bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (\(commaSeparatedInGenerics)) throws -> Void)\(voidWheres.backspaceIfNotEmpty()) {
                  self.init(name, attributes: attributes, argCount: \(paramCount)) { env, this, args in
                      try callback(\(argListAsParams))
                      return Undefined.default
                  }
              }
 
-             convenience init\(allGenericsAsyncCallback.bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction\(paramCount)\(allGenerics.bracketedOrNone).AsyncConvenienceCallback<R>)\(wheresAsyncCallback.backspaceIfNotEmpty()) {
+             convenience init\(allGenerics.bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (\(commaSeparatedInGenerics)) async throws -> Result)\(wheres.backspaceIfNotEmpty()) {
                 self.init(name, attributes: attributes, argCount: \(paramCount)) { env, this, args in
                     \(argListAssignedToValues)
-                    return Promise<R> {
+                    return Promise<Result> {
                          try await callback(\(argValueList))
                     }
                 }
              }
 
-             convenience init\(allGenerics.bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping TypedFunction\(paramCount)\(allGenerics.bracketedOrNone).AsyncConvenienceVoidCallback)\(voidWheres.backspaceIfNotEmpty()) {
+             convenience init\(inGenerics.bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (\(commaSeparatedInGenerics)) async throws -> Void)\(voidWheres.backspaceIfNotEmpty()) {
                 self.init(name, attributes: attributes, argCount: \(paramCount)) { env, this, args in
                     \(argListAssignedToValues)
                     return Promise<Undefined> {
