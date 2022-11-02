@@ -81,6 +81,19 @@ enum Method {
                  }
              }
 
+              convenience init\(allGenerics.bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (napi_env\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Result)\(wheres.backspaceIfNotEmpty()) {
+                  self.init(name, attributes: attributes, argCount: \(paramCount)) { env, this, args in
+                      try callback(env\(argListAsParams.prefixCommaIfNotEmpty()))
+                  }
+              }
+
+              convenience init\(inGenerics.bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (napi_env\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Void)\(voidWheres.backspaceIfNotEmpty()) {
+                  self.init(name, attributes: attributes, argCount: \(paramCount)) { env, this, args in
+                      try callback(env\(argListAsParams.prefixCommaIfNotEmpty()))
+                      return Undefined.default
+                  }
+              }
+
              convenience init\(allGenerics.bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (\(commaSeparatedInGenerics)) async throws -> Result)\(wheres.backspaceIfNotEmpty()) {
                 self.init(name, attributes: attributes, argCount: \(paramCount)) { env, this, args in
                     \(argListAssignedToValues)
