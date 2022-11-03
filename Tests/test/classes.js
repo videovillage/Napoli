@@ -29,11 +29,13 @@ describe('Classes', () => {
     const changedTestObject = object.testObject
     changedTestObject.testString = 'replacementTestString'
     changedTestObject.nested.nestedTestString = 'replacementNestedTestString'
+    changedTestObject.optionalNested = { nestedTestString: 'replacementOptionalNestedTestString' }
 
     object.testObject = changedTestObject
 
     assert.strictEqual(object.testObject.testString, 'replacementTestString')
     assert.strictEqual(object.testObject.nested.nestedTestString, 'replacementNestedTestString')
+    assert.strictEqual(object.testObject.optionalNested.nestedTestString, 'replacementOptionalNestedTestString')
 
     assert.strictEqual(other.testString, 'Cool')
     assert.strictEqual(other.testNumber, 1234)
