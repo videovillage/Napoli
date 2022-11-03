@@ -7,6 +7,27 @@ public protocol ValueConvertible {
     func eraseToAny() throws -> AnyValue
 }
 
+/// Here Be Dragons
+public protocol ObjectConvertible: Codable, ValueConvertible, Equatable {}
+
+public extension ObjectConvertible {
+    init(_ env: napi_env, from: napi_value) throws {
+        let object = try [String: AnyValue](env, from: from)
+        let encoded = try JSONEncoder().encode(object)
+        self = try JSONDecoder().decode(Self.self, from: encoded)
+    }
+
+    func napiValue(_ env: napi_env) throws -> napi_value {
+        try eraseToAny().napiValue(env)
+    }
+
+    func eraseToAny() throws -> AnyValue {
+        let encoded = try JSONEncoder().encode(self)
+        let result = try JSONDecoder().decode([String: AnyValue].self, from: encoded)
+        return .object(result)
+    }
+}
+
 enum TypeErasureError: LocalizedError {
     case notSupported(type: String)
 

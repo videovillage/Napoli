@@ -10,16 +10,30 @@ describe('Classes', () => {
   })
 
   it('creates classes with get/set properties', () => {
-    const testObject = new addon.TestClass1()
+    const object = new addon.TestClass1()
     const other = new addon.TestClass1()
 
-    assert.strictEqual(testObject.testString, 'Cool')
-    testObject.testString = 'Changed'
-    assert.strictEqual(testObject.testString, 'Changed')
+    assert.strictEqual(object.testString, 'Cool')
+    object.testString = 'Changed'
+    assert.strictEqual(object.testString, 'Changed')
 
-    assert.strictEqual(testObject.testNumber, 1234)
-    testObject.testNumber = 4567
-    assert.strictEqual(testObject.testNumber, 4567)
+    assert.strictEqual(object.testNumber, 1234)
+    object.testNumber = 4567
+    assert.strictEqual(object.testNumber, 4567)
+
+    assert.strictEqual(object.testObject.testString, 'testString')
+    assert.strictEqual(object.testObject.optionalString, 'optionalTestString')
+    assert.strictEqual(object.testObject.nested.nestedTestString, 'nestedTestString')
+    assert.strictEqual(object.testObject.optionalNested, undefined)
+
+    const changedTestObject = object.testObject
+    changedTestObject.testString = 'replacementTestString'
+    changedTestObject.nested.nestedTestString = 'replacementNestedTestString'
+
+    object.testObject = changedTestObject
+
+    assert.strictEqual(object.testObject.testString, 'replacementTestString')
+    assert.strictEqual(object.testObject.nested.nestedTestString, 'replacementNestedTestString')
 
     assert.strictEqual(other.testString, 'Cool')
     assert.strictEqual(other.testNumber, 1234)

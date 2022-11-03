@@ -117,6 +117,7 @@ func takeTypedCallback(env: OpaquePointer, fn: TypedFunction2<String, Int32, Boo
 final class TestClass1: ClassConvertible {
     var testString: String = "Cool"
     var testNumber: Double = 1234
+    var testObject = TestObject(testString: "testString", optionalString: "optionalTestString", nested: .init(nestedTestString: "nestedTestString"), optionalNested: nil)
 
     var readOnlyTestString: String {
         "ReadOnlyTest"
@@ -125,6 +126,7 @@ final class TestClass1: ClassConvertible {
     func reset() {
         testString = "Cool"
         testNumber = 1234
+        testObject = TestObject(testString: "testString", optionalString: "optionalTestString", nested: .init(nestedTestString: "nestedTestString"), optionalNested: nil)
     }
 
     func testThrowError() throws {
@@ -135,6 +137,7 @@ final class TestClass1: ClassConvertible {
 
     static let jsName = "TestClass1"
     static let jsInstanceProperties: [InstanceGetSetPropertyDescriptor<TestClass1>] = [
+        .init("testObject", keyPath: \.testObject),
         .init("testString", keyPath: \.testString),
         .init("testNumber", keyPath: \.testNumber),
         .init("readOnlyTestString", keyPath: \.readOnlyTestString),
@@ -143,6 +146,17 @@ final class TestClass1: ClassConvertible {
         .init("reset", TestClass1.reset),
         .init("testThrowError", TestClass1.testThrowError),
     ]
+}
+
+struct TestObject: ObjectConvertible {
+    let testString: String
+    let optionalString: String?
+    let nested: Nested
+    let optionalNested: Nested?
+
+    struct Nested: ObjectConvertible {
+        let nestedTestString: String
+    }
 }
 
 @_cdecl("_init_napi_tests")
@@ -174,7 +188,7 @@ func initNAPITests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointer?
         MethodDescriptor("returnSuccessfulPromise", returnSuccessfulPromise),
         MethodDescriptor("returnThrowingPromise", returnThrowingPromise),
         MethodDescriptor("takeTypedCallback", takeTypedCallback),
-        ClassDescriptor(TestClass1.self),
+        ClassDescriptor(TestClass1.self)
     ])
 }
 

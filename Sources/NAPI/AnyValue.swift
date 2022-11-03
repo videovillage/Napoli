@@ -81,10 +81,10 @@ public enum AnyValue: ValueConvertible, Codable {
             self = .number(number)
         } else if let boolean = try? container.decode(Bool.self) {
             self = .boolean(boolean)
-        } else if container.decodeNil() {
-            self = .null
         } else if let object = try? container.decode([String: AnyValue].self) {
             self = .object(object)
+        } else if container.decodeNil() {
+            self = .null
         } else {
             throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Failed to decode value"))
         }
@@ -109,6 +109,10 @@ public enum AnyValue: ValueConvertible, Codable {
         case .null, .undefined:
             try container.encodeNil()
         }
+    }
+
+    public func eraseToAny() throws -> AnyValue {
+        self
     }
 }
 
