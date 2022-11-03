@@ -1,7 +1,7 @@
 import Foundation
 import NAPIC
 
-public struct ValueProperty: PropertyDescribable {
+public struct ValueProperty: PropertyDescriptor {
     public let name: String
     public let attributes: napi_property_attributes
     public let value: ValueConvertible

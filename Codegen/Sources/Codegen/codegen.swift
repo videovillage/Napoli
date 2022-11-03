@@ -34,8 +34,8 @@ struct Codegen: ParsableCommand {
         let params = 10
         try TypedFunction.generate(maxParams: params).result().write(to: generatedFile(named: "TypedFunction"), atomically: true, encoding: .utf8)
         try ThreadsafeTypedFunction.generate(maxParams: params).result().write(to: generatedFile(named: "ThreadsafeTypedFunction"), atomically: true, encoding: .utf8)
-        try Method.generate(maxParams: params).result().write(to: generatedFile(named: "Method"), atomically: true, encoding: .utf8)
-        try InstanceMethod.generate(maxParams: params).result().write(to: generatedFile(named: "InstanceMethod"), atomically: true, encoding: .utf8)
+        try Method.generate(maxParams: params).result().write(to: generatedFile(named: "MethodDescriptor"), atomically: true, encoding: .utf8)
+        try InstanceMethod.generate(maxParams: params).result().write(to: generatedFile(named: "InstanceMethodDescriptor"), atomically: true, encoding: .utf8)
     }
 }
 

@@ -9,7 +9,7 @@ enum Method {
         import Foundation
         import NAPIC
 
-        public class Method: PropertyDescribable {
+        public class MethodDescriptor: PropertyDescriptor {
             public let name: String
             public let attributes: napi_property_attributes
             private let callback: TypedFunctionCallback
@@ -26,7 +26,7 @@ enum Method {
                 let _name = try name.napiValue(env)
                 let data = TypedFunctionCallbackData(callback: callback, argCount: argCount)
                 let dataPointer = Unmanaged.passRetained(data).toOpaque()
-                return napi_property_descriptor(utf8name: nil, name: _name, method: newNAPICallback, getter: nil, setter: nil, value: nil, attributes: attributes, data: dataPointer)
+                return napi_property_descriptor(utf8name: nil, name: _name, method: typedFuncNAPICallback, getter: nil, setter: nil, value: nil, attributes: attributes, data: dataPointer)
             }
         }
         """)
@@ -67,7 +67,7 @@ enum Method {
 
         source.add("""
          // \(paramCount) param methods
-         public extension Method {
+         public extension MethodDescriptor {
              convenience init\(allGenerics.bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (\(commaSeparatedInGenerics)) throws -> Result)\(wheres.backspaceIfNotEmpty()) {
                  self.init(name, attributes: attributes, argCount: \(paramCount)) { env, this, args in
                      try callback(\(argListAsParams))

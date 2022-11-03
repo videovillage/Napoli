@@ -3,7 +3,7 @@
 import Foundation
 import NAPIC
 
-public class Method: PropertyDescribable {
+public class MethodDescriptor: PropertyDescriptor {
     public let name: String
     public let attributes: napi_property_attributes
     private let callback: TypedFunctionCallback
@@ -20,12 +20,12 @@ public class Method: PropertyDescribable {
         let _name = try name.napiValue(env)
         let data = TypedFunctionCallbackData(callback: callback, argCount: argCount)
         let dataPointer = Unmanaged.passRetained(data).toOpaque()
-        return napi_property_descriptor(utf8name: nil, name: _name, method: newNAPICallback, getter: nil, setter: nil, value: nil, attributes: attributes, data: dataPointer)
+        return napi_property_descriptor(utf8name: nil, name: _name, method: typedFuncNAPICallback, getter: nil, setter: nil, value: nil, attributes: attributes, data: dataPointer)
     }
 }
 
 // 9 param methods
-public extension Method {
+public extension MethodDescriptor {
     convenience init<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6, P7, P8) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 9) { env, _, args in
             try callback(P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]), P6(env, from: args[6]), P7(env, from: args[7]), P8(env, from: args[8]))
@@ -73,7 +73,7 @@ public extension Method {
 }
 
 // 8 param methods
-public extension Method {
+public extension MethodDescriptor {
     convenience init<Result, P0, P1, P2, P3, P4, P5, P6, P7>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6, P7) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 8) { env, _, args in
             try callback(P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]), P6(env, from: args[6]), P7(env, from: args[7]))
@@ -121,7 +121,7 @@ public extension Method {
 }
 
 // 7 param methods
-public extension Method {
+public extension MethodDescriptor {
     convenience init<Result, P0, P1, P2, P3, P4, P5, P6>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 7) { env, _, args in
             try callback(P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]), P6(env, from: args[6]))
@@ -169,7 +169,7 @@ public extension Method {
 }
 
 // 6 param methods
-public extension Method {
+public extension MethodDescriptor {
     convenience init<Result, P0, P1, P2, P3, P4, P5>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (P0, P1, P2, P3, P4, P5) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 6) { env, _, args in
             try callback(P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]))
@@ -217,7 +217,7 @@ public extension Method {
 }
 
 // 5 param methods
-public extension Method {
+public extension MethodDescriptor {
     convenience init<Result, P0, P1, P2, P3, P4>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (P0, P1, P2, P3, P4) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 5) { env, _, args in
             try callback(P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]))
@@ -265,7 +265,7 @@ public extension Method {
 }
 
 // 4 param methods
-public extension Method {
+public extension MethodDescriptor {
     convenience init<Result, P0, P1, P2, P3>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (P0, P1, P2, P3) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 4) { env, _, args in
             try callback(P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]))
@@ -313,7 +313,7 @@ public extension Method {
 }
 
 // 3 param methods
-public extension Method {
+public extension MethodDescriptor {
     convenience init<Result, P0, P1, P2>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (P0, P1, P2) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 3) { env, _, args in
             try callback(P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]))
@@ -361,7 +361,7 @@ public extension Method {
 }
 
 // 2 param methods
-public extension Method {
+public extension MethodDescriptor {
     convenience init<Result, P0, P1>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (P0, P1) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 2) { env, _, args in
             try callback(P0(env, from: args[0]), P1(env, from: args[1]))
@@ -409,7 +409,7 @@ public extension Method {
 }
 
 // 1 param methods
-public extension Method {
+public extension MethodDescriptor {
     convenience init<Result, P0>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (P0) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 1) { env, _, args in
             try callback(P0(env, from: args[0]))
@@ -457,7 +457,7 @@ public extension Method {
 }
 
 // 0 param methods
-public extension Method {
+public extension MethodDescriptor {
     convenience init<Result>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping () throws -> Result) where Result: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 0) { _, _, _ in
             try callback()

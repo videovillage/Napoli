@@ -30,9 +30,9 @@ enum ThreadsafeTypedFunction {
             }
         }
 
-        func newNAPIThreadsafeFinalize(_: napi_env!, pointer _: UnsafeMutableRawPointer?, hint _: UnsafeMutableRawPointer?) {}
+        func typedFuncNAPIThreadsafeFinalize(_: napi_env!, pointer _: UnsafeMutableRawPointer?, hint _: UnsafeMutableRawPointer?) {}
 
-        func newNAPIThreadsafeCallback(_ env: napi_env?, _ js_callback: napi_value?, _: UnsafeMutableRawPointer?, _ data: UnsafeMutableRawPointer!) {
+        func typedFuncNAPIThreadsafeCallback(_ env: napi_env?, _ js_callback: napi_value?, _: UnsafeMutableRawPointer?, _ data: UnsafeMutableRawPointer!) {
             let callbackData = Unmanaged<ThreadsafeFunctionCallbackData>.fromOpaque(data).takeRetainedValue()
 
             var result: napi_value?
@@ -126,9 +126,9 @@ enum ThreadsafeTypedFunction {
                                                     0,
                                                     1,
                                                     nil,
-                                                    newNAPIThreadsafeFinalize,
+                                                    typedFuncNAPIThreadsafeFinalize,
                                                     nil,
-                                                    newNAPIThreadsafeCallback,
+                                                    typedFuncNAPIThreadsafeCallback,
                                                     &tsfn).throwIfError()
             }
 

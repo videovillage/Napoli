@@ -3,7 +3,7 @@
 import Foundation
 import NAPIC
 
-public class InstanceMethod<This>: Method where This: AnyObject {
+public class InstanceMethodDescriptor<This>: MethodDescriptor where This: AnyObject {
     // 9 param methods
     public init<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (P0, P1, P2, P3, P4, P5, P6, P7, P8) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 9) { env, this, args in

@@ -23,7 +23,6 @@ private func defineClass(_ env: napi_env, named name: String, _ constructor: @es
 }
 
 private enum InternalClass {
-    case newSwift(String, Callback, [PropertyDescribable])
     case swift(String, Callback, [PropertyDescriptor])
     case javascript(napi_value)
 }
@@ -39,34 +38,29 @@ public class Class: ValueConvertible {
         value = .swift(name, constructor, properties)
     }
 
-    public init(named name: String, _ constructor: @escaping Callback, _ properties: [PropertyDescribable]) {
-        value = .newSwift(name, constructor, properties)
-    }
-
     public func napiValue(_ env: napi_env) throws -> napi_value {
         switch value {
-        case let .swift(name, constructor, properties): return try defineClass(env, named: name, constructor, properties.map { try $0.value(env) })
-        case let .newSwift(name, constructor, properties): return try defineClass(env, named: name, constructor, properties.map { try $0.propertyDescriptor(env) })
+        case let .swift(name, constructor, properties): return try defineClass(env, named: name, constructor, properties.map { try $0.propertyDescriptor(env) })
         case let .javascript(value): return value
         }
     }
 }
 
-public protocol JSClassDefinable: AnyObject {
+public protocol ClassConvertible: AnyObject {
     init()
     static var jsName: String { get }
-    static var jsInstanceProperties: [InstanceProperty<Self>] { get }
-    static var jsInstanceMethods: [InstanceMethod<Self>] { get }
+    static var jsInstanceProperties: [InstanceGetSetPropertyDescriptor<Self>] { get }
+    static var jsInstanceMethods: [InstanceMethodDescriptor<Self>] { get }
     static var jsAttributes: napi_property_attributes { get }
 }
 
-extension JSClassDefinable {
+extension ClassConvertible {
     public static var jsAttributes: napi_property_attributes {
         napi_default
     }
 }
 
-public struct ClassProperty: PropertyDescribable {
+public struct ClassDescriptor: PropertyDescriptor {
     public var name: String {
         value.name
     }
@@ -77,7 +71,7 @@ public struct ClassProperty: PropertyDescribable {
 
     private let value: ValueProperty
 
-    public init<C: JSClassDefinable>(_ classType: C.Type) {
+    public init<C: ClassConvertible>(_ classType: C.Type) {
         value = .init(C.jsName,
                       attributes: C.jsAttributes,
                       value: Class(named: C.jsName, { env, args in

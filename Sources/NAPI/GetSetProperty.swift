@@ -1,7 +1,7 @@
 import Foundation
 import NAPIC
 
-public class Property: PropertyDescribable {
+public class GetSetPropertyDescriptor: PropertyDescriptor {
     public let name: String
     public let attributes: napi_property_attributes
 
@@ -41,7 +41,7 @@ public class Property: PropertyDescribable {
     }
 }
 
-public class InstanceProperty<This: AnyObject>: Property {
+public class InstanceGetSetPropertyDescriptor<This: AnyObject>: GetSetPropertyDescriptor {
     public init<V: ValueConvertible>(_ name: String, attributes: napi_property_attributes = napi_default, keyPath: ReferenceWritableKeyPath<This, V>) {
         super.init(name,
                    attributes: attributes,

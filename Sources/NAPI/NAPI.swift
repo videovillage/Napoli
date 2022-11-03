@@ -19,19 +19,6 @@ public func strictlyEquals(_ env: napi_env, lhs: ValueConvertible, rhs: ValueCon
 }
 
 public func defineProperties(_ env: napi_env, _ object: napi_value, _ properties: [PropertyDescriptor]) throws {
-    let props = try properties.map { try $0.value(env) }
-
-    try props.withUnsafeBufferPointer { propertiesBytes in
-        napi_define_properties(env, object, properties.count, propertiesBytes.baseAddress)
-    }.throwIfError()
-}
-
-public func initModule(_ env: napi_env, _ exports: napi_value, _ properties: [PropertyDescriptor]) -> napi_value {
-    try! defineProperties(env, exports, properties)
-    return exports
-}
-
-public func defineProperties(_ env: napi_env, _ object: napi_value, _ properties: [PropertyDescribable]) throws {
     let props = try properties.map { try $0.propertyDescriptor(env) }
 
     try props.withUnsafeBufferPointer { propertiesBytes in
@@ -39,7 +26,7 @@ public func defineProperties(_ env: napi_env, _ object: napi_value, _ properties
     }.throwIfError()
 }
 
-public func initModule(_ env: napi_env, _ exports: napi_value, _ properties: [PropertyDescribable]) -> napi_value {
+public func initModule(_ env: napi_env, _ exports: napi_value, _ properties: [PropertyDescriptor]) -> napi_value {
     try! defineProperties(env, exports, properties)
     return exports
 }

@@ -19,7 +19,7 @@ enum TypedFunction {
             }
         }
 
-        func newNAPICallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) -> napi_value? {
+        func typedFuncNAPICallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) -> napi_value? {
             var this: napi_value!
             let dataPointer = UnsafeMutablePointer<UnsafeMutableRawPointer?>.allocate(capacity: 1)
             napi_get_cb_info(env, cbinfo, nil, nil, &this, dataPointer)
@@ -191,7 +191,7 @@ enum TypedFunction {
 
                 do {
                     try nameData.withUnsafeBytes {
-                        napi_create_function(env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, newNAPICallback,  unmanagedData.toOpaque(), &result)
+                        napi_create_function(env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, typedFuncNAPICallback,  unmanagedData.toOpaque(), &result)
                     }.throwIfError()
                 } catch {
                     unmanagedData.release()

@@ -23,9 +23,9 @@ class ThreadsafeFunctionCallbackData {
     }
 }
 
-func newNAPIThreadsafeFinalize(_: napi_env!, pointer _: UnsafeMutableRawPointer?, hint _: UnsafeMutableRawPointer?) {}
+func typedFuncNAPIThreadsafeFinalize(_: napi_env!, pointer _: UnsafeMutableRawPointer?, hint _: UnsafeMutableRawPointer?) {}
 
-func newNAPIThreadsafeCallback(_ env: napi_env?, _ js_callback: napi_value?, _: UnsafeMutableRawPointer?, _ data: UnsafeMutableRawPointer!) {
+func typedFuncNAPIThreadsafeCallback(_ env: napi_env?, _ js_callback: napi_value?, _: UnsafeMutableRawPointer?, _ data: UnsafeMutableRawPointer!) {
     let callbackData = Unmanaged<ThreadsafeFunctionCallbackData>.fromOpaque(data).takeRetainedValue()
 
     var result: napi_value?
@@ -93,9 +93,9 @@ public class ThreadsafeTypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8
                                             0,
                                             1,
                                             nil,
-                                            newNAPIThreadsafeFinalize,
+                                            typedFuncNAPIThreadsafeFinalize,
                                             nil,
-                                            newNAPIThreadsafeCallback,
+                                            typedFuncNAPIThreadsafeCallback,
                                             &tsfn).throwIfError()
     }
 
@@ -136,9 +136,9 @@ public class ThreadsafeTypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: V
                                             0,
                                             1,
                                             nil,
-                                            newNAPIThreadsafeFinalize,
+                                            typedFuncNAPIThreadsafeFinalize,
                                             nil,
-                                            newNAPIThreadsafeCallback,
+                                            typedFuncNAPIThreadsafeCallback,
                                             &tsfn).throwIfError()
     }
 
@@ -179,9 +179,9 @@ public class ThreadsafeTypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: Value
                                             0,
                                             1,
                                             nil,
-                                            newNAPIThreadsafeFinalize,
+                                            typedFuncNAPIThreadsafeFinalize,
                                             nil,
-                                            newNAPIThreadsafeCallback,
+                                            typedFuncNAPIThreadsafeCallback,
                                             &tsfn).throwIfError()
     }
 
@@ -222,9 +222,9 @@ public class ThreadsafeTypedFunction6<Result, P0, P1, P2, P3, P4, P5>: ValueConv
                                             0,
                                             1,
                                             nil,
-                                            newNAPIThreadsafeFinalize,
+                                            typedFuncNAPIThreadsafeFinalize,
                                             nil,
-                                            newNAPIThreadsafeCallback,
+                                            typedFuncNAPIThreadsafeCallback,
                                             &tsfn).throwIfError()
     }
 
@@ -265,9 +265,9 @@ public class ThreadsafeTypedFunction5<Result, P0, P1, P2, P3, P4>: ValueConverti
                                             0,
                                             1,
                                             nil,
-                                            newNAPIThreadsafeFinalize,
+                                            typedFuncNAPIThreadsafeFinalize,
                                             nil,
-                                            newNAPIThreadsafeCallback,
+                                            typedFuncNAPIThreadsafeCallback,
                                             &tsfn).throwIfError()
     }
 
@@ -308,9 +308,9 @@ public class ThreadsafeTypedFunction4<Result, P0, P1, P2, P3>: ValueConvertible 
                                             0,
                                             1,
                                             nil,
-                                            newNAPIThreadsafeFinalize,
+                                            typedFuncNAPIThreadsafeFinalize,
                                             nil,
-                                            newNAPIThreadsafeCallback,
+                                            typedFuncNAPIThreadsafeCallback,
                                             &tsfn).throwIfError()
     }
 
@@ -351,9 +351,9 @@ public class ThreadsafeTypedFunction3<Result, P0, P1, P2>: ValueConvertible wher
                                             0,
                                             1,
                                             nil,
-                                            newNAPIThreadsafeFinalize,
+                                            typedFuncNAPIThreadsafeFinalize,
                                             nil,
-                                            newNAPIThreadsafeCallback,
+                                            typedFuncNAPIThreadsafeCallback,
                                             &tsfn).throwIfError()
     }
 
@@ -394,9 +394,9 @@ public class ThreadsafeTypedFunction2<Result, P0, P1>: ValueConvertible where Re
                                             0,
                                             1,
                                             nil,
-                                            newNAPIThreadsafeFinalize,
+                                            typedFuncNAPIThreadsafeFinalize,
                                             nil,
-                                            newNAPIThreadsafeCallback,
+                                            typedFuncNAPIThreadsafeCallback,
                                             &tsfn).throwIfError()
     }
 
@@ -437,9 +437,9 @@ public class ThreadsafeTypedFunction1<Result, P0>: ValueConvertible where Result
                                             0,
                                             1,
                                             nil,
-                                            newNAPIThreadsafeFinalize,
+                                            typedFuncNAPIThreadsafeFinalize,
                                             nil,
-                                            newNAPIThreadsafeCallback,
+                                            typedFuncNAPIThreadsafeCallback,
                                             &tsfn).throwIfError()
     }
 
@@ -480,9 +480,9 @@ public class ThreadsafeTypedFunction0<Result>: ValueConvertible where Result: Va
                                             0,
                                             1,
                                             nil,
-                                            newNAPIThreadsafeFinalize,
+                                            typedFuncNAPIThreadsafeFinalize,
                                             nil,
-                                            newNAPIThreadsafeCallback,
+                                            typedFuncNAPIThreadsafeCallback,
                                             &tsfn).throwIfError()
     }
 

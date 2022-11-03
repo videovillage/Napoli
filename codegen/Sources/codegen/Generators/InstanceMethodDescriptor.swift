@@ -12,7 +12,7 @@ enum InstanceMethod {
         """)
         source.newline()
 
-        try source.declareClass(.public, "InstanceMethod", genericParams: [.init(type: "This")], conformsTo: "Method", wheres: [.conforms("This", "AnyObject")]) { source in
+        try source.declareClass(.public, "InstanceMethodDescriptor", genericParams: [.init(type: "This")], conformsTo: "MethodDescriptor", wheres: [.conforms("This", "AnyObject")]) { source in
             for i in (0 ..< maxParams).reversed() {
                 try generateMethods(source: &source, paramCount: i)
             }

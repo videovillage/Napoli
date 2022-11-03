@@ -114,7 +114,7 @@ func takeTypedCallback(env: OpaquePointer, fn: TypedFunction2<String, Int32, Boo
     try assertEqual(expected: "23true", actual: try fn.call(env, 23, true))
 }
 
-final class TestClass1: JSClassDefinable {
+final class TestClass1: ClassConvertible {
     var testString: String = "Cool"
     var testNumber: Double = 1234
 
@@ -134,12 +134,12 @@ final class TestClass1: JSClassDefinable {
     required init() {}
 
     static let jsName = "TestClass1"
-    static let jsInstanceProperties: [InstanceProperty<TestClass1>] = [
+    static let jsInstanceProperties: [InstanceGetSetPropertyDescriptor<TestClass1>] = [
         .init("testString", keyPath: \.testString),
         .init("testNumber", keyPath: \.testNumber),
         .init("readOnlyTestString", keyPath: \.readOnlyTestString),
     ]
-    static let jsInstanceMethods: [InstanceMethod<TestClass1>] = [
+    static let jsInstanceMethods: [InstanceMethodDescriptor<TestClass1>] = [
         .init("reset", TestClass1.reset),
         .init("testThrowError", TestClass1.testThrowError),
     ]
@@ -148,33 +148,33 @@ final class TestClass1: JSClassDefinable {
 @_cdecl("_init_napi_tests")
 func initNAPITests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointer? {
     initModule(env, exports, [
-        Method("returnString", returnString),
-        Method("returnDouble", returnDouble),
-        Method("returnBoolean", returnBoolean),
-        Method("returnDate", returnDate),
-        Method("returnInt64", returnInt64),
-        Method("returnInt32", returnInt32),
-        Method("returnUInt32", returnUInt32),
-        Method("returnNull", returnNull),
-        Method("returnUndefined", returnUndefined),
+        MethodDescriptor("returnString", returnString),
+        MethodDescriptor("returnDouble", returnDouble),
+        MethodDescriptor("returnBoolean", returnBoolean),
+        MethodDescriptor("returnDate", returnDate),
+        MethodDescriptor("returnInt64", returnInt64),
+        MethodDescriptor("returnInt32", returnInt32),
+        MethodDescriptor("returnUInt32", returnUInt32),
+        MethodDescriptor("returnNull", returnNull),
+        MethodDescriptor("returnUndefined", returnUndefined),
 
-        Method("takeString", takeString),
-        Method("takeDouble", takeDouble),
-        Method("takeBoolean", takeBoolean),
-        Method("takeDate", takeDate),
-        Method("takeNull", takeNull),
-        Method("takeUndefined", takeUndefined),
+        MethodDescriptor("takeString", takeString),
+        MethodDescriptor("takeDouble", takeDouble),
+        MethodDescriptor("takeBoolean", takeBoolean),
+        MethodDescriptor("takeDate", takeDate),
+        MethodDescriptor("takeNull", takeNull),
+        MethodDescriptor("takeUndefined", takeUndefined),
 
-        Method("takeOptionalString", takeOptionalString),
-        Method("takeOptionalDouble", takeOptionalDouble),
-        Method("takeOptionalBoolean", takeOptionalBoolean),
+        MethodDescriptor("takeOptionalString", takeOptionalString),
+        MethodDescriptor("takeOptionalDouble", takeOptionalDouble),
+        MethodDescriptor("takeOptionalBoolean", takeOptionalBoolean),
 
-        Method("throwError", throwError),
-        Method("runThreadsafeCallback", runThreadsafeCallback),
-        Method("returnSuccessfulPromise", returnSuccessfulPromise),
-        Method("returnThrowingPromise", returnThrowingPromise),
-        Method("takeTypedCallback", takeTypedCallback),
-        ClassProperty(TestClass1.self),
+        MethodDescriptor("throwError", throwError),
+        MethodDescriptor("runThreadsafeCallback", runThreadsafeCallback),
+        MethodDescriptor("returnSuccessfulPromise", returnSuccessfulPromise),
+        MethodDescriptor("returnThrowingPromise", returnThrowingPromise),
+        MethodDescriptor("takeTypedCallback", takeTypedCallback),
+        ClassDescriptor(TestClass1.self),
     ])
 }
 
