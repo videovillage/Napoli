@@ -4,6 +4,28 @@ import NAPIC
 public protocol ValueConvertible {
     init(_ env: napi_env, from: napi_value) throws
     func napiValue(_ env: napi_env) throws -> napi_value
+    func eraseToAny() throws -> AnyValue
+}
+
+enum TypeErasureError: LocalizedError {
+    case notSupported(type: String)
+
+    static func notSupported<T>(_: T.Type) -> Self {
+        .notSupported(type: String(describing: T.self))
+    }
+
+    var errorDescription: String? {
+        switch self {
+        case let .notSupported(type: type):
+            return "Type-erasing \(type) is not supported."
+        }
+    }
+}
+
+public extension ValueConvertible {
+    func eraseToAny() throws -> AnyValue {
+        throw TypeErasureError.notSupported(Self.self)
+    }
 }
 
 extension Optional: ValueConvertible where Wrapped: ValueConvertible {
@@ -23,6 +45,15 @@ extension Optional: ValueConvertible where Wrapped: ValueConvertible {
 
     public func napiValue(_ env: napi_env) throws -> napi_value {
         try self?.napiValue(env) ?? Null.default.napiValue(env)
+    }
+
+    public func eraseToAny() throws -> AnyValue {
+        switch self {
+        case let .some(value):
+            return try value.eraseToAny()
+        case .none:
+            return .null
+        }
     }
 }
 
@@ -59,6 +90,12 @@ extension Dictionary: ValueConvertible where Key == String, Value: ValueConverti
 
         return result
     }
+
+    public func eraseToAny() throws -> AnyValue {
+        .object(try mapValues { value in
+            try value.eraseToAny()
+        })
+    }
 }
 
 extension Array: ValueConvertible where Element: ValueConvertible {
@@ -89,6 +126,10 @@ extension Array: ValueConvertible where Element: ValueConvertible {
 
         return result
     }
+
+    public func eraseToAny() throws -> AnyValue {
+        try .array(map { try $0.eraseToAny() })
+    }
 }
 
 extension String: ValueConvertible {
@@ -116,6 +157,10 @@ extension String: ValueConvertible {
 
         return result!
     }
+
+    public func eraseToAny() throws -> AnyValue {
+        .string(self)
+    }
 }
 
 extension Date: ValueConvertible {
@@ -130,24 +175,40 @@ extension Date: ValueConvertible {
         try napi_create_date(env, timeIntervalSince1970, &result).throwIfError()
         return result
     }
+
+    public func eraseToAny() throws -> AnyValue {
+        .date(self)
+    }
 }
 
 extension Double: PrimitiveValueConvertible {
     static let defaultValue = Self.nan
     static let initWithValue = napi_get_value_double
     static let createValue = napi_create_double
+
+    public func eraseToAny() throws -> AnyValue {
+        .number(self)
+    }
 }
 
 extension Int32: PrimitiveValueConvertible {
     static let defaultValue = Self.max
     static let initWithValue = napi_get_value_int32
     static let createValue = napi_create_int32
+
+    public func eraseToAny() throws -> AnyValue {
+        .number(Double(self))
+    }
 }
 
 extension UInt32: PrimitiveValueConvertible {
     static let defaultValue = Self.max
     static let initWithValue = napi_get_value_uint32
     static let createValue = napi_create_uint32
+
+    public func eraseToAny() throws -> AnyValue {
+        .number(Double(self))
+    }
 }
 
 extension Int64: ValueConvertible {
@@ -182,6 +243,14 @@ extension Int64: ValueConvertible {
     }
 
     public static let jsSafeRange: ClosedRange<Self> = -(Int64(powl(2, 53)) - 1) ... (Int64(powl(2, 53)) - 1)
+
+    public func eraseToAny() throws -> AnyValue {
+        guard Self.jsSafeRange.contains(self) else {
+            throw JSError.outOfSafeRange(self)
+        }
+
+        return .number(Double(self))
+    }
 }
 
 extension Bool: PrimitiveValueConvertible {
