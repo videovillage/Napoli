@@ -55,8 +55,8 @@ public class Class: ValueConvertible {
 public protocol JSClassDefinable: AnyObject {
     init()
     static var jsName: String { get }
-    static var jsProperties: [InstanceProperty<Self>] { get }
-    static var jsFunctions: [InstanceMethod<Self>] { get }
+    static var jsInstanceProperties: [InstanceProperty<Self>] { get }
+    static var jsInstanceMethods: [InstanceMethod<Self>] { get }
     static var jsAttributes: napi_property_attributes { get }
 }
 
@@ -84,7 +84,7 @@ public struct ClassProperty: PropertyDescribable {
             let native = C()
             try Wrap<C>.wrap(env, jsObject: args.this, nativeObject: native)
             return Undefined.default
-        }, C.jsProperties + C.jsFunctions))
+        }, C.jsInstanceProperties + C.jsInstanceMethods))
     }
 
     public func propertyDescriptor(_ env: napi_env) throws -> napi_property_descriptor {

@@ -134,12 +134,12 @@ final class TestClass1: JSClassDefinable {
     required init() {}
 
     static let jsName = "TestClass1"
-    static let jsProperties: [InstanceProperty<TestClass1>] = [
+    static let jsInstanceProperties: [InstanceProperty<TestClass1>] = [
         .init("testString", keyPath: \.testString),
         .init("testNumber", keyPath: \.testNumber),
         .init("readOnlyTestString", keyPath: \.readOnlyTestString),
     ]
-    static let jsFunctions: [InstanceMethod<TestClass1>] = [
+    static let jsInstanceMethods: [InstanceMethod<TestClass1>] = [
         .init("reset", TestClass1.reset),
         .init("testThrowError", TestClass1.testThrowError),
     ]
