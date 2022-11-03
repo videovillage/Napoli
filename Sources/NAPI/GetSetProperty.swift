@@ -6,13 +6,15 @@ public class GetSetPropertyDescriptor: PropertyDescriptor {
     public let attributes: napi_property_attributes
 
     private let getter: Callback
-    private let setter: Callback?
+    private let setter: Callback
 
     fileprivate init(_ name: String, attributes: napi_property_attributes, getter: @escaping Callback, setter: Callback?) {
         self.name = name
         self.attributes = attributes
         self.getter = getter
-        self.setter = setter
+        self.setter = setter ?? { env, args in
+            throw ReadOnlyError(name)
+        }
     }
 
     public init<V: ValueConvertible>(_ name: String, attributes: napi_property_attributes = napi_default, getter: @escaping () -> V, setter: ((V) -> Void)? = nil) {
@@ -29,7 +31,9 @@ public class GetSetPropertyDescriptor: PropertyDescriptor {
                 return Undefined.default
             }
         } else {
-            self.setter = nil
+            self.setter = { env, args in
+                throw ReadOnlyError(name)
+            }
         }
     }
 
@@ -37,7 +41,16 @@ public class GetSetPropertyDescriptor: PropertyDescriptor {
         let _name = try name.napiValue(env)
         let data = GetSetCallbackData(getter: getter, setter: setter)
         let dataPointer = Unmanaged.passRetained(data).toOpaque()
-        return napi_property_descriptor(utf8name: nil, name: _name, method: nil, getter: swiftNAPIGetterCallback, setter: setter != nil ? swiftNAPISetterCallback : nil, value: nil, attributes: attributes, data: dataPointer)
+        return napi_property_descriptor(utf8name: nil, name: _name, method: nil, getter: swiftNAPIGetterCallback, setter: swiftNAPISetterCallback, value: nil, attributes: attributes, data: dataPointer)
+    }
+
+    private struct ReadOnlyError: ErrorConvertible {
+        let code: String? = "ESWIFTREADONLYPROPERTY"
+        let message: String
+
+        init(_ name: String) {
+            self.message = "Tried to write to read-only property \"\(name)\""
+        }
     }
 }
 

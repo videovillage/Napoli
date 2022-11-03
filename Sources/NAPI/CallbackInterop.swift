@@ -39,9 +39,9 @@ class CallbackData {
 
 class GetSetCallbackData {
     let getter: Callback
-    let setter: Callback?
+    let setter: Callback
 
-    init(getter: @escaping Callback, setter: Callback?) {
+    init(getter: @escaping Callback, setter: @escaping Callback) {
         self.getter = getter
         self.setter = setter
     }
@@ -89,7 +89,7 @@ func swiftNAPISetterCallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) ->
     let data = Unmanaged<GetSetCallbackData>.fromOpaque(dataPointer.pointee!).takeUnretainedValue()
 
     do {
-        return try data.setter!(env, args as! Arguments).napiValue(env)
+        return try data.setter(env, args as! Arguments).napiValue(env)
     } catch NAPI.Error.pendingException {
         return nil
     } catch {

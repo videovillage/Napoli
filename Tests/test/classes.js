@@ -42,7 +42,13 @@ describe('Classes', () => {
   it('creates classes with readonly properties', () => {
     const testObject = new addon.TestClass1()
     assert.strictEqual(testObject.readOnlyTestString, 'ReadOnlyTest')
-    testObject.readOnlyTestString = 'Neat'
+    assert.throws(() => {
+      testObject.readOnlyTestString = 'Neat'
+      return true
+    }, (err) => {
+      assert.strictEqual(err.code, 'ESWIFTREADONLYPROPERTY')
+      return true
+    })
     assert.strictEqual(testObject.readOnlyTestString, 'ReadOnlyTest')
   })
 })
