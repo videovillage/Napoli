@@ -51,7 +51,7 @@ public enum AnyValue: ValueConvertible, Codable {
         }
     }
 
-    public init<V: ValueConvertible>(_ value: V) throws {
+    public init(_ value: some ValueConvertible) throws {
         self = try value.eraseToAny()
     }
 
@@ -116,11 +116,11 @@ public enum AnyValue: ValueConvertible, Codable {
     }
 }
 
-fileprivate enum ObjectType {
+private enum ObjectType {
     case date, array, generic
 
     init(_ env: napi_env, object: napi_value) throws {
-        var isType: Bool = false
+        var isType = false
         try napi_is_date(env, object, &isType).throwIfError()
 
         if isType {

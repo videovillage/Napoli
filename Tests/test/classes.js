@@ -24,14 +24,14 @@ describe('Classes', () => {
     assert.strictEqual(object.testObject.testString, 'testString')
     assert.strictEqual(object.testObject.optionalString, 'optionalTestString')
     assert.strictEqual(object.testObject.nested.nestedTestString, 'nestedTestString')
-    assert.strictEqual(object.testObject.optionalNested, undefined)
+    assert.strictEqual(object.testObject.optionalNested, null)
 
     const changedTestObject = object.testObject
     changedTestObject.testString = 'replacementTestString'
     changedTestObject.nested.nestedTestString = 'replacementNestedTestString'
 
     object.testObject = changedTestObject
-
+      
     assert.strictEqual(object.testObject.testString, 'replacementTestString')
     assert.strictEqual(object.testObject.nested.nestedTestString, 'replacementNestedTestString')
 

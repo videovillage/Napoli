@@ -7,45 +7,24 @@ public protocol ValueConvertible {
     func eraseToAny() throws -> AnyValue
 }
 
-/// Here Be Dragons
-public protocol ObjectConvertible: Codable, ValueConvertible, Equatable {}
-
-public extension ObjectConvertible {
-    init(_ env: napi_env, from: napi_value) throws {
-        let object = try [String: AnyValue](env, from: from)
-        let encoded = try JSONEncoder().encode(object)
-        self = try JSONDecoder().decode(Self.self, from: encoded)
-    }
-
-    func napiValue(_ env: napi_env) throws -> napi_value {
-        try eraseToAny().napiValue(env)
-    }
-
-    func eraseToAny() throws -> AnyValue {
-        let encoded = try JSONEncoder().encode(self)
-        let result = try JSONDecoder().decode([String: AnyValue].self, from: encoded)
-        return .object(result)
-    }
-}
-
 enum TypeErasureError: LocalizedError {
-    case notSupported(type: String)
-
-    static func notSupported<T>(_: T.Type) -> Self {
-        .notSupported(type: String(describing: T.self))
-    }
+    case notSupported(type: String, label: String?)
 
     var errorDescription: String? {
         switch self {
-        case let .notSupported(type: type):
-            return "Type-erasing \(type) is not supported."
+        case let .notSupported(type, label):
+            if let label {
+                return "Type-erasing field \"\(label)\" (type \(type)) to AnyValue is not supported."
+            } else {
+                return "Type-erasing \(type) to AnyValue is not supported."
+            }
         }
     }
 }
 
 public extension ValueConvertible {
     func eraseToAny() throws -> AnyValue {
-        throw TypeErasureError.notSupported(Self.self)
+        throw TypeErasureError.notSupported(type: String(describing: Self.self), label: nil)
     }
 }
 

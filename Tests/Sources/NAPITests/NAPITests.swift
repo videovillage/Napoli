@@ -188,7 +188,7 @@ func initNAPITests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointer?
         MethodDescriptor("returnSuccessfulPromise", returnSuccessfulPromise),
         MethodDescriptor("returnThrowingPromise", returnThrowingPromise),
         MethodDescriptor("takeTypedCallback", takeTypedCallback),
-        ClassDescriptor(TestClass1.self)
+        ClassDescriptor(TestClass1.self),
     ])
 }
 
