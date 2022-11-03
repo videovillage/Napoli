@@ -1,9 +1,9 @@
 import NAPIC
 
-private func defineClass(_ env: napi_env, named name: String, _ constructor: @escaping Callback, _ properties: [PropertyDescriptor]) throws -> napi_value {
+private func defineClass(_ env: napi_env, named name: String, _ constructor: @escaping Callback, _ props: [napi_property_descriptor]) throws -> napi_value {
     var result: napi_value?
     let nameData = name.data(using: .utf8)!
-    let props = try properties.map { try $0.value(env) }
+    let propCount = props.count
 
     let data = CallbackData(callback: constructor)
     let unmanagedData = Unmanaged.passRetained(data)
@@ -11,7 +11,7 @@ private func defineClass(_ env: napi_env, named name: String, _ constructor: @es
     do {
         try nameData.withUnsafeBytes { nameBytes in
             props.withUnsafeBufferPointer { propertiesBytes in
-                napi_define_class(env, nameBytes.baseAddress?.assumingMemoryBound(to: UInt8.self), nameBytes.count, swiftNAPICallback, unmanagedData.toOpaque(), properties.count, propertiesBytes.baseAddress, &result)
+                napi_define_class(env, nameBytes.baseAddress?.assumingMemoryBound(to: UInt8.self), nameBytes.count, swiftNAPICallback, unmanagedData.toOpaque(), propCount, propertiesBytes.baseAddress, &result)
             }
         }.throwIfError()
     } catch {
@@ -23,6 +23,7 @@ private func defineClass(_ env: napi_env, named name: String, _ constructor: @es
 }
 
 private enum InternalClass {
+    case newSwift(String, Callback, [PropertyDescribable])
     case swift(String, Callback, [PropertyDescriptor])
     case javascript(napi_value)
 }
@@ -38,9 +39,14 @@ public class Class: ValueConvertible {
         value = .swift(name, constructor, properties)
     }
 
+    public init(named name: String, _ constructor: @escaping Callback, _ properties: [PropertyDescribable]) {
+        value = .newSwift(name, constructor, properties)
+    }
+
     public func napiValue(_ env: napi_env) throws -> napi_value {
         switch value {
-        case let .swift(name, constructor, properties): return try defineClass(env, named: name, constructor, properties)
+        case let .swift(name, constructor, properties): return try defineClass(env, named: name, constructor, properties.map { try $0.value(env) })
+        case let .newSwift(name, constructor, properties): return try defineClass(env, named: name, constructor, properties.map { try $0.propertyDescriptor(env) })
         case let .javascript(value): return value
         }
     }
@@ -49,13 +55,39 @@ public class Class: ValueConvertible {
 public protocol JSClassDefinable: AnyObject {
     init()
     static var jsName: String { get }
-    static var jsProperties: [PropertyDescriptor] { get }
-    static var jsFunctions: [PropertyDescriptor] { get }
+    static var jsProperties: [InstanceProperty<Self>] { get }
+    static var jsFunctions: [InstanceMethod<Self>] { get }
     static var jsAttributes: napi_property_attributes { get }
 }
 
-public extension JSClassDefinable {
-    static var jsAttributes: napi_property_attributes {
+extension JSClassDefinable {
+    public static var jsAttributes: napi_property_attributes {
         napi_default
+    }
+}
+
+public struct ClassProperty: PropertyDescribable {
+    public var name: String {
+        value.name
+    }
+
+    public var attributes: napi_property_attributes {
+        value.attributes
+    }
+
+    private let value: ValueProperty
+
+    public init<C: JSClassDefinable>(_ classType: C.Type) {
+        value = .init(C.jsName,
+                      attributes: C.jsAttributes,
+                      value: Class(named: C.jsName, { env, args in
+            let native = C()
+            try Wrap<C>.wrap(env, jsObject: args.this, nativeObject: native)
+            return Undefined.default
+        }, C.jsProperties + C.jsFunctions))
+    }
+
+    public func propertyDescriptor(_ env: napi_env) throws -> napi_property_descriptor {
+        try value.propertyDescriptor(env)
     }
 }
