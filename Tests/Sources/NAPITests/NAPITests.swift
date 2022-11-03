@@ -100,25 +100,21 @@ func runThreadsafeCallback(tsfn: ThreadsafeTypedFunction1<String, String>) throw
     }
 }
 
-func returnSuccessfulPromise(msg: String) -> Promise<String> {
-    Promise {
-        try await Task.sleep(seconds: 0.1)
-        return msg + " hello"
-    }
+func returnSuccessfulPromise(msg: String) async throws -> String {
+    try await Task.sleep(seconds: 0.1)
+    return msg + " hello"
 }
 
-func returnThrowingPromise(msg _: String) -> Promise<Void> {
-    Promise {
-        try await Task.sleep(seconds: 0.1)
-        try throwError()
-    }
+func returnThrowingPromise(msg _: String) async throws {
+    try await Task.sleep(seconds: 0.1)
+    try throwError()
 }
 
 func takeTypedCallback(env: OpaquePointer, fn: TypedFunction2<String, Int32, Bool>) throws {
     try assertEqual(expected: "23true", actual: try fn.call(env, 23, true))
 }
 
-class TestClass1: JSClassDefinable {
+final class TestClass1: JSClassDefinable {
     var testString: String = "Cool"
     var testNumber: Double = 1234
 
@@ -138,47 +134,47 @@ class TestClass1: JSClassDefinable {
     required init() {}
 
     static let jsName = "TestClass1"
-    static let jsProperties: [PropertyDescriptor] = [
-        .instanceProperty("testString", keyPath: \TestClass1.testString),
-        .instanceProperty("testNumber", keyPath: \TestClass1.testNumber),
-        .instanceProperty("readOnlyTestString", keyPath: \TestClass1.readOnlyTestString),
+    static let jsProperties: [InstanceProperty<TestClass1>] = [
+        .init("testString", keyPath: \.testString),
+        .init("testNumber", keyPath: \.testNumber),
+        .init("readOnlyTestString", keyPath: \.readOnlyTestString),
     ]
-    static let jsFunctions: [PropertyDescriptor] = [
-        .instanceMethod("reset") { (me: TestClass1) in me.reset() },
-        .instanceMethod("testThrowError") { (me: TestClass1) in try me.testThrowError() },
+    static let jsFunctions: [InstanceMethod<TestClass1>] = [
+        .init("reset", TestClass1.reset),
+        .init("testThrowError", TestClass1.testThrowError),
     ]
 }
 
 @_cdecl("_init_napi_tests")
 func initNAPITests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointer? {
     initModule(env, exports, [
-        .function("returnString", returnString),
-        .function("returnDouble", returnDouble),
-        .function("returnBoolean", returnBoolean),
-        .function("returnDate", returnDate),
-        .function("returnInt64", returnInt64),
-        .function("returnInt32", returnInt32),
-        .function("returnUInt32", returnUInt32),
-        .function("returnNull", returnNull),
-        .function("returnUndefined", returnUndefined),
+        Method("returnString", returnString),
+        Method("returnDouble", returnDouble),
+        Method("returnBoolean", returnBoolean),
+        Method("returnDate", returnDate),
+        Method("returnInt64", returnInt64),
+        Method("returnInt32", returnInt32),
+        Method("returnUInt32", returnUInt32),
+        Method("returnNull", returnNull),
+        Method("returnUndefined", returnUndefined),
 
-        .function("takeString", takeString),
-        .function("takeDouble", takeDouble),
-        .function("takeBoolean", takeBoolean),
-        .function("takeDate", takeDate),
-        .function("takeNull", takeNull),
-        .function("takeUndefined", takeUndefined),
+        Method("takeString", takeString),
+        Method("takeDouble", takeDouble),
+        Method("takeBoolean", takeBoolean),
+        Method("takeDate", takeDate),
+        Method("takeNull", takeNull),
+        Method("takeUndefined", takeUndefined),
 
-        .function("takeOptionalString", takeOptionalString),
-        .function("takeOptionalDouble", takeOptionalDouble),
-        .function("takeOptionalBoolean", takeOptionalBoolean),
+        Method("takeOptionalString", takeOptionalString),
+        Method("takeOptionalDouble", takeOptionalDouble),
+        Method("takeOptionalBoolean", takeOptionalBoolean),
 
-        .function("throwError", throwError),
-        .function("runThreadsafeCallback", runThreadsafeCallback),
-        .function("returnSuccessfulPromise", returnSuccessfulPromise),
-        .function("returnThrowingPromise", returnThrowingPromise),
-        .function("takeTypedCallback", takeTypedCallback),
-        .class(TestClass1.self),
+        Method("throwError", throwError),
+        Method("runThreadsafeCallback", runThreadsafeCallback),
+        Method("returnSuccessfulPromise", returnSuccessfulPromise),
+        Method("returnThrowingPromise", returnThrowingPromise),
+        Method("takeTypedCallback", takeTypedCallback),
+        ClassProperty(TestClass1.self),
     ])
 }
 
