@@ -100,7 +100,11 @@ enum ThreadsafeTypedFunction {
             inGenericsAsArgs = ""
         }
 
-        try source.declareClass(.public, "ThreadsafeTypedFunction\(paramCount)", genericParams: allGenerics, conformsTo: Types.valueConvertible, wheres: wheres) { source in
+        let docs = """
+        A threadsafe and type-safe function with return type `Result`\(paramCount > 0 ? " and \(paramCount) parameter\(paramCount == 1 ? "" : "s")" : "").
+        """
+
+        try source.declareClass(.public, "ThreadsafeTypedFunction\(paramCount)", genericParams: allGenerics, conformsTo: Types.valueConvertible, wheres: wheres, docs: docs) { source in
             source.add("""
             public typealias InternalFunction = TypedFunction\(paramCount)\(allGenerics.bracketedOrNone)
             fileprivate var tsfn: napi_threadsafe_function!

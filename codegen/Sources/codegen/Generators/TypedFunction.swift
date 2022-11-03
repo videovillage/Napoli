@@ -91,7 +91,11 @@ enum TypedFunction {
 
         let inGenericsAsNAPI = inGenerics.map { "\($0.type.lowercased()).napiValue(env)" }.commaSeparated
 
-        try source.declareClass(.public, "TypedFunction\(paramCount)", genericParams: allGenerics, conformsTo: Types.valueConvertible, wheres: wheres) { source in
+        let docs = """
+        A type-safe function with return type `Result`\(paramCount > 0 ? " and \(paramCount) parameter\(paramCount == 1 ? "" : "s")" : "").
+        """
+
+        try source.declareClass(.public, "TypedFunction\(paramCount)", genericParams: allGenerics, conformsTo: Types.valueConvertible, wheres: wheres, docs: docs) { source in
             source.add("""
             public typealias ConvenienceCallback = (\(commaSeparatedInGenerics)) throws -> Result
             public typealias ConvenienceVoidCallback = (\(commaSeparatedInGenerics)) throws -> Void

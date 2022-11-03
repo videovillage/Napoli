@@ -32,8 +32,8 @@ struct Source {
     }
 
     @discardableResult
-    mutating func declareClass(_ access: Access = .default, _ symbol: String, genericParams: [Generic], conformsTo: String = "", wheres: [Where] = [], builder: Builder) throws -> Class {
-        let c = Class(access: access, symbol: symbol, genericParams: genericParams, conformsTo: conformsTo, wheres: wheres)
+    mutating func declareClass(_ access: Access = .default, _ symbol: String, genericParams: [Generic], conformsTo: String = "", wheres: [Where] = [], docs: String? = nil, builder: Builder) throws -> Class {
+        let c = Class(access: access, symbol: symbol, genericParams: genericParams, conformsTo: conformsTo, wheres: wheres, documentation: docs)
         try declareClass(c, builder: builder)
         return c
     }
@@ -139,6 +139,7 @@ struct Class {
     let genericParams: [Generic]
     let conformsTo: String
     let wheres: [Where]
+    let documentation: String?
 
     private var conformsString: String {
         if conformsTo.isEmpty {
@@ -148,8 +149,14 @@ struct Class {
         }
     }
 
+    private var documentationJoined: String {
+        guard let documentation else { return "" }
+
+        return documentation.components(separatedBy: .newlines).map { "/// \($0)" }.joined(separator: "\n") + "\n"
+    }
+
     var value: String {
-        "\(access.value.spaceIfNotEmpty())class \(symbol)\(genericParams.bracketedOrNone)\(conformsString)\(wheres.value.backspaceIfNotEmpty())"
+        "\(documentationJoined)\(access.value.spaceIfNotEmpty())class \(symbol)\(genericParams.bracketedOrNone)\(conformsString)\(wheres.value.backspaceIfNotEmpty())"
     }
 }
 
