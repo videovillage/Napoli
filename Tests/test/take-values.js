@@ -35,7 +35,6 @@ describe('Take Values', () => {
       assert.throws(() => addon.takeString(true), (err) => err instanceof TypeError && err.message === 'Expected string')
       assert.throws(() => addon.takeString(null), (err) => err instanceof TypeError && err.message === 'Expected string')
       assert.throws(() => addon.takeString(undefined), (err) => err instanceof TypeError && err.message === 'Expected string')
-      assert.throws(() => addon.takeString(), (err) => err instanceof TypeError && err.message === 'Expected string')
     })
 
     it('expects doubles', () => {
@@ -43,7 +42,6 @@ describe('Take Values', () => {
       assert.throws(() => addon.takeDouble(true), (err) => err instanceof TypeError && err.message === 'Expected number')
       assert.throws(() => addon.takeDouble(null), (err) => err instanceof TypeError && err.message === 'Expected number')
       assert.throws(() => addon.takeDouble(undefined), (err) => err instanceof TypeError && err.message === 'Expected number')
-      assert.throws(() => addon.takeDouble(), (err) => err instanceof TypeError && err.message === 'Expected number')
     })
 
     it('expects booleans', () => {
@@ -51,7 +49,6 @@ describe('Take Values', () => {
       assert.throws(() => addon.takeBoolean(1337), (err) => err instanceof TypeError && err.message === 'Expected boolean')
       assert.throws(() => addon.takeBoolean(null), (err) => err instanceof TypeError && err.message === 'Expected boolean')
       assert.throws(() => addon.takeBoolean(undefined), (err) => err instanceof TypeError && err.message === 'Expected boolean')
-      assert.throws(() => addon.takeBoolean(), (err) => err instanceof TypeError && err.message === 'Expected boolean')
     })
 
     it('expects null', () => {
@@ -59,7 +56,6 @@ describe('Take Values', () => {
       assert.throws(() => addon.takeNull(1337), (err) => err instanceof TypeError && err.message === 'Expected null')
       assert.throws(() => addon.takeNull(true), (err) => err instanceof TypeError && err.message === 'Expected null')
       assert.throws(() => addon.takeNull(undefined), (err) => err instanceof TypeError && err.message === 'Expected null')
-      assert.throws(() => addon.takeNull(), (err) => err instanceof TypeError && err.message === 'Expected null')
     })
 
     it('expects undefined', () => {

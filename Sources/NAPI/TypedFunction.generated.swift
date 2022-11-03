@@ -13,27 +13,45 @@ class TypedFunctionCallbackData {
 }
 
 func typedFuncNAPICallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) -> napi_value? {
+    enum Error: ErrorConvertible {
+        case invalidArgCount(actual: Int, expected: Int)
+
+        var message: String {
+            switch self {
+            case let .invalidArgCount(actual, expected):
+                return "Received invalid arg count (actual: \(actual), expected: \(expected))"
+            }
+        }
+
+        var code: String? {
+            "ESWIFTCALLBACK"
+        }
+    }
+
     var this: napi_value!
     let dataPointer = UnsafeMutablePointer<UnsafeMutableRawPointer?>.allocate(capacity: 1)
     napi_get_cb_info(env, cbinfo, nil, nil, &this, dataPointer)
     let data = Unmanaged<TypedFunctionCallbackData>.fromOpaque(dataPointer.pointee!).takeUnretainedValue()
 
     let usedArgs: [napi_value]
+    var actualArgCount = data.argCount
     if data.argCount > 0 {
         var args = [napi_value?](repeating: nil, count: data.argCount)
-        var argCount = data.argCount
 
         args.withUnsafeMutableBufferPointer {
-            _ = napi_get_cb_info(env, cbinfo, &argCount, $0.baseAddress, nil, nil)
+            _ = napi_get_cb_info(env, cbinfo, &actualArgCount, $0.baseAddress, nil, nil)
         }
 
-        assert(argCount == data.argCount)
         usedArgs = args.map { $0! }
     } else {
         usedArgs = []
     }
 
     do {
+        guard actualArgCount == data.argCount else {
+            throw Error.invalidArgCount(actual: actualArgCount, expected: data.argCount)
+        }
+
         return try data.callback(env, this, usedArgs).napiValue(env)
     } catch NAPI.Error.pendingException {
         return nil
