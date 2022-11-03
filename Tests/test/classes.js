@@ -31,7 +31,7 @@ describe('Classes', () => {
     changedTestObject.nested.nestedTestString = 'replacementNestedTestString'
 
     object.testObject = changedTestObject
-      
+
     assert.strictEqual(object.testObject.testString, 'replacementTestString')
     assert.strictEqual(object.testObject.nested.nestedTestString, 'replacementNestedTestString')
 
