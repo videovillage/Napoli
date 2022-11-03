@@ -15,10 +15,12 @@ describe('Classes', () => {
 
     assert.strictEqual(object.testString, 'Cool')
     object.testString = 'Changed'
+    assert.doesNotThrow(() => object.assertTestString('Changed'))
     assert.strictEqual(object.testString, 'Changed')
 
     assert.strictEqual(object.testNumber, 1234)
     object.testNumber = 4567
+    assert.doesNotThrow(() => object.assertTestNumber(4567))
     assert.strictEqual(object.testNumber, 4567)
 
     assert.strictEqual(object.testObject.testString, 'testString')

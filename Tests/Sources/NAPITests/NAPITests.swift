@@ -129,6 +129,14 @@ final class TestClass1: ClassConvertible {
         testObject = TestObject(testString: "testString", optionalString: "optionalTestString", nested: .init(nestedTestString: "nestedTestString"), optionalNested: nil)
     }
 
+    func assertTestString(_ string: String) throws {
+        try assertEqual(expected: string, actual: testString)
+    }
+
+    func assertTestNumber(_ number: Double) throws {
+        try assertEqual(expected: number, actual: testNumber)
+    }
+
     func testThrowError() throws {
         try throwError()
     }
@@ -145,6 +153,8 @@ final class TestClass1: ClassConvertible {
     static let jsInstanceMethods: [InstanceMethodDescriptor<TestClass1>] = [
         .init("reset", TestClass1.reset),
         .init("testThrowError", TestClass1.testThrowError),
+        .init("assertTestString", TestClass1.assertTestString),
+        .init("assertTestNumber", TestClass1.assertTestNumber)
     ]
 }
 
