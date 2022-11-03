@@ -54,8 +54,8 @@ public protocol ClassConvertible: AnyObject {
     static var jsAttributes: napi_property_attributes { get }
 }
 
-extension ClassConvertible {
-    public static var jsAttributes: napi_property_attributes {
+public extension ClassConvertible {
+    static var jsAttributes: napi_property_attributes {
         napi_default
     }
 }
@@ -71,14 +71,14 @@ public struct ClassDescriptor: PropertyDescriptor {
 
     private let value: ValueProperty
 
-    public init<C: ClassConvertible>(_ classType: C.Type) {
+    public init<C: ClassConvertible>(_: C.Type) {
         value = .init(C.jsName,
                       attributes: C.jsAttributes,
                       value: Class(named: C.jsName, { env, args in
-            let native = C()
-            try Wrap<C>.wrap(env, jsObject: args.this, nativeObject: native)
-            return Undefined.default
-        }, C.jsInstanceProperties + C.jsInstanceMethods))
+                          let native = C()
+                          try Wrap<C>.wrap(env, jsObject: args.this, nativeObject: native)
+                          return Undefined.default
+                      }, C.jsInstanceProperties + C.jsInstanceMethods))
     }
 
     public func propertyDescriptor(_ env: napi_env) throws -> napi_property_descriptor {

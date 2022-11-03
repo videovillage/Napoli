@@ -18,5 +18,3 @@ public struct ValueProperty: PropertyDescriptor {
         return napi_property_descriptor(utf8name: nil, name: _name, method: nil, getter: nil, setter: nil, value: _value, attributes: attributes, data: nil)
     }
 }
-
-

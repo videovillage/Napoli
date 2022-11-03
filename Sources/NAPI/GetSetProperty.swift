@@ -54,7 +54,7 @@ public class InstanceGetSetPropertyDescriptor<This: AnyObject>: GetSetPropertyDe
                    })
     }
 
-    public init<V: ValueConvertible>(_ name: String, attributes: napi_property_attributes = napi_default, keyPath: KeyPath<This, V>) {
+    public init(_ name: String, attributes: napi_property_attributes = napi_default, keyPath: KeyPath<This, some ValueConvertible>) {
         super.init(name,
                    attributes: attributes,
                    getter: { env, args in
