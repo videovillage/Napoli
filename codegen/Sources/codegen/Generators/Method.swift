@@ -15,7 +15,7 @@ enum Method {
             private let callback: TypedFunctionCallback
             private let argCount: Int
 
-            fileprivate init(_ name: String, attributes: napi_property_attributes = napi_default, argCount: Int, _ callback: @escaping TypedFunctionCallback) {
+            internal init(_ name: String, attributes: napi_property_attributes = napi_default, argCount: Int, _ callback: @escaping TypedFunctionCallback) {
                 self.name = name
                 self.attributes = attributes
                 self.callback = callback
