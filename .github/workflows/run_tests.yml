@@ -29,10 +29,11 @@ jobs:
         working-directory: "Tests"
     steps:
       - uses: actions/checkout@v3
-      - uses: swift-actions/setup-swift@v1
+      - name: Use Swift ${{ matrix.swift-version }}
+        uses: swift-actions/setup-swift@v1
         with:
           swift-version: ${{ matrix.swift-version }}
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
