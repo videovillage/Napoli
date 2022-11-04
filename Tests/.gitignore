@@ -9,5 +9,4 @@ DerivedData/
 
 /.build/
 /node_modules/
-/package-lock.json
 /Package.resolved
