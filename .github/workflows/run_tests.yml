@@ -1,0 +1,21 @@
+name: "Run Tests"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - '**'
+    paths: ['Sources/**.swift', 'Tests/**.swift', 'Tests/**.js', 'Tests/package.json']
+
+jobs:
+  run-tests:
+    name: Run Tests on ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-12]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Test
+        run: |
+          ${{ github.workspace }}/bin/test
