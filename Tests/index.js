@@ -1,1 +1,1 @@
-module.exports = require('./.build/release/NapoliTests.node')
+module.exports = require("./.build/release/NapoliTests.node")

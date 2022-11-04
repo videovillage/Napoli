@@ -3,11 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "test": "standard && mocha",
-    "postinstall": "swift build -c release -Xlinker -undefined -Xlinker dynamic_lookup && mv .build/release/libNapoliTests.dylib .build/release/NapoliTests.node"
+    "test": "npx prettier --check . && mocha",
+    "postinstall": "node bin/npm-postinstall.js"
   },
   "devDependencies": {
     "mocha": "^6.0.0",
-    "standard": "^12.0.1"
+    "prettier": "2.7.1"
   }
 }

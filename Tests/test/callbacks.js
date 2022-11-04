@@ -1,18 +1,18 @@
 /* eslint-env mocha */
 
-const assert = require('assert')
-const addon = require('../')
+const assert = require("assert")
+const addon = require("../")
 
-describe('Callbacks:', function () {
-  it('runs threadsafe callbacks', function (done) {
+describe("Callbacks:", function () {
+  it("runs threadsafe callbacks", function (done) {
     addon.runThreadsafeCallback(function (msg) {
-      assert.strictEqual(msg, 'hello world')
+      assert.strictEqual(msg, "hello world")
       done()
-      return 'message'
+      return "message"
     })
   })
 
-  it('runs typed callbacks', () => {
+  it("runs typed callbacks", () => {
     addon.takeTypedCallback(function (number, bool) {
       assert.strictEqual(number, 23)
       assert.strictEqual(bool, true)
@@ -20,16 +20,16 @@ describe('Callbacks:', function () {
     })
   })
 
-  it('returns successful promise', async function () {
-    const promise = addon.returnSuccessfulPromise('cool')
-    assert.strictEqual(await promise, 'cool hello')
-    assert.strictEqual(await promise, 'cool hello')
+  it("returns successful promise", async function () {
+    const promise = addon.returnSuccessfulPromise("cool")
+    assert.strictEqual(await promise, "cool hello")
+    assert.strictEqual(await promise, "cool hello")
   })
 
-  it('returns throwing promise', async function () {
-    await assert.rejects(addon.returnThrowingPromise('cool'), (err) => {
-      assert.strictEqual(err.code, 'ETEST')
-      assert.strictEqual(err.message, 'Error message')
+  it("returns throwing promise", async function () {
+    await assert.rejects(addon.returnThrowingPromise("cool"), (err) => {
+      assert.strictEqual(err.code, "ETEST")
+      assert.strictEqual(err.message, "Error message")
       return true
     })
   })
