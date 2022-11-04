@@ -39,7 +39,7 @@ jobs:
         id: output-commit
         run: |
           SHA=$(git rev-parse HEAD)
-          echo "::set-output name=commitSHA::$SHA"
+          echo "commitSHA=$SHA" >> $GITHUB_OUTPUT
 
   run-tests:
     name: Run Tests on ${{ matrix.os }} with Swift ${{ matrix.swift-version }} Node ${{ matrix.node-version }}
