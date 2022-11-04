@@ -19,7 +19,7 @@ jobs:
     name: Run Tests on ${{ matrix.os }} with Swift ${{ matrix.swift-version }} Node ${{ matrix.node-version }}
     strategy:
       matrix:
-        os: [macos-12, ubuntu-latest, windows-latest]
+        os: [macos-12, ubuntu-latest]
         node-version: ["19.x"]
         swift-version: ["5.7.1"]
     runs-on: ${{ matrix.os }}
