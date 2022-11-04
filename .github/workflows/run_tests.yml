@@ -4,20 +4,34 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - '**'
-    paths: ['Package.swift', 'Sources/**.swift', 'Tests/**.swift', 'Tests/**.js', 'Tests/package.json']
+      - "**"
+    paths:
+      [
+        "Package.swift",
+        "Sources/**.swift",
+        "Tests/**.swift",
+        "Tests/**.js",
+        "Tests/package.json",
+      ]
 
 jobs:
   run-tests:
-    name: Run Tests on ${{ matrix.os }}
+    name: Run Tests on ${{ matrix.os }} with Swift ${{ matrix.swift-version }} Node ${{ matrix.node-version }}
     strategy:
       matrix:
-        os: [macos-12, ubuntu-latest]
+        os: [macos-12, ubuntu-latest, windows-latest]
+        node-version: ["19.x"]
+        swift-version: ["5.7.1"]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: swift-actions/setup-swift@v1
+        with:
+          swift-version: ${{ matrix.swift-version }}
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
       - uses: actions/checkout@v3
       - name: Test
-        shell: bash
-        run: |
-          ${{ github.workspace }}/bin/test
+        run: "cd Tests && npm install && npm test"
