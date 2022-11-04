@@ -8,5 +8,5 @@ rm -rf "${SCRIPT_DIR}/../Sources/Napoli/Generated"
 mkdir -p "${SCRIPT_DIR}/../Sources/Napoli/Generated"
 
 swift run codegen "${SCRIPT_DIR}/../Sources/Napoli/Generated"
-cd "${SCRIPT_DIR}/../Sources/Napoli/"
+cd "${SCRIPT_DIR}/../Sources/Napoli/Generated"
 swiftformat *.generated.swift
