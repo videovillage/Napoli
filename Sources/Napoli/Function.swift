@@ -23,6 +23,7 @@ private enum InternalFunction {
     case javascript(napi_value)
     case swift(String, Callback)
 }
+
 public class Function: ValueConvertible {
     fileprivate let value: InternalFunction
 
