@@ -16,8 +16,27 @@ on:
       ]
 
 jobs:
+  swift-format:
+    name: Format Swift
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install SwiftFormat
+        uses: Cyberbeni/install-swift-tool@v2
+        with:
+          url: https://github.com/nicklockwood/SwiftFormat
+      - name: Run SwiftFormat
+        run: swiftformat .
+      - uses: EndBug/add-and-commit@v9
+        with:
+          author_name: botlockwood
+          default_author: github_actions
+          message: "ran swiftformat"
+
   run-tests:
     name: Run Tests on ${{ matrix.os }} with Swift ${{ matrix.swift-version }} Node ${{ matrix.node-version }}
+    needs: swift-format
     strategy:
       matrix:
         os: [macos-12, ubuntu-latest]
