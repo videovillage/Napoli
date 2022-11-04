@@ -24,7 +24,6 @@ async function run() {
 
   // run a shell script without exec
   const util = require("util")
-  const { runInContext } = require("vm")
   const exec = util.promisify(require("child_process").exec)
 
   try {
