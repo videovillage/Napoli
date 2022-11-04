@@ -29,6 +29,7 @@ async function run() {
 
   try {
     await exec(swiftBuildCommand)
+    await exec(moveLibraryCommand)
   } catch (e) {
     console.error(e)
   }
