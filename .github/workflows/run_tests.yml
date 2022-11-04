@@ -35,6 +35,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
+          cache-dependency-path: "Tests/package-lock.json"
       - uses: actions/checkout@v3
       - name: Test
         run: "npm install && npm test"
