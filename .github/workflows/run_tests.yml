@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - '**'
-    paths: ['Sources/**.swift', 'Tests/**.swift', 'Tests/**.js', 'Tests/package.json']
+    paths: ['Package.swift', 'Sources/**.swift', 'Tests/**.swift', 'Tests/**.js', 'Tests/package.json']
 
 jobs:
   run-tests:
