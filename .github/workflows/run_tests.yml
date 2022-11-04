@@ -38,6 +38,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-          cache-dependency-path: "**/package-lock.json"
+          cache-dependency-path: "Tests/package-lock.json"
       - name: Test
         run: "npm install && npm test"
