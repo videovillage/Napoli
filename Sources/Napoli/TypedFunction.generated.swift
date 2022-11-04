@@ -53,7 +53,7 @@ func typedFuncNAPICallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) -> n
         }
 
         return try data.callback(env, this, usedArgs).napiValue(env)
-    } catch NAPI.Error.pendingException {
+    } catch Napoli.Error.pendingException {
         return nil
     } catch {
         if try! exceptionIsPending(env) == false { try! throwError(env, error) }

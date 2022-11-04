@@ -1,5 +1,5 @@
 import Foundation
-import NAPI
+import Napoli
 
 struct TestError: Swift.Error, ErrorConvertible {
     public var message: String
@@ -169,8 +169,8 @@ struct TestObject: ObjectConvertible {
     }
 }
 
-@_cdecl("_init_napi_tests")
-func initNAPITests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointer? {
+@_cdecl("_init_napoli_tests")
+func initNapoliTests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointer? {
     initModule(env, exports, [
         MethodDescriptor("returnString", returnString),
         MethodDescriptor("returnDouble", returnDouble),

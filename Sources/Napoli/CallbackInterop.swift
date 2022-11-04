@@ -7,7 +7,7 @@ public protocol ErrorConvertible: Swift.Error {
 }
 
 internal func throwError(_ env: napi_env, _ error: Swift.Error) throws {
-    if let error = error as? NAPI.Error {
+    if let error = error as? Napoli.Error {
         try error.napi_throw(env).throwIfError()
     } else if let error = error as? ValueConvertible {
         try napi_throw(env, error.napiValue(env)).throwIfError()
@@ -26,7 +26,6 @@ internal func exceptionIsPending(_ env: napi_env) throws -> Bool {
     return result
 }
 
-public typealias AsyncCallback = (napi_env, Arguments) async throws -> ValueConvertible
 public typealias Callback = (napi_env, Arguments) throws -> ValueConvertible
 
 class CallbackData {
@@ -56,7 +55,7 @@ func swiftNAPICallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) -> napi_
 
     do {
         return try data.callback(env, args as! Arguments).napiValue(env)
-    } catch NAPI.Error.pendingException {
+    } catch Napoli.Error.pendingException {
         return nil
     } catch {
         if try! exceptionIsPending(env) == false { try! throwError(env, error) }
@@ -73,7 +72,7 @@ func swiftNAPIGetterCallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) ->
 
     do {
         return try data.getter(env, args as! Arguments).napiValue(env)
-    } catch NAPI.Error.pendingException {
+    } catch Napoli.Error.pendingException {
         return nil
     } catch {
         if try! exceptionIsPending(env) == false { try! throwError(env, error) }
@@ -90,7 +89,7 @@ func swiftNAPISetterCallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) ->
 
     do {
         return try data.setter(env, args as! Arguments).napiValue(env)
-    } catch NAPI.Error.pendingException {
+    } catch Napoli.Error.pendingException {
         return nil
     } catch {
         if try! exceptionIsPending(env) == false { try! throwError(env, error) }

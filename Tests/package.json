@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "test": "standard && mocha",
-    "postinstall": "swift build -c release -Xlinker -undefined -Xlinker dynamic_lookup && mv .build/release/libNAPITests.dylib .build/release/NAPITests.node"
+    "postinstall": "swift build -c release -Xlinker -undefined -Xlinker dynamic_lookup && mv .build/release/libNapoliTests.dylib .build/release/NapoliTests.node"
   },
   "devDependencies": {
     "mocha": "^6.0.0",

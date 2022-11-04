@@ -8,7 +8,7 @@ public struct Null: ValueConvertible {
     public init(_ env: napi_env, from: napi_value) throws {
         guard try strictlyEquals(env, lhs: from, rhs: Null.default) else {
             napi_throw_type_error(env, nil, "Expected null")
-            throw NAPI.Error.pendingException
+            throw Napoli.Error.pendingException
         }
     }
 

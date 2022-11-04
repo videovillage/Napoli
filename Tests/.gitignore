@@ -1,3 +1,12 @@
+.DS_Store
+/Packages
+/*.xcodeproj
+xcuserdata/
+DerivedData/
+.swiftpm/config/registries.json
+.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+.netrc
+
 /.build/
 /node_modules/
 /package-lock.json

@@ -3,19 +3,19 @@
 import PackageDescription
 
 let package = Package(
-    name: "NAPITests",
+    name: "NapoliTests",
     platforms: [.macOS(.v10_15)],
     products: [
-        .library(name: "NAPITests", type: .dynamic, targets: ["NAPITests"]),
+        .library(name: "NapoliTests", type: .dynamic, targets: ["NapoliTests"]),
     ],
     dependencies: [
         .package(path: "../"),
     ],
     targets: [
         .target(name: "Trampoline",
-                dependencies: [.product(name: "NAPIC", package: "swift-napi-bindings")]),
-        .target(name: "NAPITests",
+                dependencies: [.product(name: "NAPIC", package: "Napoli")]),
+        .target(name: "NapoliTests",
                 dependencies: ["Trampoline",
-                               .product(name: "NAPI", package: "swift-napi-bindings")]),
+                               .product(name: "Napoli", package: "Napoli")]),
     ]
 )
