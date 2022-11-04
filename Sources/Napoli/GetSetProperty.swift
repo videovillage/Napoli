@@ -12,7 +12,7 @@ public class GetSetPropertyDescriptor: PropertyDescriptor {
         self.name = name
         self.attributes = attributes
         self.getter = getter
-        self.setter = setter ?? { env, args in
+        self.setter = setter ?? { _, _ in
             throw ReadOnlyError(name)
         }
     }
@@ -31,7 +31,7 @@ public class GetSetPropertyDescriptor: PropertyDescriptor {
                 return Undefined.default
             }
         } else {
-            self.setter = { env, args in
+            self.setter = { _, _ in
                 throw ReadOnlyError(name)
             }
         }
@@ -49,7 +49,7 @@ public class GetSetPropertyDescriptor: PropertyDescriptor {
         let message: String
 
         init(_ name: String) {
-            self.message = "Tried to write to read-only property \"\(name)\""
+            message = "Tried to write to read-only property \"\(name)\""
         }
     }
 }

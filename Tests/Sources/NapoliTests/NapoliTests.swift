@@ -154,7 +154,7 @@ final class TestClass1: ClassConvertible {
         .init("reset", TestClass1.reset),
         .init("testThrowError", TestClass1.testThrowError),
         .init("assertTestString", TestClass1.assertTestString),
-        .init("assertTestNumber", TestClass1.assertTestNumber)
+        .init("assertTestNumber", TestClass1.assertTestNumber),
     ]
 }
 
