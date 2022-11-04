@@ -28,6 +28,7 @@ jobs:
       run:
         working-directory: "Tests"
     steps:
+      - uses: actions/checkout@v3
       - uses: swift-actions/setup-swift@v1
         with:
           swift-version: ${{ matrix.swift-version }}
@@ -37,6 +38,5 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
           cache-dependency-path: "**/package-lock.json"
-      - uses: actions/checkout@v3
       - name: Test
         run: "npm install && npm test"
