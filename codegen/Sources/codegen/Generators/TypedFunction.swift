@@ -157,10 +157,10 @@ enum TypedFunction {
                 }
             }
 
-            public convenience init(named name: String, _ callback: @escaping AsyncConvenienceVoidCallback) where Result == Promise<Void> {
+            public convenience init(named name: String, _ callback: @escaping AsyncConvenienceVoidCallback) where Result == Promise<Undefined> {
                 self.init(named: name) { env, this, args in
                     \(argListAssignedToValues)
-                    return Promise<Void> {
+                    return Promise<Undefined> {
                         try await callback(\(argValueList))
                     }
                 }

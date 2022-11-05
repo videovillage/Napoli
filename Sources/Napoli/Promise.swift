@@ -1,7 +1,7 @@
 import Foundation
 import NAPIC
 
-public class Promise<Result>: ValueConvertible {
+public class Promise<Result: ValueConvertible>: ValueConvertible {
     public required init(_: napi_env, from _: napi_value) throws {
         fatalError("not implemented")
     }
@@ -9,14 +9,14 @@ public class Promise<Result>: ValueConvertible {
     private var deferred: ThreadSafeDeferred!
     private let task: Task<ValueConvertible, Swift.Error>
 
-    public init(_ closure: @escaping () async throws -> ValueConvertible) where Result: ValueConvertible {
-        task = Task {
+    public init(_ closure: @escaping () async throws -> Result) {
+        self.task = Task {
             try await closure()
         }
     }
 
-    public init(_ closure: @escaping () async throws -> Void) where Result == Void {
-        task = Task {
+    public init(_ closure: @escaping () async throws -> Void) where Result == Undefined {
+        self.task = Task {
             try await closure()
             return Undefined.default
         }
