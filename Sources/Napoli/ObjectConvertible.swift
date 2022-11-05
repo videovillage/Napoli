@@ -25,7 +25,7 @@ public extension ObjectConvertible {
                 let label = child.label,
                 let value = child.value as? ValueConvertible
             else {
-                throw TypeErasureError.notSupported(type: String(describing: type(of: child.value)), label: child.label)
+                throw AnyValueError.erasingNotSupported(type: String(describing: type(of: child.value)), label: child.label)
             }
 
             result[label] = try value.eraseToAny()

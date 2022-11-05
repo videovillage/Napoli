@@ -4,27 +4,44 @@ import NAPIC
 public protocol ValueConvertible {
     init(_ env: napi_env, from: napi_value) throws
     func napiValue(_ env: napi_env) throws -> napi_value
+
+    init(_ any: AnyValue) throws
     func eraseToAny() throws -> AnyValue
 }
 
-enum TypeErasureError: LocalizedError {
-    case notSupported(type: String, label: String?)
+enum AnyValueError: LocalizedError {
+    case initNotSupported(type: String, value: String?)
+    case erasingNotSupported(type: String, label: String?)
 
     var errorDescription: String? {
         switch self {
-        case let .notSupported(type, label):
+        case let .erasingNotSupported(type, label):
             if let label {
                 return "Type-erasing field \"\(label)\" (type \(type)) to AnyValue is not supported."
             } else {
                 return "Type-erasing \(type) to AnyValue is not supported."
             }
+        case let .initNotSupported(type, value):
+            if let value {
+                return "Initializing type \(type) from \(value) is not supported."
+            } else {
+                return "Initializing type \(type) from AnyValue is not supported."
+            }
         }
+    }
+
+    static func initNotSupported<V: ValueConvertible>(_ selfType: V.Type, from: AnyValue?) -> Self {
+        .initNotSupported(type: String(describing: selfType), value: from == nil ? nil : String(describing: from!))
     }
 }
 
 public extension ValueConvertible {
+    init(_ any: AnyValue) throws {
+        throw AnyValueError.initNotSupported(Self.self, from: nil)
+    }
+
     func eraseToAny() throws -> AnyValue {
-        throw TypeErasureError.notSupported(type: String(describing: Self.self), label: nil)
+        throw AnyValueError.erasingNotSupported(type: String(describing: Self.self), label: nil)
     }
 }
 
@@ -45,6 +62,15 @@ extension Optional: ValueConvertible where Wrapped: ValueConvertible {
 
     public func napiValue(_ env: napi_env) throws -> napi_value {
         try self?.napiValue(env) ?? Null.default.napiValue(env)
+    }
+
+    public init(_ any: AnyValue) throws {
+        switch any {
+        case .null, .undefined:
+            self = .none
+        default:
+            self = .some(try Wrapped(any))
+        }
     }
 
     public func eraseToAny() throws -> AnyValue {
@@ -91,6 +117,20 @@ extension Dictionary: ValueConvertible where Key == String, Value: ValueConverti
         return result
     }
 
+    public init(_ any: AnyValue) throws {
+        switch any {
+        case let .object(dict):
+            var result = Self.init()
+            result.reserveCapacity(dict.count)
+            for (key, value) in dict {
+                result[key] = try Value(value)
+            }
+            self = result
+        default:
+            throw AnyValueError.initNotSupported(Self.self, from: any)
+        }
+    }
+
     public func eraseToAny() throws -> AnyValue {
         .object(try mapValues { value in
             try value.eraseToAny()
@@ -127,6 +167,15 @@ extension Array: ValueConvertible where Element: ValueConvertible {
         return result
     }
 
+    public init(_ any: AnyValue) throws {
+        switch any {
+        case let .array(array):
+            self = try array.map { try Element($0) }
+        default:
+            throw AnyValueError.initNotSupported(Self.self, from: any)
+        }
+    }
+
     public func eraseToAny() throws -> AnyValue {
         try .array(map { try $0.eraseToAny() })
     }
@@ -158,6 +207,15 @@ extension String: ValueConvertible {
         return result!
     }
 
+    public init(_ any: AnyValue) throws {
+        switch any {
+        case let .string(string):
+            self = string
+        default:
+            throw AnyValueError.initNotSupported(Self.self, from: any)
+        }
+    }
+
     public func eraseToAny() throws -> AnyValue {
         .string(self)
     }
@@ -176,6 +234,15 @@ extension Date: ValueConvertible {
         return result
     }
 
+    public init(_ any: AnyValue) throws {
+        switch any {
+        case let .date(date):
+            self = date
+        default:
+            throw AnyValueError.initNotSupported(Self.self, from: any)
+        }
+    }
+
     public func eraseToAny() throws -> AnyValue {
         .date(self)
     }
@@ -185,6 +252,15 @@ extension Double: PrimitiveValueConvertible {
     static let defaultValue = Self.nan
     static let initWithValue = napi_get_value_double
     static let createValue = napi_create_double
+
+    public init(_ any: AnyValue) throws {
+        switch any {
+        case let .number(number):
+            self = number
+        default:
+            throw AnyValueError.initNotSupported(Self.self, from: any)
+        }
+    }
 
     public func eraseToAny() throws -> AnyValue {
         .number(self)
@@ -196,6 +272,15 @@ extension Int32: PrimitiveValueConvertible {
     static let initWithValue = napi_get_value_int32
     static let createValue = napi_create_int32
 
+    public init(_ any: AnyValue) throws {
+        switch any {
+        case let .number(number):
+            self = Self(number)
+        default:
+            throw AnyValueError.initNotSupported(Self.self, from: any)
+        }
+    }
+
     public func eraseToAny() throws -> AnyValue {
         .number(Double(self))
     }
@@ -205,6 +290,15 @@ extension UInt32: PrimitiveValueConvertible {
     static let defaultValue = Self.max
     static let initWithValue = napi_get_value_uint32
     static let createValue = napi_create_uint32
+
+    public init(_ any: AnyValue) throws {
+        switch any {
+        case let .number(number):
+            self = Self(number)
+        default:
+            throw AnyValueError.initNotSupported(Self.self, from: any)
+        }
+    }
 
     public func eraseToAny() throws -> AnyValue {
         .number(Double(self))
@@ -244,6 +338,15 @@ extension Int64: ValueConvertible {
 
     public static let jsSafeRange: ClosedRange<Self> = -(Int64(powl(2, 53)) - 1) ... (Int64(powl(2, 53)) - 1)
 
+    public init(_ any: AnyValue) throws {
+        switch any {
+        case let .number(number):
+            self = Self(number)
+        default:
+            throw AnyValueError.initNotSupported(Self.self, from: any)
+        }
+    }
+
     public func eraseToAny() throws -> AnyValue {
         guard Self.jsSafeRange.contains(self) else {
             throw JSError.outOfSafeRange(self)
@@ -257,6 +360,19 @@ extension Bool: PrimitiveValueConvertible {
     static let defaultValue = false
     static let initWithValue = napi_get_value_bool
     static let createValue = napi_get_boolean
+
+    public init(_ any: AnyValue) throws {
+        switch any {
+        case let .boolean(bool):
+            self = bool
+        default:
+            throw AnyValueError.initNotSupported(Self.self, from: any)
+        }
+    }
+
+    public func eraseToAny() throws -> AnyValue {
+        .boolean(self)
+    }
 }
 
 protocol PrimitiveValueConvertible: ValueConvertible {
