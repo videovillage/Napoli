@@ -39,26 +39,26 @@ public class ObjectReference: ValueConvertible {
         objectValue
     }
 
-    func keys(env: napi_env? = nil) throws -> [String] {
+    public func keys(env: napi_env? = nil) throws -> [String] {
         guard let env = env ?? self.env else { throw Error.envRequired }
         var namesArray: napi_value!
         try napi_get_property_names(env, objectValue, &namesArray).throwIfError()
         return try [String](env, from: namesArray)
     }
 
-    func set(_ key: String, value: some ValueConvertible, env: napi_env? = nil) throws {
+    public func set(_ key: String, value: some ValueConvertible, env: napi_env? = nil) throws {
         guard let env = env ?? self.env else { throw Error.envRequired }
         try napi_set_property(env, objectValue, key.napiValue(env), value.napiValue(env)).throwIfError()
     }
 
-    func get<V: ValueConvertible>(_ key: String, env: napi_env? = nil) throws -> V {
+    public func get<V: ValueConvertible>(_ key: String, env: napi_env? = nil) throws -> V {
         guard let env = env ?? self.env else { throw Error.envRequired }
         var value: napi_value!
         try napi_get_property(env, objectValue, key.napiValue(env), &value).throwIfError()
         return try V(env, from: value)
     }
 
-    func immutable(_ env: napi_env? = nil) throws -> [String: AnyValue] {
+    public func immutable(_ env: napi_env? = nil) throws -> [String: AnyValue] {
         guard let env = env ?? self.env else { throw Error.envRequired }
         return try .init(env, from: objectValue)
     }
@@ -69,6 +69,7 @@ public class ObjectReference: ValueConvertible {
 
     deinit {
         if let env {
+            print("unref")
             try! napi_remove_env_cleanup_hook(env, envCleanupCallback, cleanupObject).throwIfError()
             try! napi_delete_reference(env, ref).throwIfError()
         }
