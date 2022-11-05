@@ -5,7 +5,7 @@ import NAPIC
 public protocol ObjectConvertible: ValueConvertible, Codable, Equatable {}
 
 public extension ObjectConvertible {
-    init(_ env: napi_env, from: napi_value) throws {
+    init(_: napi_env, from _: napi_value) throws {
         fatalError("not supported")
     }
 
