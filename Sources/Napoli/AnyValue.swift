@@ -28,20 +28,20 @@ public enum AnyValue: ValueConvertible, Codable {
         try napi_typeof(env, value, &type).throwIfError()
         switch type {
         case napi_boolean:
-            self = try .init(Bool(env, from: value))
+            self = try .boolean(Bool(env, from: value))
         case napi_object:
             switch try ObjectType(env, object: value) {
             case .array:
-                self = try .init([AnyValue](env, from: value))
+                self = try .array([AnyValue](env, from: value))
             case .date:
-                self = try .init(Date(env, from: value))
+                self = try .date(Date(env, from: value))
             case .generic:
-                self = try .init([String: AnyValue](env, from: value))
+                self = try .object([String: AnyValue](env, from: value))
             }
         case napi_string:
-            self = try .init(String(env, from: value))
+            self = try .string(String(env, from: value))
         case napi_number:
-            self = try .init(String(env, from: value))
+            self = try .number(Double(env, from: value))
         case napi_null:
             self = .null
         case napi_undefined:
