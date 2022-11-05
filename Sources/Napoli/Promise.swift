@@ -10,13 +10,13 @@ public class Promise<Result>: ValueConvertible {
     private let task: Task<ValueConvertible, Swift.Error>
 
     public init(_ closure: @escaping () async throws -> ValueConvertible) where Result: ValueConvertible {
-        self.task = Task {
+        task = Task {
             try await closure()
         }
     }
 
     public init(_ closure: @escaping () async throws -> Void) where Result == Void {
-        self.task = Task {
+        task = Task {
             try await closure()
             return Undefined.default
         }
