@@ -91,19 +91,6 @@ public class Object: ValueConvertible {
         }
     }
 
-    public required convenience init(_ any: AnyValue) throws {
-        switch any {
-        case let .object(object):
-            self.init(object.storage)
-        default:
-            throw AnyValueError.initNotSupported(Self.self, from: any)
-        }
-    }
-
-    public func eraseToAny() throws -> AnyValue {
-        .object(self)
-    }
-
     func frozen(_ env: napi_env? = nil) throws -> [String: AnyValue] {
         switch storage {
         case let .javascript(frozenEnv, from):
