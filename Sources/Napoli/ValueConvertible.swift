@@ -30,13 +30,13 @@ enum AnyValueError: LocalizedError {
         }
     }
 
-    static func initNotSupported<V: ValueConvertible>(_ selfType: V.Type, from: AnyValue?) -> Self {
+    static func initNotSupported(_ selfType: (some ValueConvertible).Type, from: AnyValue?) -> Self {
         .initNotSupported(type: String(describing: selfType), value: from == nil ? nil : String(describing: from!))
     }
 }
 
 public extension ValueConvertible {
-    init(_ any: AnyValue) throws {
+    init(_: AnyValue) throws {
         throw AnyValueError.initNotSupported(Self.self, from: nil)
     }
 
@@ -120,7 +120,7 @@ extension Dictionary: ValueConvertible where Key == String, Value: ValueConverti
     public init(_ any: AnyValue) throws {
         switch any {
         case let .object(dict):
-            var result = Self.init()
+            var result = Self()
             result.reserveCapacity(dict.count)
             for (key, value) in dict {
                 result[key] = try Value(value)

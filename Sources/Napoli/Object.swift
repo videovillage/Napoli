@@ -12,6 +12,7 @@ public class Object: ValueConvertible {
             }
         }
     }
+
     private enum Storage {
         case javascript(napi_value)
         case swift([String: AnyValue])
@@ -19,11 +20,11 @@ public class Object: ValueConvertible {
 
     private var storage: Storage
 
-    public init(_ dict: [String: AnyValue]) {
+    public init(_: [String: AnyValue]) {
         storage = .swift(.init())
     }
 
-    public required init(_ env: napi_env, from: napi_value) throws {
+    public required init(_: napi_env, from: napi_value) throws {
         storage = .javascript(from)
     }
 
