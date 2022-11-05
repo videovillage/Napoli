@@ -35,7 +35,7 @@ public class ObjectReference: ValueConvertible {
         napi_add_env_cleanup_hook(env, envCleanupCallback, cleanupObject)
     }
 
-    public func napiValue(_ env: napi_env) throws -> napi_value {
+    public func napiValue(_: napi_env) throws -> napi_value {
         objectValue
     }
 
