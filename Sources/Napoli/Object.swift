@@ -25,7 +25,7 @@ public class Object: ValueConvertible {
         self.init(.swift(dict))
     }
 
-    public convenience required init(_ env: napi_env, from: napi_value) throws {
+    public required convenience init(_ env: napi_env, from: napi_value) throws {
         self.init(.javascript(env, from))
     }
 
@@ -91,7 +91,7 @@ public class Object: ValueConvertible {
         }
     }
 
-    public convenience required init(_ any: AnyValue) throws {
+    public required convenience init(_ any: AnyValue) throws {
         switch any {
         case let .object(object):
             self.init(object.storage)

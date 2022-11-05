@@ -51,19 +51,19 @@ extension Optional: ValueConvertible where Wrapped: ValueConvertible {
             self = .none
             return
         }
-        
+
         if try strictlyEquals(env, lhs: from, rhs: Undefined.default) {
             self = .none
             return
         }
-        
+
         self = .some(try Wrapped(env, from: from))
     }
-    
+
     public func napiValue(_ env: napi_env) throws -> napi_value {
         try self?.napiValue(env) ?? Null.default.napiValue(env)
     }
-    
+
     public init(_ any: AnyValue) throws {
         switch any {
         case .null, .undefined:
@@ -72,7 +72,7 @@ extension Optional: ValueConvertible where Wrapped: ValueConvertible {
             self = .some(try Wrapped(any))
         }
     }
-    
+
     public func eraseToAny() throws -> AnyValue {
         switch self {
         case let .some(value):
