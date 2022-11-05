@@ -6,9 +6,7 @@ public protocol ObjectConvertible: ValueConvertible, Codable, Equatable {}
 
 public extension ObjectConvertible {
     init(_ env: napi_env, from: napi_value) throws {
-        let object = try [String: AnyValue](env, from: from)
-        let encoded = try JSONEncoder().encode(object)
-        self = try JSONDecoder().decode(Self.self, from: encoded)
+        fatalError("not supported")
     }
 
     func napiValue(_ env: napi_env) throws -> napi_value {
@@ -31,6 +29,6 @@ public extension ObjectConvertible {
             result[label] = try value.eraseToAny()
         }
 
-        return .object(result)
+        fatalError("not supported")
     }
 }

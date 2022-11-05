@@ -83,61 +83,6 @@ extension Optional: ValueConvertible where Wrapped: ValueConvertible {
     }
 }
 
-extension Dictionary: ValueConvertible where Key == String, Value: ValueConvertible {
-    public init(_ env: napi_env, from: napi_value) throws {
-        var namesArray: napi_value!
-        try napi_get_property_names(env, from, &namesArray).throwIfError()
-
-        var count: UInt32 = .zero
-        try napi_get_array_length(env, namesArray, &count).throwIfError()
-
-        var dict = Self(minimumCapacity: Int(count))
-
-        for i in 0 ..< count {
-            var key: napi_value!
-            try napi_get_element(env, namesArray, i, &key).throwIfError()
-            var value: napi_value!
-            try napi_get_property(env, from, key, &value).throwIfError()
-
-            try dict[String(env, from: key)] = Value(env, from: value)
-        }
-
-        self = dict
-    }
-
-    public func napiValue(_ env: napi_env) throws -> napi_value {
-        var result: napi_value!
-
-        try napi_create_object(env, &result).throwIfError()
-
-        for (key, value) in self {
-            try napi_set_property(env, result, try key.napiValue(env), try value.napiValue(env)).throwIfError()
-        }
-
-        return result
-    }
-
-    public init(_ any: AnyValue) throws {
-        switch any {
-        case let .object(dict):
-            var result = Self()
-            result.reserveCapacity(dict.count)
-            for (key, value) in dict {
-                result[key] = try Value(value)
-            }
-            self = result
-        default:
-            throw AnyValueError.initNotSupported(Self.self, from: any)
-        }
-    }
-
-    public func eraseToAny() throws -> AnyValue {
-        .object(try mapValues { value in
-            try value.eraseToAny()
-        })
-    }
-}
-
 extension Array: ValueConvertible where Element: ValueConvertible {
     public init(_ env: napi_env, from: napi_value) throws {
         var count: UInt32 = .zero
