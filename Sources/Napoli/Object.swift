@@ -71,4 +71,17 @@ public class Object: ValueConvertible {
             return try V(dict[key] ?? .undefined)
         }
     }
+
+    public required convenience init(_ any: AnyValue) throws {
+        switch any {
+        case let .object(object):
+            self.init(object.storage)
+        default:
+            throw AnyValueError.initNotSupported(Self.self, from: any)
+        }
+    }
+
+    public func eraseToAny() throws -> AnyValue {
+        .object(self)
+    }
 }
