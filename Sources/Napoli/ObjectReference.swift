@@ -69,7 +69,6 @@ public class ObjectReference: ValueConvertible {
 
     deinit {
         if let env {
-            print("unref")
             try! napi_remove_env_cleanup_hook(env, envCleanupCallback, cleanupObject).throwIfError()
             try! napi_delete_reference(env, ref).throwIfError()
         }
