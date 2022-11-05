@@ -94,6 +94,8 @@ extension Dictionary: ValueConvertible where Key == String, Value: ValueConverti
         var dict = Self(minimumCapacity: Int(count))
 
         for i in 0 ..< count {
+            let scope = try Scope.open(env)
+            defer { scope.close(env) }
             var key: napi_value!
             try napi_get_element(env, namesArray, i, &key).throwIfError()
             var value: napi_value!
@@ -147,6 +149,8 @@ extension Array: ValueConvertible where Element: ValueConvertible {
         array.reserveCapacity(Int(count))
 
         for i in 0 ..< count {
+            let scope = try Scope.open(env)
+            defer { scope.close(env) }
             var result: napi_value!
             try napi_get_element(env, from, i, &result).throwIfError()
             try array.append(Element(env, from: result))
