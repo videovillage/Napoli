@@ -32,8 +32,8 @@ struct Source {
     }
 
     @discardableResult
-    mutating func declareClass(_ access: Access = .default, _ symbol: String, genericParams: [Generic], conformsTo: String = "", wheres: [Where] = [], docs: String? = nil, builder: Builder) throws -> Class {
-        let c = Class(access: access, symbol: symbol, genericParams: genericParams, conformsTo: conformsTo, wheres: wheres, documentation: docs)
+    mutating func declareClass(_ access: Access = .default, _ symbol: String, genericParams: [Generic], conformsTo: String = "", wheres: [Where] = [], docs: String? = nil, preamble: String? = nil, builder: Builder) throws -> Class {
+        let c = Class(access: access, symbol: symbol, genericParams: genericParams, conformsTo: conformsTo, wheres: wheres, documentation: docs, preamble: preamble)
         try declareClass(c, builder: builder)
         return c
     }
@@ -140,6 +140,7 @@ struct Class {
     let conformsTo: String
     let wheres: [Where]
     let documentation: String?
+    let preamble: String?
 
     private var conformsString: String {
         if conformsTo.isEmpty {
@@ -150,13 +151,19 @@ struct Class {
     }
 
     private var documentationJoined: String {
-        guard let documentation else { return "" }
+        guard let documentation, !documentation.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return "" }
 
         return documentation.components(separatedBy: .newlines).map { "/// \($0)" }.joined(separator: "\n") + "\n"
     }
 
+    private var preambleJoined: String {
+        guard let preamble, !preamble.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return "" }
+
+        return preamble + "\n"
+    }
+
     var value: String {
-        "\(documentationJoined)\(access.value.spaceIfNotEmpty())class \(symbol)\(genericParams.bracketedOrNone)\(conformsString)\(wheres.value.backspaceIfNotEmpty())"
+        "\(documentationJoined)\(preambleJoined)\(access.value.spaceIfNotEmpty())class \(symbol)\(genericParams.bracketedOrNone)\(conformsString)\(wheres.value.backspaceIfNotEmpty())"
     }
 }
 
