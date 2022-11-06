@@ -31,6 +31,7 @@ async function run() {
     await exec(moveLibraryCommand)
   } catch (e) {
     console.error(e)
+    process.exit(1)
   }
 }
 
