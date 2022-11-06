@@ -6,7 +6,7 @@ const assert = require("assert")
 describe("Pass by reference", () => {
   it("modifies objects", async () => {
     let anon = { cool: "bad" }
-    await addon.modifyObjectByReference(anon)
+    await addon.modifyObjectByReferenceAsyncThreadsafe(anon)
 
     assert.equal(anon.cool, "neat")
     assert.equal(anon.additional, "good")

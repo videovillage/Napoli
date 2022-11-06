@@ -84,7 +84,7 @@ func takeOptionalBoolean(value: Bool?) -> Bool {
     value ?? true
 }
 
-func modifyObjectByReference(object: ThreadsafeObjectReference) async throws {
+func modifyObjectByReferenceAsyncThreadsafe(object: ThreadsafeObjectReference) async throws {
     try assertEqual(expected: "bad", actual: try await object.get("cool"))
     try await Task.sleep(seconds: 0.01)
     try await object.set("cool", value: "neat")
@@ -208,7 +208,7 @@ func initNapoliTests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointe
         MethodDescriptor("returnSuccessfulPromise", returnSuccessfulPromise),
         MethodDescriptor("returnThrowingPromise", returnThrowingPromise),
         MethodDescriptor("takeTypedCallback", takeTypedCallback),
-        MethodDescriptor("modifyObjectByReference", modifyObjectByReference),
+        MethodDescriptor("modifyObjectByReferenceAsyncThreadsafe", modifyObjectByReferenceAsyncThreadsafe),
         ClassDescriptor(TestClass1.self),
     ])
 }

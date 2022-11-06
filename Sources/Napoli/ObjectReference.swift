@@ -63,10 +63,8 @@ public class ObjectReference: ValueConvertible {
     }
 
     deinit {
-        if let env {
-            try! deleteReference(env, ref: ref)
-            try! napi_remove_env_cleanup_hook(env, envCleanupCallback, cleanupObject).throwIfError()
-        }
+        try! deleteReference(env!, ref: ref)
+        try! napi_remove_env_cleanup_hook(env!, envCleanupCallback, cleanupObject).throwIfError()
     }
 }
 
