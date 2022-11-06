@@ -14,11 +14,14 @@ public enum AnyValue: ValueConvertible, Codable {
 
     enum Error: LocalizedError {
         case unknownType(UInt32)
+        case unsupportedObjectType(String)
 
         var errorDescription: String? {
             switch self {
             case let .unknownType(value):
-                return "Initializing from unknown type (\(value)) is not supported."
+                return "Initializing AnyValue from unknown type (\(value)) is not supported."
+            case let .unsupportedObjectType(value):
+                return "Initializing AnyValue from type \(value) is not supported."
             }
         }
     }
@@ -30,13 +33,16 @@ public enum AnyValue: ValueConvertible, Codable {
         case napi_boolean:
             self = try .boolean(Bool(env, from: value))
         case napi_object:
-            switch try ObjectType(env, object: value) {
+            let objectType = try ObjectType(env, object: value)
+            switch objectType {
             case .array:
                 self = try .array([AnyValue](env, from: value))
             case .date:
                 self = try .date(Date(env, from: value))
             case .generic:
                 self = try .object([String: AnyValue](env, from: value))
+            default:
+                throw Error.unsupportedObjectType(objectType.rawValue)
             }
         case napi_string:
             self = try .string(String(env, from: value))
@@ -116,25 +122,44 @@ public enum AnyValue: ValueConvertible, Codable {
     }
 }
 
-private enum ObjectType {
-    case date, array, generic
+private enum ObjectType: String {
+    case date, array, typedArray, dataView, generic
 
     init(_ env: napi_env, object: napi_value) throws {
-        var isType = false
-        try napi_is_date(env, object, &isType).throwIfError()
-
-        if isType {
+        if try napiIsDate(env, object) {
             self = .date
-            return
-        }
-
-        try napi_is_array(env, object, &isType).throwIfError()
-
-        if isType {
+        } else if try napiIsArray(env, object) {
             self = .array
-            return
+        } else if try napiIsTypedArray(env, object) {
+            self = .typedArray
+        } else if try napiIsDataView(env, object) {
+            self = .dataView
+        } else {
+            self = .generic
         }
-
-        self = .generic
     }
+}
+
+func napiIsDate(_ env: napi_env, _ value: napi_value) throws -> Bool {
+    var isType = false
+    try napi_is_date(env, value, &isType).throwIfError()
+    return isType
+}
+
+func napiIsArray(_ env: napi_env, _ value: napi_value) throws -> Bool {
+    var isType = false
+    try napi_is_array(env, value, &isType).throwIfError()
+    return isType
+}
+
+func napiIsTypedArray(_ env: napi_env, _ value: napi_value) throws -> Bool {
+    var isType = false
+    try napi_is_typedarray(env, value, &isType).throwIfError()
+    return isType
+}
+
+func napiIsDataView(_ env: napi_env, _ value: napi_value) throws -> Bool {
+    var isType = false
+    try napi_is_dataview(env, value, &isType).throwIfError()
+    return isType
 }
