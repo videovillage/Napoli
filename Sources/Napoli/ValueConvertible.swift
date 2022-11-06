@@ -23,7 +23,7 @@ enum AnyValueError: LocalizedError {
             }
         case let .initNotSupported(type, value):
             if let value {
-                return "Initializing type \(type) from \(value) is not supported."
+                return "Initializing type \(type) from AnyValue(\(value)) is not supported."
             } else {
                 return "Initializing type \(type) from AnyValue is not supported."
             }
