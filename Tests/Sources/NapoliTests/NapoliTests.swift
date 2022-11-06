@@ -85,7 +85,10 @@ func takeOptionalBoolean(value: Bool?) -> Bool {
 }
 
 func modifyObjectByReference(object: ThreadsafeObjectReference) async throws {
+    try assertEqual(expected: "bad", actual: try await object.get("cool"))
+    try await Task.sleep(seconds: 0.01)
     try await object.set("cool", value: "neat")
+    try await Task.sleep(seconds: 0.01)
     try await object.set("additional", value: "good")
     try assertEqual(expected: "neat", actual: try await object.get("cool"))
     try assertEqual(expected: "good", actual: try await object.get("additional"))
