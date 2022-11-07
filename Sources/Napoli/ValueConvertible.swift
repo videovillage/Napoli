@@ -387,8 +387,9 @@ protocol PrimitiveValueConvertible: ValueConvertible {
 
 extension PrimitiveValueConvertible {
     public init(_ env: napi_env, from: napi_value) throws {
-        self = Self.defaultValue
-        try Self.initWithValue(env, from, &self).throwIfError()
+        var result = Self.defaultValue
+        try Self.initWithValue(env, from, &result).throwIfError()
+        self = result
     }
 
     public func napiValue(_ env: napi_env) throws -> napi_value {

@@ -53,7 +53,7 @@ public enum AnyValue: ValueConvertible, Codable {
         case napi_undefined:
             self = .undefined
         default:
-            throw Error.unknownType(type.rawValue)
+            throw Error.unknownType(UInt32(type.rawValue))
         }
     }
 
