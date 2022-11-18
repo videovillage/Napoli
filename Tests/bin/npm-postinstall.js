@@ -4,27 +4,22 @@ async function run() {
   var os = require("os")
   var platform = os.platform()
 
-  var swiftBuildCommand = ""
+  var swiftBuildCommand = "swift build -c release"
   var moveLibraryCommand = ""
   let nodeHeadersVersion = "19.0.1"
   var downloadHeadersCommand = ""
 
   const util = require("util")
-  const exec = util.promisify(require("node:child_process").exec)
-  var shell = ""
+  const exec = require("node:child_process").exec
 
   if (platform == "darwin" || platform == "linux") {
     downloadHeadersCommand = `npx node-gyp install ${nodeHeadersVersion} --devdir=node_headers --ensure`
-    shell = "/bin/sh"
-    swiftBuildCommand = "swift build -c release"
     var libExtension = platform == "darwin" ? ".dylib" : ".so"
     moveLibraryCommand = `mv .build/release/libNapoliTests${libExtension} .build/release/NapoliTests.node`
   } else if (platform === "win32") {
-    shell = "C:\\Program Files\\PowerShell\\7\\pwsh.EXE"
-    downloadHeadersCommand = `npx.cmd node-gyp install ${nodeHeadersVersion} --arch=x64 --devdir=node_headers --ensure`
-    swiftBuildCommand = "swift.exe build -c release"
+    downloadHeadersCommand = `npx node-gyp install ${nodeHeadersVersion} --arch=x64 --devdir=node_headers --ensure`
     moveLibraryCommand =
-      "Move-Item -Force -Path .build\\release\\NapoliTests.dll -Destination .build\\release\\NapoliTests.node"
+      "move /Y .build\\release\\NapoliTests.dll .build\\release\\NapoliTests.node"
   } else {
     console.log("Unsupported platform: " + platform)
     process.exit(1)
@@ -32,11 +27,28 @@ async function run() {
 
   try {
     console.log(`Downloading Node.js headers: \"${downloadHeadersCommand}\"`)
-    await exec(downloadHeadersCommand, { shell: shell })
+    var download = exec(downloadHeadersCommand)
+    download.stdout.pipe(process.stdout)
+    download.stderr.pipe(process.stderr)
+    await new Promise((resolve) => {
+      download.on("close", resolve)
+    })
+
     console.log(`Build: \"${swiftBuildCommand}\"`)
-    await exec(swiftBuildCommand, { shell: shell })
+    var build = exec(swiftBuildCommand)
+    build.stdout.pipe(process.stdout)
+    build.stderr.pipe(process.stderr)
+    await new Promise((resolve) => {
+      build.on("close", resolve)
+    })
+
     console.log(`Renaming library to .node: \"${moveLibraryCommand}\"`)
-    await exec(moveLibraryCommand, { shell: shell })
+    var move = exec(moveLibraryCommand)
+    move.stdout.pipe(process.stdout)
+    move.stderr.pipe(process.stderr)
+    await new Promise((resolve) => {
+      move.on("close", resolve)
+    })
   } catch (e) {
     console.error(e)
     process.exit(1)
