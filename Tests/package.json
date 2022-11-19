@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "test": "npx prettier --check . && mocha",
-    "postinstall": "node bin/npm-postinstall.js"
+    "postinstall": "node bin/npm-postinstall.js NapoliTests"
   },
   "devDependencies": {
     "mocha": "^6.0.0",

@@ -4,7 +4,8 @@ async function run() {
   var os = require("os")
   var platform = os.platform()
 
-  var swiftBuildCommand = "swift build -c release"
+  let libraryName = process.argv.slice(2)
+  let swiftBuildCommand = "swift build -c release"
   var moveLibraryCommand = ""
   let nodeHeadersVersion = "19.0.1"
   var downloadHeadersCommand = ""
@@ -15,11 +16,10 @@ async function run() {
   if (platform == "darwin" || platform == "linux") {
     downloadHeadersCommand = `npx node-gyp install ${nodeHeadersVersion} --devdir=node_headers --ensure`
     var libExtension = platform == "darwin" ? ".dylib" : ".so"
-    moveLibraryCommand = `mv .build/release/libNapoliTests${libExtension} .build/release/NapoliTests.node`
+    moveLibraryCommand = `mv .build/release/lib${libraryName}${libExtension} .build/release/${libraryName}.node`
   } else if (platform === "win32") {
     downloadHeadersCommand = `npx node-gyp install ${nodeHeadersVersion} --arch=x64 --devdir=node_headers --ensure`
-    moveLibraryCommand =
-      "move /Y .build\\release\\NapoliTests.dll .build\\release\\NapoliTests.node"
+    moveLibraryCommand = `move /Y .build\\release\\${libraryName}.dll .build\\release\\${libraryName}.node`
   } else {
     console.log("Unsupported platform: " + platform)
     process.exit(1)
