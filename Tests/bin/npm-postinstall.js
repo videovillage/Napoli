@@ -10,7 +10,6 @@ async function run() {
   let nodeHeadersVersion = "19.0.1"
   var downloadHeadersCommand = ""
 
-  const util = require("util")
   const exec = require("node:child_process").exec
 
   if (platform == "darwin" || platform == "linux") {
