@@ -2,7 +2,7 @@
 
 import PackageDescription
 
-let dynamicLinkerSettings: [LinkerSetting] = [.unsafeFlags(["-Lnode_headers\\19.0.1\\x64", "-lnode"], .when(platforms: [.windows])),
+let dynamicLinkerSettings: [LinkerSetting] = [.unsafeFlags(["-lnode"], .when(platforms: [.windows])),
                                               .unsafeFlags(["-Xlinker", "-undefined", "-Xlinker", "dynamic_lookup"], .when(platforms: [.macOS, .linux]))]
 
 let package = Package(

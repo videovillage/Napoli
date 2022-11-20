@@ -4,10 +4,10 @@ async function run() {
   var os = require("os")
   var platform = os.platform()
 
-  let libraryName = process.argv.slice(2)
-  let swiftBuildCommand = "swift build -c release"
+  var libraryName = process.argv.slice(2)
+  var swiftBuildCommand = "swift build -c release"
   var moveLibraryCommand = ""
-  let nodeHeadersVersion = "19.0.1"
+  var nodeHeadersVersion = process.versions["node"]
   var downloadHeadersCommand = ""
 
   const exec = require("node:child_process").exec
@@ -19,6 +19,7 @@ async function run() {
   } else if (platform === "win32") {
     downloadHeadersCommand = `npx node-gyp install ${nodeHeadersVersion} --arch=x64 --devdir=node_headers --ensure`
     moveLibraryCommand = `move /Y .build\\release\\${libraryName}.dll .build\\release\\${libraryName}.node`
+    swiftBuildCommand = `${swiftBuildCommand} -Xlinker -Lnode_headers\\${nodeHeadersVersion}\\x64`
   } else {
     console.log("Unsupported platform: " + platform)
     process.exit(1)

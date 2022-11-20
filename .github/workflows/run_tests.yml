@@ -7,10 +7,9 @@ on:
       - "**"
     paths:
       [
-        "Package.swift",
-        "Sources/**.swift",
-        "Tests/**.swift",
-        "Tests/**.js",
+        "**Package.resolved",
+        "**.swift",
+        "**.js",
         "Tests/package.json",
         "Tests/package-lock.json",
         ".github/workflows/run_tests.yml",
@@ -48,8 +47,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-12, ubuntu-latest, windows-latest]
-        node-version: ["19.0.1"]
-        node-headers-version: ["19.0.1"]
+        node-version: ["19.1.0"]
         swift-version: ["5.7"]
     runs-on: ${{ matrix.os }}
     defaults:
@@ -72,18 +70,13 @@ jobs:
           Add-Content $env:GITHUB_PATH "C:\Program Files\swift\runtime-development\usr\bin"
           Add-Content $env:GITHUB_PATH "C:\Program Files\swift\icu-69.1\usr\bin"
           Add-Content $env:GITHUB_ENV "SDKROOT=C:\Library\Developer\Platforms\Windows.platform\Developer\SDKs\Windows.sdk"
-      - name: Install Node ${{ matrix.node-version }} on macOS/Linux
-        if: ${{ runner.os != 'Windows' }}
+      - name: Install Node ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
           cache-dependency-path: "Tests/package-lock.json"
-      - name: Install Node 19.0.0 on Windows
-        if: ${{ runner.os == 'Windows' }}
-        run: |
-          choco upgrade -y --force nodejs --version 19.0.0
-          choco upgrade -y --force nodejs.install --version 19.0.0
-          refreshenv
       - name: Test
-        run: "npm install && npm test"
+        run: |
+          npm install
+          npm test
