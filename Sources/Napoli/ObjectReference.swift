@@ -1,10 +1,9 @@
 import Foundation
 import NAPIC
 
-@available(*, noasync)
 open class ObjectReference: ValueConvertible {
-    private var env: Environment?
     private let ref: napi_ref
+    private let envAccessor: EnvironmentAccessor
 
     fileprivate var cleanupObject: UnsafeMutableRawPointer!
 
@@ -13,10 +12,8 @@ open class ObjectReference: ValueConvertible {
     }
 
     public required init(_ env: Environment, from: napi_value) throws {
-        self.env = env
         ref = try createReference(env, from: from, initialRefCount: 1)
-        cleanupObject = Unmanaged<ObjectReference>.passUnretained(self).toOpaque()
-        napi_add_env_cleanup_hook(env.env, envCleanupCallback, cleanupObject)
+        envAccessor = try EnvironmentAccessor(env)
     }
 
     public func napiValue(_ env: Environment) throws -> napi_value {
@@ -29,8 +26,24 @@ open class ObjectReference: ValueConvertible {
         return try [String](env, from: namesArray)
     }
 
+    public func keys() async throws -> [String] {
+        let ref = ref
+        return try await envAccessor.withEnvironment { env in
+            var namesArray: napi_value!
+            try napi_get_property_names(env.env, getReferenceValue(env, ref: ref), &namesArray).throwIfError()
+            return try [String](env, from: namesArray)
+        }
+    }
+
     public func set(_ env: Environment, _ key: String, value: some ValueConvertible) throws {
         try napi_set_property(env.env, getReferenceValue(env, ref: ref), key.napiValue(env), value.napiValue(env)).throwIfError()
+    }
+
+    public func set(_ key: String, value: some ValueConvertible) async throws {
+        let ref = ref
+        try await envAccessor.withEnvironment { env in
+            try napi_set_property(env.env, getReferenceValue(env, ref: ref), key.napiValue(env), value.napiValue(env)).throwIfError()
+        }
     }
 
     public func get<V: ValueConvertible>(_ env: Environment, _ key: String) throws -> V {
@@ -39,113 +52,34 @@ open class ObjectReference: ValueConvertible {
         return try V(env, from: value)
     }
 
+    public func get<V: ValueConvertible>(_ key: String) async throws -> V {
+        let ref = ref
+        return try await envAccessor.withEnvironment { env in
+            var value: napi_value!
+            try napi_get_property(env.env, getReferenceValue(env, ref: ref), key.napiValue(env), &value).throwIfError()
+            return try V(env, from: value)
+        }
+    }
+
     public func immutable(_ env: Environment) throws -> [String: AnyValue] {
         try .init(env, from: getReferenceValue(env, ref: ref))
     }
 
-    fileprivate func envCleanup() {
-        env = nil
-    }
-
-    deinit {
-        try! deleteReference(env!, ref: ref)
-        try! napi_remove_env_cleanup_hook(env!.env, envCleanupCallback, cleanupObject).throwIfError()
-    }
-}
-
-private func envCleanupCallback(_ pointer: UnsafeMutableRawPointer?) {
-    guard let pointer else { return }
-    Unmanaged<ObjectReference>.fromOpaque(pointer).takeUnretainedValue().envCleanup()
-}
-
-open class ThreadsafeObjectReference: ValueConvertible {
-    private typealias KeysGetter = ThreadsafeTypedFunction0<[String]>
-    private typealias Setter = ThreadsafeTypedFunction2<Undefined, String, AnyValue>
-    private typealias Getter = ThreadsafeTypedFunction1<AnyValue, String>
-    private typealias ImmutableGetter = ThreadsafeTypedFunction0<[String: AnyValue]>
-    private typealias DeinitCallback = ThreadsafeTypedFunction0<Undefined>
-
-    private let ref: napi_ref
-    private let keysGetter: KeysGetter
-    private let setter: Setter
-    private let getter: Getter
-    private let immutableGetter: ImmutableGetter
-    private let deinitCallback: DeinitCallback
-
-    public convenience init(_ env: Environment, from: [String: AnyValue]) throws {
-        try self.init(env, from: from.napiValue(env))
-    }
-
-    public required init(_ env: Environment, from: napi_value) throws {
-        ref = try createReference(env, from: from, initialRefCount: 1)
-        keysGetter = try Self.keysGetter(env, ref: ref)
-        setter = try Self.setter(env, ref: ref)
-        getter = try Self.getter(env, ref: ref)
-        immutableGetter = try Self.immutableGetter(env, ref: ref)
-        deinitCallback = try Self.deinitCallback(env, ref: ref)
-    }
-
-    public func napiValue(_ env: Environment) throws -> napi_value {
-        try getReferenceValue(env, ref: ref)
-    }
-
-    public func keys() async throws -> [String] {
-        try await keysGetter.call()
-    }
-
-    public func set(_ key: String, value: some ValueConvertible) async throws {
-        try await setter.call(key, value.eraseToAny())
-    }
-
-    public func get<V: ValueConvertible>(_ key: String) async throws -> V {
-        try await V(getter.call(key))
-    }
-
     public func immutable() async throws -> [String: AnyValue] {
-        try await immutableGetter.call()
-    }
-
-    deinit {
-        let callback = deinitCallback
-        Task {
-            try! await callback.call()
+        let ref = self.ref
+        return try await envAccessor.withEnvironment { env in
+            try [String: AnyValue](env, from: getReferenceValue(env, ref: ref))
         }
     }
 
-    private static func keysGetter(_ env: Environment, ref: napi_ref) throws -> KeysGetter {
-        try .init(env, .init(named: "keysGetter") { env, _, _ in
-            var namesArray: napi_value!
-            try napi_get_property_names(env.env, getReferenceValue(env, ref: ref), &namesArray).throwIfError()
-            return try [String](env, from: namesArray)
-        })
-    }
-
-    private static func setter(_ env: Environment, ref: napi_ref) throws -> Setter {
-        try .init(env, .init(named: "setter") { env, _, args in
-            try napi_set_property(env.env, getReferenceValue(env, ref: ref), args[0], args[1]).throwIfError()
-            return Undefined.default
-        })
-    }
-
-    private static func getter(_ env: Environment, ref: napi_ref) throws -> Getter {
-        try .init(env, .init(named: "getter") { env, _, args in
-            var value: napi_value!
-            try napi_get_property(env.env, getReferenceValue(env, ref: ref), args[0], &value).throwIfError()
-            return try AnyValue(env, from: value)
-        })
-    }
-
-    private static func immutableGetter(_ env: Environment, ref: napi_ref) throws -> ImmutableGetter {
-        try .init(env, .init(named: "immutableGetter") { env, _, _ in
-            try [String: AnyValue](env, from: getReferenceValue(env, ref: ref))
-        })
-    }
-
-    private static func deinitCallback(_ env: Environment, ref: napi_ref) throws -> DeinitCallback {
-        try .init(env, .init(named: "deinit") { env, _, _ in
-            try deleteReference(env, ref: ref)
-            return Undefined.default
-        })
+    deinit {
+        let envAccessor = envAccessor
+        let ref = ref
+        Task {
+            try! await envAccessor.withEnvironment { env in
+                try deleteReference(env, ref: ref)
+            }
+        }
     }
 }
 
