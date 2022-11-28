@@ -36,6 +36,10 @@ func returnBoolean() -> Bool {
     true
 }
 
+func returnArrayBuffer() -> Data {
+    Data([223, 123, 44, 52, 32])
+}
+
 func returnNull() -> Null {
     Null.default
 }
@@ -70,6 +74,10 @@ func takeUndefined(value: Undefined) throws {
 
 func takeDate(date: Date) throws {
     try assertEqual(expected: 1000, actual: date.timeIntervalSince1970)
+}
+
+func takeArrayBuffer(data: Data) throws {
+    try assertEqual(expected: Data([12, 44, 35, 10]), actual: data)
 }
 
 func takeOptionalString(value: String?) -> String {
@@ -193,6 +201,7 @@ func initNapoliTests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointe
         MethodDescriptor("returnString", returnString),
         MethodDescriptor("returnDouble", returnDouble),
         MethodDescriptor("returnBoolean", returnBoolean),
+        MethodDescriptor("returnArrayBuffer", returnArrayBuffer),
         MethodDescriptor("returnDate", returnDate),
         MethodDescriptor("returnInt64", returnInt64),
         MethodDescriptor("returnInt32", returnInt32),
@@ -206,6 +215,7 @@ func initNapoliTests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointe
         MethodDescriptor("takeDate", takeDate),
         MethodDescriptor("takeNull", takeNull),
         MethodDescriptor("takeUndefined", takeUndefined),
+        MethodDescriptor("takeArrayBuffer", takeArrayBuffer),
 
         MethodDescriptor("takeOptionalString", takeOptionalString),
         MethodDescriptor("takeOptionalDouble", takeOptionalDouble),

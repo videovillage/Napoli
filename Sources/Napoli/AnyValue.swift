@@ -5,6 +5,7 @@ import NAPIC
 public enum AnyValue: ValueConvertible, Codable {
     case object([String: AnyValue])
     case array([AnyValue])
+    case arrayBuffer(Data)
     case string(String)
     case number(Double)
     case boolean(Bool)
@@ -41,6 +42,8 @@ public enum AnyValue: ValueConvertible, Codable {
                 self = try .date(Date(env, from: value))
             case .generic:
                 self = try .object([String: AnyValue](env, from: value))
+            case .arrayBuffer:
+                self = try .arrayBuffer(Data(env, from: value))
             default:
                 throw Error.unsupportedObjectType(objectType.rawValue)
             }
@@ -69,6 +72,7 @@ public enum AnyValue: ValueConvertible, Codable {
         case let .number(number): return try number.napiValue(env)
         case let .boolean(boolean): return try boolean.napiValue(env)
         case let .date(date): return try date.napiValue(env)
+        case let .arrayBuffer(data): return try data.napiValue(env)
         case .null: return try Null.default.napiValue(env)
         case .undefined: return try Undefined.default.napiValue(env)
         }
@@ -87,6 +91,8 @@ public enum AnyValue: ValueConvertible, Codable {
             self = .number(number)
         } else if let boolean = try? container.decode(Bool.self) {
             self = .boolean(boolean)
+        } else if let data = try? container.decode(Data.self) {
+            self = .arrayBuffer(data)
         } else if let object = try? container.decode([String: AnyValue].self) {
             self = .object(object)
         } else if container.decodeNil() {
@@ -112,6 +118,8 @@ public enum AnyValue: ValueConvertible, Codable {
             try container.encode(bool)
         case let .date(date):
             try container.encode(date)
+        case let .arrayBuffer(data):
+            try container.encode(data)
         case .null, .undefined:
             try container.encodeNil()
         }
@@ -123,7 +131,7 @@ public enum AnyValue: ValueConvertible, Codable {
 }
 
 private enum ObjectType: String {
-    case date, array, typedArray, dataView, generic
+    case date, array, typedArray, dataView, arrayBuffer, generic
 
     init(_ env: napi_env, object: napi_value) throws {
         if try napiIsDate(env, object) {
@@ -134,6 +142,8 @@ private enum ObjectType: String {
             self = .typedArray
         } else if try napiIsDataView(env, object) {
             self = .dataView
+        } else if try napiIsArrayBuffer(env, object) {
+            self = .arrayBuffer
         } else {
             self = .generic
         }
@@ -161,5 +171,11 @@ func napiIsTypedArray(_ env: napi_env, _ value: napi_value) throws -> Bool {
 func napiIsDataView(_ env: napi_env, _ value: napi_value) throws -> Bool {
     var isType = false
     try napi_is_dataview(env, value, &isType).throwIfError()
+    return isType
+}
+
+func napiIsArrayBuffer(_ env: napi_env, _ value: napi_value) throws -> Bool {
+    var isType = false
+    try napi_is_arraybuffer(env, value, &isType).throwIfError()
     return isType
 }

@@ -16,6 +16,11 @@ describe("Take Values", () => {
     addon.takeBoolean(true)
   })
 
+  it("takes arrayBuffer", () => {
+    var array = new Uint8Array([12, 44, 35, 10])
+    addon.takeArrayBuffer(array.buffer)
+  })
+
   it("takes dates", () => {
     const date = new Date(1000)
     addon.takeDate(date)

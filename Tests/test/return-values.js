@@ -39,4 +39,9 @@ describe("Return Values", () => {
   it("returns undefined", () => {
     assert.strictEqual(addon.returnUndefined(), undefined)
   })
+
+  it("returns array buffers", () => {
+    var array = new Uint8Array([223, 123, 44, 52, 32])
+    addon.assertDataEqual(addon.returnArrayBuffer(), array)
+  })
 })

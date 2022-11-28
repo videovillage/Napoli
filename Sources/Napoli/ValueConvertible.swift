@@ -252,6 +252,39 @@ extension Date: ValueConvertible {
     }
 }
 
+extension Data: ValueConvertible {
+    public init(_ env: napi_env, from: napi_value) throws {
+        var data: UnsafeMutableRawPointer!
+        var count: Int = 0
+        try napi_get_arraybuffer_info(env, from, &data, &count).throwIfError()
+
+        self = Data(bytes: data, count: count)
+    }
+
+    public func napiValue(_ env: napi_env) throws -> napi_value {
+        var result: napi_value!
+        var newDataPointer: UnsafeMutableRawPointer!
+        try napi_create_arraybuffer(env, count, &newDataPointer, &result).throwIfError()
+        withUnsafeBytes {
+            newDataPointer.copyMemory(from: $0.baseAddress!, byteCount: $0.count)
+        }
+        return result
+    }
+
+    public init(_ any: AnyValue) throws {
+        switch any {
+        case let .arrayBuffer(data):
+            self = data
+        default:
+            throw AnyValueError.initNotSupported(Self.self, from: any)
+        }
+    }
+
+    public func eraseToAny() throws -> AnyValue {
+        .arrayBuffer(self)
+    }
+}
+
 extension Double: PrimitiveValueConvertible {
     static let defaultValue = Self.nan
     static let initWithValue = napi_get_value_double
