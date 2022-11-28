@@ -69,6 +69,11 @@ public class TypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>: ValueCo
     public typealias AsyncConvenienceCallback<R: ValueConvertible> = (P0, P1, P2, P3, P4, P5, P6, P7, P8) async throws -> R
     public typealias AsyncConvenienceVoidCallback = (P0, P1, P2, P3, P4, P5, P6, P7, P8) async throws -> Void
 
+    public typealias ConvenienceEnvCallback = (Environment, P0, P1, P2, P3, P4, P5, P6, P7, P8) throws -> Result
+    public typealias ConvenienceEnvVoidCallback = (Environment, P0, P1, P2, P3, P4, P5, P6, P7, P8) throws -> Void
+    public typealias AsyncConvenienceEnvCallback<R: ValueConvertible> = (Environment, P0, P1, P2, P3, P4, P5, P6, P7, P8) async throws -> R
+    public typealias AsyncConvenienceEnvVoidCallback = (Environment, P0, P1, P2, P3, P4, P5, P6, P7, P8) async throws -> Void
+
     fileprivate enum InternalTypedFunction {
         case javascript(napi_value)
         case swift(String, TypedFunctionCallback)
@@ -111,6 +116,37 @@ public class TypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>: ValueCo
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4]); let p5 = try P5(env, from: args[5]); let p6 = try P6(env, from: args[6]); let p7 = try P7(env, from: args[7]); let p8 = try P8(env, from: args[8])
             return Promise<Undefined> {
                 try await callback(p0, p1, p2, p3, p4, p5, p6, p7, p8)
+            }
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping ConvenienceEnvCallback) {
+        self.init(named: name) { env, _, args in
+            try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]), P6(env, from: args[6]), P7(env, from: args[7]), P8(env, from: args[8]))
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping ConvenienceEnvVoidCallback) where Result == Undefined {
+        self.init(named: name) { env, _, args in
+            try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]), P6(env, from: args[6]), P7(env, from: args[7]), P8(env, from: args[8]))
+            return Undefined.default
+        }
+    }
+
+    public convenience init<R: ValueConvertible>(named name: String, _ callback: @escaping AsyncConvenienceEnvCallback<R>) where Result == Promise<R> {
+        self.init(named: name) { env, _, args in
+            let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4]); let p5 = try P5(env, from: args[5]); let p6 = try P6(env, from: args[6]); let p7 = try P7(env, from: args[7]); let p8 = try P8(env, from: args[8])
+            return Promise<R> {
+                return try await callback(env, p0, p1, p2, p3, p4, p5, p6, p7, p8)
+            }
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping AsyncConvenienceEnvVoidCallback) where Result == Promise<Undefined> {
+        self.init(named: name) { env, _, args in
+            let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4]); let p5 = try P5(env, from: args[5]); let p6 = try P6(env, from: args[6]); let p7 = try P7(env, from: args[7]); let p8 = try P8(env, from: args[8])
+            return Promise<Undefined> {
+                try await callback(env, p0, p1, p2, p3, p4, p5, p6, p7, p8)
             }
         }
     }
@@ -176,6 +212,11 @@ public class TypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: ValueConver
     public typealias AsyncConvenienceCallback<R: ValueConvertible> = (P0, P1, P2, P3, P4, P5, P6, P7) async throws -> R
     public typealias AsyncConvenienceVoidCallback = (P0, P1, P2, P3, P4, P5, P6, P7) async throws -> Void
 
+    public typealias ConvenienceEnvCallback = (Environment, P0, P1, P2, P3, P4, P5, P6, P7) throws -> Result
+    public typealias ConvenienceEnvVoidCallback = (Environment, P0, P1, P2, P3, P4, P5, P6, P7) throws -> Void
+    public typealias AsyncConvenienceEnvCallback<R: ValueConvertible> = (Environment, P0, P1, P2, P3, P4, P5, P6, P7) async throws -> R
+    public typealias AsyncConvenienceEnvVoidCallback = (Environment, P0, P1, P2, P3, P4, P5, P6, P7) async throws -> Void
+
     fileprivate enum InternalTypedFunction {
         case javascript(napi_value)
         case swift(String, TypedFunctionCallback)
@@ -218,6 +259,37 @@ public class TypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: ValueConver
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4]); let p5 = try P5(env, from: args[5]); let p6 = try P6(env, from: args[6]); let p7 = try P7(env, from: args[7])
             return Promise<Undefined> {
                 try await callback(p0, p1, p2, p3, p4, p5, p6, p7)
+            }
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping ConvenienceEnvCallback) {
+        self.init(named: name) { env, _, args in
+            try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]), P6(env, from: args[6]), P7(env, from: args[7]))
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping ConvenienceEnvVoidCallback) where Result == Undefined {
+        self.init(named: name) { env, _, args in
+            try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]), P6(env, from: args[6]), P7(env, from: args[7]))
+            return Undefined.default
+        }
+    }
+
+    public convenience init<R: ValueConvertible>(named name: String, _ callback: @escaping AsyncConvenienceEnvCallback<R>) where Result == Promise<R> {
+        self.init(named: name) { env, _, args in
+            let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4]); let p5 = try P5(env, from: args[5]); let p6 = try P6(env, from: args[6]); let p7 = try P7(env, from: args[7])
+            return Promise<R> {
+                return try await callback(env, p0, p1, p2, p3, p4, p5, p6, p7)
+            }
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping AsyncConvenienceEnvVoidCallback) where Result == Promise<Undefined> {
+        self.init(named: name) { env, _, args in
+            let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4]); let p5 = try P5(env, from: args[5]); let p6 = try P6(env, from: args[6]); let p7 = try P7(env, from: args[7])
+            return Promise<Undefined> {
+                try await callback(env, p0, p1, p2, p3, p4, p5, p6, p7)
             }
         }
     }
@@ -283,6 +355,11 @@ public class TypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: ValueConvertibl
     public typealias AsyncConvenienceCallback<R: ValueConvertible> = (P0, P1, P2, P3, P4, P5, P6) async throws -> R
     public typealias AsyncConvenienceVoidCallback = (P0, P1, P2, P3, P4, P5, P6) async throws -> Void
 
+    public typealias ConvenienceEnvCallback = (Environment, P0, P1, P2, P3, P4, P5, P6) throws -> Result
+    public typealias ConvenienceEnvVoidCallback = (Environment, P0, P1, P2, P3, P4, P5, P6) throws -> Void
+    public typealias AsyncConvenienceEnvCallback<R: ValueConvertible> = (Environment, P0, P1, P2, P3, P4, P5, P6) async throws -> R
+    public typealias AsyncConvenienceEnvVoidCallback = (Environment, P0, P1, P2, P3, P4, P5, P6) async throws -> Void
+
     fileprivate enum InternalTypedFunction {
         case javascript(napi_value)
         case swift(String, TypedFunctionCallback)
@@ -325,6 +402,37 @@ public class TypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: ValueConvertibl
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4]); let p5 = try P5(env, from: args[5]); let p6 = try P6(env, from: args[6])
             return Promise<Undefined> {
                 try await callback(p0, p1, p2, p3, p4, p5, p6)
+            }
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping ConvenienceEnvCallback) {
+        self.init(named: name) { env, _, args in
+            try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]), P6(env, from: args[6]))
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping ConvenienceEnvVoidCallback) where Result == Undefined {
+        self.init(named: name) { env, _, args in
+            try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]), P6(env, from: args[6]))
+            return Undefined.default
+        }
+    }
+
+    public convenience init<R: ValueConvertible>(named name: String, _ callback: @escaping AsyncConvenienceEnvCallback<R>) where Result == Promise<R> {
+        self.init(named: name) { env, _, args in
+            let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4]); let p5 = try P5(env, from: args[5]); let p6 = try P6(env, from: args[6])
+            return Promise<R> {
+                return try await callback(env, p0, p1, p2, p3, p4, p5, p6)
+            }
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping AsyncConvenienceEnvVoidCallback) where Result == Promise<Undefined> {
+        self.init(named: name) { env, _, args in
+            let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4]); let p5 = try P5(env, from: args[5]); let p6 = try P6(env, from: args[6])
+            return Promise<Undefined> {
+                try await callback(env, p0, p1, p2, p3, p4, p5, p6)
             }
         }
     }
@@ -390,6 +498,11 @@ public class TypedFunction6<Result, P0, P1, P2, P3, P4, P5>: ValueConvertible wh
     public typealias AsyncConvenienceCallback<R: ValueConvertible> = (P0, P1, P2, P3, P4, P5) async throws -> R
     public typealias AsyncConvenienceVoidCallback = (P0, P1, P2, P3, P4, P5) async throws -> Void
 
+    public typealias ConvenienceEnvCallback = (Environment, P0, P1, P2, P3, P4, P5) throws -> Result
+    public typealias ConvenienceEnvVoidCallback = (Environment, P0, P1, P2, P3, P4, P5) throws -> Void
+    public typealias AsyncConvenienceEnvCallback<R: ValueConvertible> = (Environment, P0, P1, P2, P3, P4, P5) async throws -> R
+    public typealias AsyncConvenienceEnvVoidCallback = (Environment, P0, P1, P2, P3, P4, P5) async throws -> Void
+
     fileprivate enum InternalTypedFunction {
         case javascript(napi_value)
         case swift(String, TypedFunctionCallback)
@@ -432,6 +545,37 @@ public class TypedFunction6<Result, P0, P1, P2, P3, P4, P5>: ValueConvertible wh
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4]); let p5 = try P5(env, from: args[5])
             return Promise<Undefined> {
                 try await callback(p0, p1, p2, p3, p4, p5)
+            }
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping ConvenienceEnvCallback) {
+        self.init(named: name) { env, _, args in
+            try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]))
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping ConvenienceEnvVoidCallback) where Result == Undefined {
+        self.init(named: name) { env, _, args in
+            try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]))
+            return Undefined.default
+        }
+    }
+
+    public convenience init<R: ValueConvertible>(named name: String, _ callback: @escaping AsyncConvenienceEnvCallback<R>) where Result == Promise<R> {
+        self.init(named: name) { env, _, args in
+            let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4]); let p5 = try P5(env, from: args[5])
+            return Promise<R> {
+                return try await callback(env, p0, p1, p2, p3, p4, p5)
+            }
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping AsyncConvenienceEnvVoidCallback) where Result == Promise<Undefined> {
+        self.init(named: name) { env, _, args in
+            let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4]); let p5 = try P5(env, from: args[5])
+            return Promise<Undefined> {
+                try await callback(env, p0, p1, p2, p3, p4, p5)
             }
         }
     }
@@ -497,6 +641,11 @@ public class TypedFunction5<Result, P0, P1, P2, P3, P4>: ValueConvertible where 
     public typealias AsyncConvenienceCallback<R: ValueConvertible> = (P0, P1, P2, P3, P4) async throws -> R
     public typealias AsyncConvenienceVoidCallback = (P0, P1, P2, P3, P4) async throws -> Void
 
+    public typealias ConvenienceEnvCallback = (Environment, P0, P1, P2, P3, P4) throws -> Result
+    public typealias ConvenienceEnvVoidCallback = (Environment, P0, P1, P2, P3, P4) throws -> Void
+    public typealias AsyncConvenienceEnvCallback<R: ValueConvertible> = (Environment, P0, P1, P2, P3, P4) async throws -> R
+    public typealias AsyncConvenienceEnvVoidCallback = (Environment, P0, P1, P2, P3, P4) async throws -> Void
+
     fileprivate enum InternalTypedFunction {
         case javascript(napi_value)
         case swift(String, TypedFunctionCallback)
@@ -539,6 +688,37 @@ public class TypedFunction5<Result, P0, P1, P2, P3, P4>: ValueConvertible where 
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4])
             return Promise<Undefined> {
                 try await callback(p0, p1, p2, p3, p4)
+            }
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping ConvenienceEnvCallback) {
+        self.init(named: name) { env, _, args in
+            try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]))
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping ConvenienceEnvVoidCallback) where Result == Undefined {
+        self.init(named: name) { env, _, args in
+            try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]))
+            return Undefined.default
+        }
+    }
+
+    public convenience init<R: ValueConvertible>(named name: String, _ callback: @escaping AsyncConvenienceEnvCallback<R>) where Result == Promise<R> {
+        self.init(named: name) { env, _, args in
+            let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4])
+            return Promise<R> {
+                return try await callback(env, p0, p1, p2, p3, p4)
+            }
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping AsyncConvenienceEnvVoidCallback) where Result == Promise<Undefined> {
+        self.init(named: name) { env, _, args in
+            let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4])
+            return Promise<Undefined> {
+                try await callback(env, p0, p1, p2, p3, p4)
             }
         }
     }
@@ -604,6 +784,11 @@ public class TypedFunction4<Result, P0, P1, P2, P3>: ValueConvertible where Resu
     public typealias AsyncConvenienceCallback<R: ValueConvertible> = (P0, P1, P2, P3) async throws -> R
     public typealias AsyncConvenienceVoidCallback = (P0, P1, P2, P3) async throws -> Void
 
+    public typealias ConvenienceEnvCallback = (Environment, P0, P1, P2, P3) throws -> Result
+    public typealias ConvenienceEnvVoidCallback = (Environment, P0, P1, P2, P3) throws -> Void
+    public typealias AsyncConvenienceEnvCallback<R: ValueConvertible> = (Environment, P0, P1, P2, P3) async throws -> R
+    public typealias AsyncConvenienceEnvVoidCallback = (Environment, P0, P1, P2, P3) async throws -> Void
+
     fileprivate enum InternalTypedFunction {
         case javascript(napi_value)
         case swift(String, TypedFunctionCallback)
@@ -646,6 +831,37 @@ public class TypedFunction4<Result, P0, P1, P2, P3>: ValueConvertible where Resu
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3])
             return Promise<Undefined> {
                 try await callback(p0, p1, p2, p3)
+            }
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping ConvenienceEnvCallback) {
+        self.init(named: name) { env, _, args in
+            try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]))
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping ConvenienceEnvVoidCallback) where Result == Undefined {
+        self.init(named: name) { env, _, args in
+            try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]))
+            return Undefined.default
+        }
+    }
+
+    public convenience init<R: ValueConvertible>(named name: String, _ callback: @escaping AsyncConvenienceEnvCallback<R>) where Result == Promise<R> {
+        self.init(named: name) { env, _, args in
+            let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3])
+            return Promise<R> {
+                return try await callback(env, p0, p1, p2, p3)
+            }
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping AsyncConvenienceEnvVoidCallback) where Result == Promise<Undefined> {
+        self.init(named: name) { env, _, args in
+            let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3])
+            return Promise<Undefined> {
+                try await callback(env, p0, p1, p2, p3)
             }
         }
     }
@@ -711,6 +927,11 @@ public class TypedFunction3<Result, P0, P1, P2>: ValueConvertible where Result: 
     public typealias AsyncConvenienceCallback<R: ValueConvertible> = (P0, P1, P2) async throws -> R
     public typealias AsyncConvenienceVoidCallback = (P0, P1, P2) async throws -> Void
 
+    public typealias ConvenienceEnvCallback = (Environment, P0, P1, P2) throws -> Result
+    public typealias ConvenienceEnvVoidCallback = (Environment, P0, P1, P2) throws -> Void
+    public typealias AsyncConvenienceEnvCallback<R: ValueConvertible> = (Environment, P0, P1, P2) async throws -> R
+    public typealias AsyncConvenienceEnvVoidCallback = (Environment, P0, P1, P2) async throws -> Void
+
     fileprivate enum InternalTypedFunction {
         case javascript(napi_value)
         case swift(String, TypedFunctionCallback)
@@ -753,6 +974,37 @@ public class TypedFunction3<Result, P0, P1, P2>: ValueConvertible where Result: 
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2])
             return Promise<Undefined> {
                 try await callback(p0, p1, p2)
+            }
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping ConvenienceEnvCallback) {
+        self.init(named: name) { env, _, args in
+            try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]))
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping ConvenienceEnvVoidCallback) where Result == Undefined {
+        self.init(named: name) { env, _, args in
+            try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]))
+            return Undefined.default
+        }
+    }
+
+    public convenience init<R: ValueConvertible>(named name: String, _ callback: @escaping AsyncConvenienceEnvCallback<R>) where Result == Promise<R> {
+        self.init(named: name) { env, _, args in
+            let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2])
+            return Promise<R> {
+                return try await callback(env, p0, p1, p2)
+            }
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping AsyncConvenienceEnvVoidCallback) where Result == Promise<Undefined> {
+        self.init(named: name) { env, _, args in
+            let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2])
+            return Promise<Undefined> {
+                try await callback(env, p0, p1, p2)
             }
         }
     }
@@ -818,6 +1070,11 @@ public class TypedFunction2<Result, P0, P1>: ValueConvertible where Result: Valu
     public typealias AsyncConvenienceCallback<R: ValueConvertible> = (P0, P1) async throws -> R
     public typealias AsyncConvenienceVoidCallback = (P0, P1) async throws -> Void
 
+    public typealias ConvenienceEnvCallback = (Environment, P0, P1) throws -> Result
+    public typealias ConvenienceEnvVoidCallback = (Environment, P0, P1) throws -> Void
+    public typealias AsyncConvenienceEnvCallback<R: ValueConvertible> = (Environment, P0, P1) async throws -> R
+    public typealias AsyncConvenienceEnvVoidCallback = (Environment, P0, P1) async throws -> Void
+
     fileprivate enum InternalTypedFunction {
         case javascript(napi_value)
         case swift(String, TypedFunctionCallback)
@@ -860,6 +1117,37 @@ public class TypedFunction2<Result, P0, P1>: ValueConvertible where Result: Valu
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1])
             return Promise<Undefined> {
                 try await callback(p0, p1)
+            }
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping ConvenienceEnvCallback) {
+        self.init(named: name) { env, _, args in
+            try callback(env, P0(env, from: args[0]), P1(env, from: args[1]))
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping ConvenienceEnvVoidCallback) where Result == Undefined {
+        self.init(named: name) { env, _, args in
+            try callback(env, P0(env, from: args[0]), P1(env, from: args[1]))
+            return Undefined.default
+        }
+    }
+
+    public convenience init<R: ValueConvertible>(named name: String, _ callback: @escaping AsyncConvenienceEnvCallback<R>) where Result == Promise<R> {
+        self.init(named: name) { env, _, args in
+            let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1])
+            return Promise<R> {
+                return try await callback(env, p0, p1)
+            }
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping AsyncConvenienceEnvVoidCallback) where Result == Promise<Undefined> {
+        self.init(named: name) { env, _, args in
+            let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1])
+            return Promise<Undefined> {
+                try await callback(env, p0, p1)
             }
         }
     }
@@ -925,6 +1213,11 @@ public class TypedFunction1<Result, P0>: ValueConvertible where Result: ValueCon
     public typealias AsyncConvenienceCallback<R: ValueConvertible> = (P0) async throws -> R
     public typealias AsyncConvenienceVoidCallback = (P0) async throws -> Void
 
+    public typealias ConvenienceEnvCallback = (Environment, P0) throws -> Result
+    public typealias ConvenienceEnvVoidCallback = (Environment, P0) throws -> Void
+    public typealias AsyncConvenienceEnvCallback<R: ValueConvertible> = (Environment, P0) async throws -> R
+    public typealias AsyncConvenienceEnvVoidCallback = (Environment, P0) async throws -> Void
+
     fileprivate enum InternalTypedFunction {
         case javascript(napi_value)
         case swift(String, TypedFunctionCallback)
@@ -967,6 +1260,37 @@ public class TypedFunction1<Result, P0>: ValueConvertible where Result: ValueCon
             let p0 = try P0(env, from: args[0])
             return Promise<Undefined> {
                 try await callback(p0)
+            }
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping ConvenienceEnvCallback) {
+        self.init(named: name) { env, _, args in
+            try callback(env, P0(env, from: args[0]))
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping ConvenienceEnvVoidCallback) where Result == Undefined {
+        self.init(named: name) { env, _, args in
+            try callback(env, P0(env, from: args[0]))
+            return Undefined.default
+        }
+    }
+
+    public convenience init<R: ValueConvertible>(named name: String, _ callback: @escaping AsyncConvenienceEnvCallback<R>) where Result == Promise<R> {
+        self.init(named: name) { env, _, args in
+            let p0 = try P0(env, from: args[0])
+            return Promise<R> {
+                return try await callback(env, p0)
+            }
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping AsyncConvenienceEnvVoidCallback) where Result == Promise<Undefined> {
+        self.init(named: name) { env, _, args in
+            let p0 = try P0(env, from: args[0])
+            return Promise<Undefined> {
+                try await callback(env, p0)
             }
         }
     }
@@ -1032,6 +1356,11 @@ public class TypedFunction0<Result>: ValueConvertible where Result: ValueConvert
     public typealias AsyncConvenienceCallback<R: ValueConvertible> = () async throws -> R
     public typealias AsyncConvenienceVoidCallback = () async throws -> Void
 
+    public typealias ConvenienceEnvCallback = (Environment) throws -> Result
+    public typealias ConvenienceEnvVoidCallback = (Environment) throws -> Void
+    public typealias AsyncConvenienceEnvCallback<R: ValueConvertible> = (Environment) async throws -> R
+    public typealias AsyncConvenienceEnvVoidCallback = (Environment) async throws -> Void
+
     fileprivate enum InternalTypedFunction {
         case javascript(napi_value)
         case swift(String, TypedFunctionCallback)
@@ -1074,6 +1403,37 @@ public class TypedFunction0<Result>: ValueConvertible where Result: ValueConvert
 
             Promise<Undefined> {
                 try await callback()
+            }
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping ConvenienceEnvCallback) {
+        self.init(named: name) { env, _, _ in
+            try callback(env)
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping ConvenienceEnvVoidCallback) where Result == Undefined {
+        self.init(named: name) { env, _, _ in
+            try callback(env)
+            return Undefined.default
+        }
+    }
+
+    public convenience init<R: ValueConvertible>(named name: String, _ callback: @escaping AsyncConvenienceEnvCallback<R>) where Result == Promise<R> {
+        self.init(named: name) { env, _, _ in
+
+            Promise<R> {
+                try await callback(env)
+            }
+        }
+    }
+
+    public convenience init(named name: String, _ callback: @escaping AsyncConvenienceEnvVoidCallback) where Result == Promise<Undefined> {
+        self.init(named: name) { env, _, _ in
+
+            Promise<Undefined> {
+                try await callback(env)
             }
         }
     }

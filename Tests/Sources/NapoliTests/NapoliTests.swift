@@ -102,12 +102,12 @@ func modifyObjectByReferenceAsyncThreadsafe(object: ThreadsafeObjectReference) a
     try assertEqual(expected: "good", actual: try await object.get("additional"))
 }
 
-func modifyObjectByReferenceSync(object: ObjectReference) throws {
-    try assertEqual(expected: "bad", actual: try object.get("cool"))
-    try object.set("cool", value: "neat")
-    try object.set("additional", value: "good")
-    try assertEqual(expected: "neat", actual: try object.get("cool"))
-    try assertEqual(expected: "good", actual: try object.get("additional"))
+func modifyObjectByReferenceSync(env: Environment, object: ObjectReference) throws {
+    try assertEqual(expected: "bad", actual: try object.get(env, "cool"))
+    try object.set(env, "cool", value: "neat")
+    try object.set(env, "additional", value: "good")
+    try assertEqual(expected: "neat", actual: try object.get(env, "cool"))
+    try assertEqual(expected: "good", actual: try object.get(env, "additional"))
 }
 
 func throwError() throws {

@@ -121,6 +121,11 @@ enum TypedFunction {
             public typealias AsyncConvenienceCallback<R: ValueConvertible> = (\(commaSeparatedInGenerics)) async throws -> R
             public typealias AsyncConvenienceVoidCallback = (\(commaSeparatedInGenerics)) async throws -> Void
 
+            public typealias ConvenienceEnvCallback = (Environment\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Result
+            public typealias ConvenienceEnvVoidCallback = (Environment\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Void
+            public typealias AsyncConvenienceEnvCallback<R: ValueConvertible> = (Environment\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) async throws -> R
+            public typealias AsyncConvenienceEnvVoidCallback = (Environment\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) async throws -> Void
+
             fileprivate enum InternalTypedFunction {
                 case javascript(napi_value)
                 case swift(String, TypedFunctionCallback)
@@ -163,6 +168,37 @@ enum TypedFunction {
                     \(argListAssignedToValues)
                     return Promise<Undefined> {
                         try await callback(\(argValueList))
+                    }
+                }
+            }
+
+            public convenience init(named name: String, _ callback: @escaping ConvenienceEnvCallback) {
+                self.init(named: name) { env, _, args in
+                    try callback(env\(argListAsParams.prefixCommaIfNotEmpty()))
+                }
+            }
+
+            public convenience init(named name: String, _ callback: @escaping ConvenienceEnvVoidCallback) where Result == Undefined {
+                self.init(named: name) { env, _, args in
+                    try callback(env\(argListAsParams.prefixCommaIfNotEmpty()))
+                    return Undefined.default
+                }
+            }
+
+            public convenience init<R: ValueConvertible>(named name: String, _ callback: @escaping AsyncConvenienceEnvCallback<R>) where Result == Promise<R> {
+                self.init(named: name) { env, _, args in
+                    \(argListAssignedToValues)
+                    return Promise<R> {
+                        return try await callback(env\(argValueList.prefixCommaIfNotEmpty()))
+                    }
+                }
+            }
+
+            public convenience init(named name: String, _ callback: @escaping AsyncConvenienceEnvVoidCallback) where Result == Promise<Undefined> {
+                self.init(named: name) { env, this, args in
+                    \(argListAssignedToValues)
+                    return Promise<Undefined> {
+                        try await callback(env\(argValueList.prefixCommaIfNotEmpty()))
                     }
                 }
             }

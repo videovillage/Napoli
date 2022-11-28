@@ -3,17 +3,6 @@ import NAPIC
 
 @available(*, noasync)
 open class ObjectReference: ValueConvertible {
-    enum Error: LocalizedError {
-        case envRequired
-
-        var errorDescription: String? {
-            switch self {
-            case .envRequired:
-                return "Environment was invalidated - you must provide a env when getting or setting a js object"
-            }
-        }
-    }
-
     private var env: Environment?
     private let ref: napi_ref
 
@@ -34,27 +23,23 @@ open class ObjectReference: ValueConvertible {
         try getReferenceValue(env, ref: ref)
     }
 
-    public func keys(env: Environment? = nil) throws -> [String] {
-        guard let env = env ?? self.env else { throw Error.envRequired }
+    public func keys(_ env: Environment) throws -> [String] {
         var namesArray: napi_value!
         try napi_get_property_names(env.env, getReferenceValue(env, ref: ref), &namesArray).throwIfError()
         return try [String](env, from: namesArray)
     }
 
-    public func set(_ key: String, value: some ValueConvertible, env: Environment? = nil) throws {
-        guard let env = env ?? self.env else { throw Error.envRequired }
+    public func set(_ env: Environment, _ key: String, value: some ValueConvertible) throws {
         try napi_set_property(env.env, getReferenceValue(env, ref: ref), key.napiValue(env), value.napiValue(env)).throwIfError()
     }
 
-    public func get<V: ValueConvertible>(_ key: String, env: Environment? = nil) throws -> V {
-        guard let env = env ?? self.env else { throw Error.envRequired }
+    public func get<V: ValueConvertible>(_ env: Environment, _ key: String) throws -> V {
         var value: napi_value!
         try napi_get_property(env.env, getReferenceValue(env, ref: ref), key.napiValue(env), &value).throwIfError()
         return try V(env, from: value)
     }
 
-    public func immutable(_ env: Environment? = nil) throws -> [String: AnyValue] {
-        guard let env = env ?? self.env else { throw Error.envRequired }
+    public func immutable(_ env: Environment) throws -> [String: AnyValue] {
         return try .init(env, from: getReferenceValue(env, ref: ref))
     }
 
