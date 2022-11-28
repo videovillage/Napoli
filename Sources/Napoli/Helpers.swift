@@ -68,7 +68,6 @@ public class EnvironmentAccessor {
     }
 }
 
-
 public func initModule(_ env: napi_env, _ exports: napi_value, _ properties: [PropertyDescriptor]) -> napi_value {
     try! defineProperties(Environment(env), exports, properties)
     return exports

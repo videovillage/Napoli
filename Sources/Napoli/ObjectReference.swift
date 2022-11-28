@@ -66,7 +66,7 @@ open class ObjectReference: ValueConvertible {
     }
 
     public func immutable() async throws -> [String: AnyValue] {
-        let ref = self.ref
+        let ref = ref
         return try await envAccessor.withEnvironment { env in
             try [String: AnyValue](env, from: getReferenceValue(env, ref: ref))
         }
