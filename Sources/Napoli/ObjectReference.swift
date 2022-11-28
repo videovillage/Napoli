@@ -40,7 +40,7 @@ open class ObjectReference: ValueConvertible {
     }
 
     public func immutable(_ env: Environment) throws -> [String: AnyValue] {
-        return try .init(env, from: getReferenceValue(env, ref: ref))
+        try .init(env, from: getReferenceValue(env, ref: ref))
     }
 
     fileprivate func envCleanup() {
