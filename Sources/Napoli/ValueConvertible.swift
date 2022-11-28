@@ -2,8 +2,8 @@ import Foundation
 import NAPIC
 
 public protocol ValueConvertible {
-    init(_ env: napi_env, from: napi_value) throws
-    func napiValue(_ env: napi_env) throws -> napi_value
+    init(_ env: Environment, from: napi_value) throws
+    func napiValue(_ env: Environment) throws -> napi_value
 
     init(_ any: AnyValue) throws
     func eraseToAny() throws -> AnyValue
@@ -46,7 +46,7 @@ public extension ValueConvertible {
 }
 
 extension Optional: ValueConvertible where Wrapped: ValueConvertible {
-    public init(_ env: napi_env, from: napi_value) throws {
+    public init(_ env: Environment, from: napi_value) throws {
         if try strictlyEquals(env, lhs: from, rhs: Null.default) {
             self = .none
             return
@@ -60,7 +60,7 @@ extension Optional: ValueConvertible where Wrapped: ValueConvertible {
         self = .some(try Wrapped(env, from: from))
     }
 
-    public func napiValue(_ env: napi_env) throws -> napi_value {
+    public func napiValue(_ env: Environment) throws -> napi_value {
         try self?.napiValue(env) ?? Null.default.napiValue(env)
     }
 
@@ -84,12 +84,12 @@ extension Optional: ValueConvertible where Wrapped: ValueConvertible {
 }
 
 extension Dictionary: ValueConvertible where Key == String, Value: ValueConvertible {
-    public init(_ env: napi_env, from: napi_value) throws {
+    public init(_ env: Environment, from: napi_value) throws {
         var namesArray: napi_value!
-        try napi_get_property_names(env, from, &namesArray).throwIfError()
+        try napi_get_property_names(env.env, from, &namesArray).throwIfError()
 
         var count: UInt32 = .zero
-        try napi_get_array_length(env, namesArray, &count).throwIfError()
+        try napi_get_array_length(env.env, namesArray, &count).throwIfError()
 
         var dict = Self(minimumCapacity: Int(count))
 
@@ -97,9 +97,9 @@ extension Dictionary: ValueConvertible where Key == String, Value: ValueConverti
             let scope = try Scope.open(env)
             defer { scope.close(env) }
             var key: napi_value!
-            try napi_get_element(env, namesArray, i, &key).throwIfError()
+            try napi_get_element(env.env, namesArray, i, &key).throwIfError()
             var value: napi_value!
-            try napi_get_property(env, from, key, &value).throwIfError()
+            try napi_get_property(env.env, from, key, &value).throwIfError()
 
             try dict[String(env, from: key)] = Value(env, from: value)
         }
@@ -107,13 +107,13 @@ extension Dictionary: ValueConvertible where Key == String, Value: ValueConverti
         self = dict
     }
 
-    public func napiValue(_ env: napi_env) throws -> napi_value {
+    public func napiValue(_ env: Environment) throws -> napi_value {
         var result: napi_value!
 
-        try napi_create_object(env, &result).throwIfError()
+        try napi_create_object(env.env, &result).throwIfError()
 
         for (key, value) in self {
-            try napi_set_property(env, result, try key.napiValue(env), try value.napiValue(env)).throwIfError()
+            try napi_set_property(env.env, result, try key.napiValue(env), try value.napiValue(env)).throwIfError()
         }
 
         return result
@@ -141,9 +141,9 @@ extension Dictionary: ValueConvertible where Key == String, Value: ValueConverti
 }
 
 extension Array: ValueConvertible where Element: ValueConvertible {
-    public init(_ env: napi_env, from: napi_value) throws {
+    public init(_ env: Environment, from: napi_value) throws {
         var count: UInt32 = .zero
-        try napi_get_array_length(env, from, &count).throwIfError()
+        try napi_get_array_length(env.env, from, &count).throwIfError()
 
         var array = [Element]()
         array.reserveCapacity(Int(count))
@@ -152,20 +152,20 @@ extension Array: ValueConvertible where Element: ValueConvertible {
             let scope = try Scope.open(env)
             defer { scope.close(env) }
             var result: napi_value!
-            try napi_get_element(env, from, i, &result).throwIfError()
+            try napi_get_element(env.env, from, i, &result).throwIfError()
             try array.append(Element(env, from: result))
         }
 
         self = array
     }
 
-    public func napiValue(_ env: napi_env) throws -> napi_value {
+    public func napiValue(_ env: Environment) throws -> napi_value {
         var result: napi_value!
 
-        try napi_create_array_with_length(env, count, &result).throwIfError()
+        try napi_create_array_with_length(env.env, count, &result).throwIfError()
 
         for (index, element) in enumerated() {
-            try napi_set_element(env, result, UInt32(index), try element.napiValue(env)).throwIfError()
+            try napi_set_element(env.env, result, UInt32(index), try element.napiValue(env)).throwIfError()
         }
 
         return result
@@ -186,26 +186,26 @@ extension Array: ValueConvertible where Element: ValueConvertible {
 }
 
 extension String: ValueConvertible {
-    public init(_ env: napi_env, from: napi_value) throws {
+    public init(_ env: Environment, from: napi_value) throws {
         var length = 0
 
-        try napi_get_value_string_utf8(env, from, nil, 0, &length).throwIfError()
+        try napi_get_value_string_utf8(env.env, from, nil, 0, &length).throwIfError()
 
         var data = Data(count: length + 1)
 
         try data.withUnsafeMutableBytes {
-            napi_get_value_string_utf8(env, from, $0.baseAddress, length + 1, &length)
+            napi_get_value_string_utf8(env.env, from, $0.baseAddress, length + 1, &length)
         }.throwIfError()
 
         self.init(data: data.dropLast(), encoding: .utf8)!
     }
 
-    public func napiValue(_ env: napi_env) throws -> napi_value {
+    public func napiValue(_ env: Environment) throws -> napi_value {
         var result: napi_value?
         let data = data(using: .utf8)!
 
         try data.withUnsafeBytes {
-            napi_create_string_utf8(env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, &result)
+            napi_create_string_utf8(env.env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, &result)
         }.throwIfError()
 
         return result!
@@ -226,15 +226,15 @@ extension String: ValueConvertible {
 }
 
 extension Date: ValueConvertible {
-    public init(_ env: napi_env, from: napi_value) throws {
+    public init(_ env: Environment, from: napi_value) throws {
         var timeInterval: Double = .nan
-        try napi_get_date_value(env, from, &timeInterval).throwIfError()
+        try napi_get_date_value(env.env, from, &timeInterval).throwIfError()
         self = Date(timeIntervalSince1970: timeInterval)
     }
 
-    public func napiValue(_ env: napi_env) throws -> napi_value {
+    public func napiValue(_ env: Environment) throws -> napi_value {
         var result: napi_value!
-        try napi_create_date(env, timeIntervalSince1970, &result).throwIfError()
+        try napi_create_date(env.env, timeIntervalSince1970, &result).throwIfError()
         return result
     }
 
@@ -253,18 +253,18 @@ extension Date: ValueConvertible {
 }
 
 extension Data: ValueConvertible {
-    public init(_ env: napi_env, from: napi_value) throws {
+    public init(_ env: Environment, from: napi_value) throws {
         var data: UnsafeMutableRawPointer!
         var count = 0
-        try napi_get_arraybuffer_info(env, from, &data, &count).throwIfError()
+        try napi_get_arraybuffer_info(env.env, from, &data, &count).throwIfError()
 
         self = Data(bytes: data, count: count)
     }
 
-    public func napiValue(_ env: napi_env) throws -> napi_value {
+    public func napiValue(_ env: Environment) throws -> napi_value {
         var result: napi_value!
         var newDataPointer: UnsafeMutableRawPointer!
-        try napi_create_arraybuffer(env, count, &newDataPointer, &result).throwIfError()
+        try napi_create_arraybuffer(env.env, count, &newDataPointer, &result).throwIfError()
         withUnsafeBytes {
             newDataPointer.copyMemory(from: $0.baseAddress!, byteCount: $0.count)
         }
@@ -354,22 +354,22 @@ extension Int64: ValueConvertible {
         }
     }
 
-    public init(_ env: napi_env, from: napi_value) throws {
+    public init(_ env: Environment, from: napi_value) throws {
         self = Self.max
-        try napi_get_value_int64(env, from, &self).throwIfError()
+        try napi_get_value_int64(env.env, from, &self).throwIfError()
 
         guard Self.jsSafeRange.contains(self) else {
             throw JSError.outOfSafeRange(self)
         }
     }
 
-    public func napiValue(_ env: napi_env) throws -> napi_value {
+    public func napiValue(_ env: Environment) throws -> napi_value {
         guard Self.jsSafeRange.contains(self) else {
             throw JSError.outOfSafeRange(self)
         }
 
         var result: napi_value?
-        try napi_create_int64(env, self, &result).throwIfError()
+        try napi_create_int64(env.env, self, &result).throwIfError()
         return result!
     }
 
@@ -419,15 +419,15 @@ protocol PrimitiveValueConvertible: ValueConvertible {
 }
 
 extension PrimitiveValueConvertible {
-    public init(_ env: napi_env, from: napi_value) throws {
+    public init(_ env: Environment, from: napi_value) throws {
         var result = Self.defaultValue
-        try Self.initWithValue(env, from, &result).throwIfError()
+        try Self.initWithValue(env.env, from, &result).throwIfError()
         self = result
     }
 
-    public func napiValue(_ env: napi_env) throws -> napi_value {
+    public func napiValue(_ env: Environment) throws -> napi_value {
         var result: napi_value?
-        try Self.createValue(env, self, &result).throwIfError()
+        try Self.createValue(env.env, self, &result).throwIfError()
         return result!
     }
 }

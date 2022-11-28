@@ -64,14 +64,14 @@ enum InstanceMethod {
               }
           }
 
-           public init\(allGenerics.bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (napi_env\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Result)\(wheres.backspaceIfNotEmpty()) {
+           public init\(allGenerics.bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (Environment\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Result)\(wheres.backspaceIfNotEmpty()) {
                super.init(name, attributes: attributes, argCount: \(paramCount)) { env, this, args in
                    let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
                    return try callback(env\(argListAsParams.prefixCommaIfNotEmpty()))
                }
            }
 
-           public init\(inGenerics.bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (napi_env\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Void)\(voidWheres.backspaceIfNotEmpty()) {
+           public init\(inGenerics.bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (Environment\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Void)\(voidWheres.backspaceIfNotEmpty()) {
                super.init(name, attributes: attributes, argCount: \(paramCount)) { env, this, args in
                    let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
                    try callback(env\(argListAsParams.prefixCommaIfNotEmpty()))

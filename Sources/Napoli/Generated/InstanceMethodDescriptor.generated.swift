@@ -20,14 +20,14 @@ public class InstanceMethodDescriptor<This>: MethodDescriptor where This: AnyObj
         }
     }
 
-    public init<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (napi_env, P0, P1, P2, P3, P4, P5, P6, P7, P8) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
+    public init<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (Environment, P0, P1, P2, P3, P4, P5, P6, P7, P8) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 9) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
             return try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]), P6(env, from: args[6]), P7(env, from: args[7]), P8(env, from: args[8]))
         }
     }
 
-    public init<P0, P1, P2, P3, P4, P5, P6, P7, P8>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (napi_env, P0, P1, P2, P3, P4, P5, P6, P7, P8) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
+    public init<P0, P1, P2, P3, P4, P5, P6, P7, P8>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (Environment, P0, P1, P2, P3, P4, P5, P6, P7, P8) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 9) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
             try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]), P6(env, from: args[6]), P7(env, from: args[7]), P8(env, from: args[8]))
@@ -72,14 +72,14 @@ public class InstanceMethodDescriptor<This>: MethodDescriptor where This: AnyObj
         }
     }
 
-    public init<Result, P0, P1, P2, P3, P4, P5, P6, P7>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (napi_env, P0, P1, P2, P3, P4, P5, P6, P7) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
+    public init<Result, P0, P1, P2, P3, P4, P5, P6, P7>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (Environment, P0, P1, P2, P3, P4, P5, P6, P7) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 8) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
             return try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]), P6(env, from: args[6]), P7(env, from: args[7]))
         }
     }
 
-    public init<P0, P1, P2, P3, P4, P5, P6, P7>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (napi_env, P0, P1, P2, P3, P4, P5, P6, P7) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
+    public init<P0, P1, P2, P3, P4, P5, P6, P7>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (Environment, P0, P1, P2, P3, P4, P5, P6, P7) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 8) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
             try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]), P6(env, from: args[6]), P7(env, from: args[7]))
@@ -124,14 +124,14 @@ public class InstanceMethodDescriptor<This>: MethodDescriptor where This: AnyObj
         }
     }
 
-    public init<Result, P0, P1, P2, P3, P4, P5, P6>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (napi_env, P0, P1, P2, P3, P4, P5, P6) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
+    public init<Result, P0, P1, P2, P3, P4, P5, P6>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (Environment, P0, P1, P2, P3, P4, P5, P6) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 7) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
             return try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]), P6(env, from: args[6]))
         }
     }
 
-    public init<P0, P1, P2, P3, P4, P5, P6>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (napi_env, P0, P1, P2, P3, P4, P5, P6) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
+    public init<P0, P1, P2, P3, P4, P5, P6>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (Environment, P0, P1, P2, P3, P4, P5, P6) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 7) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
             try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]), P6(env, from: args[6]))
@@ -176,14 +176,14 @@ public class InstanceMethodDescriptor<This>: MethodDescriptor where This: AnyObj
         }
     }
 
-    public init<Result, P0, P1, P2, P3, P4, P5>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (napi_env, P0, P1, P2, P3, P4, P5) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
+    public init<Result, P0, P1, P2, P3, P4, P5>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (Environment, P0, P1, P2, P3, P4, P5) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 6) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
             return try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]))
         }
     }
 
-    public init<P0, P1, P2, P3, P4, P5>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (napi_env, P0, P1, P2, P3, P4, P5) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
+    public init<P0, P1, P2, P3, P4, P5>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (Environment, P0, P1, P2, P3, P4, P5) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 6) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
             try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]))
@@ -228,14 +228,14 @@ public class InstanceMethodDescriptor<This>: MethodDescriptor where This: AnyObj
         }
     }
 
-    public init<Result, P0, P1, P2, P3, P4>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (napi_env, P0, P1, P2, P3, P4) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
+    public init<Result, P0, P1, P2, P3, P4>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (Environment, P0, P1, P2, P3, P4) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 5) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
             return try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]))
         }
     }
 
-    public init<P0, P1, P2, P3, P4>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (napi_env, P0, P1, P2, P3, P4) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
+    public init<P0, P1, P2, P3, P4>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (Environment, P0, P1, P2, P3, P4) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 5) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
             try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]))
@@ -280,14 +280,14 @@ public class InstanceMethodDescriptor<This>: MethodDescriptor where This: AnyObj
         }
     }
 
-    public init<Result, P0, P1, P2, P3>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (napi_env, P0, P1, P2, P3) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
+    public init<Result, P0, P1, P2, P3>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (Environment, P0, P1, P2, P3) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 4) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
             return try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]))
         }
     }
 
-    public init<P0, P1, P2, P3>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (napi_env, P0, P1, P2, P3) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
+    public init<P0, P1, P2, P3>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (Environment, P0, P1, P2, P3) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 4) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
             try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]))
@@ -332,14 +332,14 @@ public class InstanceMethodDescriptor<This>: MethodDescriptor where This: AnyObj
         }
     }
 
-    public init<Result, P0, P1, P2>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (napi_env, P0, P1, P2) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
+    public init<Result, P0, P1, P2>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (Environment, P0, P1, P2) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 3) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
             return try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]))
         }
     }
 
-    public init<P0, P1, P2>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (napi_env, P0, P1, P2) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
+    public init<P0, P1, P2>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (Environment, P0, P1, P2) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 3) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
             try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]))
@@ -384,14 +384,14 @@ public class InstanceMethodDescriptor<This>: MethodDescriptor where This: AnyObj
         }
     }
 
-    public init<Result, P0, P1>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (napi_env, P0, P1) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible {
+    public init<Result, P0, P1>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (Environment, P0, P1) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 2) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
             return try callback(env, P0(env, from: args[0]), P1(env, from: args[1]))
         }
     }
 
-    public init<P0, P1>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (napi_env, P0, P1) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible {
+    public init<P0, P1>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (Environment, P0, P1) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 2) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
             try callback(env, P0(env, from: args[0]), P1(env, from: args[1]))
@@ -436,14 +436,14 @@ public class InstanceMethodDescriptor<This>: MethodDescriptor where This: AnyObj
         }
     }
 
-    public init<Result, P0>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (napi_env, P0) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible {
+    public init<Result, P0>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (Environment, P0) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 1) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
             return try callback(env, P0(env, from: args[0]))
         }
     }
 
-    public init<P0>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (napi_env, P0) throws -> Void) where P0: ValueConvertible {
+    public init<P0>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (Environment, P0) throws -> Void) where P0: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 1) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
             try callback(env, P0(env, from: args[0]))
@@ -488,14 +488,14 @@ public class InstanceMethodDescriptor<This>: MethodDescriptor where This: AnyObj
         }
     }
 
-    public init<Result>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (napi_env) throws -> Result) where Result: ValueConvertible {
+    public init<Result>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (Environment) throws -> Result) where Result: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 0) { env, this, _ in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
             return try callback(env)
         }
     }
 
-    public init(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (napi_env) throws -> Void) {
+    public init(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (Environment) throws -> Void) {
         super.init(name, attributes: attributes, argCount: 0) { env, this, _ in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
             try callback(env)

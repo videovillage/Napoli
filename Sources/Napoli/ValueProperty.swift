@@ -12,7 +12,7 @@ public struct ValueProperty: PropertyDescriptor {
         self.value = value
     }
 
-    public func propertyDescriptor(_ env: napi_env) throws -> napi_property_descriptor {
+    public func propertyDescriptor(_ env: Environment) throws -> napi_property_descriptor {
         let _name = try name.napiValue(env)
         let _value = try value.napiValue(env)
         return napi_property_descriptor(utf8name: nil, name: _name, method: nil, getter: nil, setter: nil, value: _value, attributes: attributes, data: nil)

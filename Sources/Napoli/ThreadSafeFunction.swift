@@ -4,7 +4,7 @@ import NAPIC
 public class ThreadsafeFunction: ValueConvertible {
     class CallbackData {
         typealias Continuation = CheckedContinuation<ValueConvertible, Swift.Error>
-        typealias ResultConstructor = (napi_env, napi_value) throws -> ValueConvertible
+        typealias ResultConstructor = (Environment, napi_value) throws -> ValueConvertible
         let this: ValueConvertible
         let args: [ValueConvertible]
         let continuation: Continuation
@@ -27,17 +27,17 @@ public class ThreadsafeFunction: ValueConvertible {
 
     fileprivate var tsfn: napi_threadsafe_function!
 
-    public required convenience init(_ env: napi_env, from: napi_value) throws {
+    public required convenience init(_ env: Environment, from: napi_value) throws {
         let function = try Function(env, from: from)
         try self.init(env, function)
     }
 
-    public func napiValue(_ env: napi_env) throws -> napi_value {
+    public func napiValue(_ env: Environment) throws -> napi_value {
         try Undefined.default.napiValue(env)
     }
 
-    public init(_ env: napi_env, _ function: Function) throws {
-        try napi_create_threadsafe_function(env,
+    public init(_ env: Environment, _ function: Function) throws {
+        try napi_create_threadsafe_function(env.env,
                                             function.napiValue(env),
                                             nil,
                                             "ThreadsafeWrapper".napiValue(env),

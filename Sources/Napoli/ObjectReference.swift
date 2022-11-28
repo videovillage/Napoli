@@ -9,51 +9,51 @@ open class ObjectReference: ValueConvertible {
         var errorDescription: String? {
             switch self {
             case .envRequired:
-                return "napi_env was invalidated - you must provide a env when getting or setting a js object"
+                return "Environment was invalidated - you must provide a env when getting or setting a js object"
             }
         }
     }
 
-    private var env: napi_env?
+    private var env: Environment?
     private let ref: napi_ref
 
     fileprivate var cleanupObject: UnsafeMutableRawPointer!
 
-    public convenience init(_ env: napi_env, from: [String: AnyValue]) throws {
+    public convenience init(_ env: Environment, from: [String: AnyValue]) throws {
         try self.init(env, from: from.napiValue(env))
     }
 
-    public required init(_ env: napi_env, from: napi_value) throws {
+    public required init(_ env: Environment, from: napi_value) throws {
         self.env = env
         ref = try createReference(env, from: from, initialRefCount: 1)
         cleanupObject = Unmanaged<ObjectReference>.passUnretained(self).toOpaque()
-        napi_add_env_cleanup_hook(env, envCleanupCallback, cleanupObject)
+        napi_add_env_cleanup_hook(env.env, envCleanupCallback, cleanupObject)
     }
 
-    public func napiValue(_ env: napi_env) throws -> napi_value {
+    public func napiValue(_ env: Environment) throws -> napi_value {
         try getReferenceValue(env, ref: ref)
     }
 
-    public func keys(env: napi_env? = nil) throws -> [String] {
+    public func keys(env: Environment? = nil) throws -> [String] {
         guard let env = env ?? self.env else { throw Error.envRequired }
         var namesArray: napi_value!
-        try napi_get_property_names(env, getReferenceValue(env, ref: ref), &namesArray).throwIfError()
+        try napi_get_property_names(env.env, getReferenceValue(env, ref: ref), &namesArray).throwIfError()
         return try [String](env, from: namesArray)
     }
 
-    public func set(_ key: String, value: some ValueConvertible, env: napi_env? = nil) throws {
+    public func set(_ key: String, value: some ValueConvertible, env: Environment? = nil) throws {
         guard let env = env ?? self.env else { throw Error.envRequired }
-        try napi_set_property(env, getReferenceValue(env, ref: ref), key.napiValue(env), value.napiValue(env)).throwIfError()
+        try napi_set_property(env.env, getReferenceValue(env, ref: ref), key.napiValue(env), value.napiValue(env)).throwIfError()
     }
 
-    public func get<V: ValueConvertible>(_ key: String, env: napi_env? = nil) throws -> V {
+    public func get<V: ValueConvertible>(_ key: String, env: Environment? = nil) throws -> V {
         guard let env = env ?? self.env else { throw Error.envRequired }
         var value: napi_value!
-        try napi_get_property(env, getReferenceValue(env, ref: ref), key.napiValue(env), &value).throwIfError()
+        try napi_get_property(env.env, getReferenceValue(env, ref: ref), key.napiValue(env), &value).throwIfError()
         return try V(env, from: value)
     }
 
-    public func immutable(_ env: napi_env? = nil) throws -> [String: AnyValue] {
+    public func immutable(_ env: Environment? = nil) throws -> [String: AnyValue] {
         guard let env = env ?? self.env else { throw Error.envRequired }
         return try .init(env, from: getReferenceValue(env, ref: ref))
     }
@@ -64,7 +64,7 @@ open class ObjectReference: ValueConvertible {
 
     deinit {
         try! deleteReference(env!, ref: ref)
-        try! napi_remove_env_cleanup_hook(env!, envCleanupCallback, cleanupObject).throwIfError()
+        try! napi_remove_env_cleanup_hook(env!.env, envCleanupCallback, cleanupObject).throwIfError()
     }
 }
 
@@ -87,11 +87,11 @@ open class ThreadsafeObjectReference: ValueConvertible {
     private let immutableGetter: ImmutableGetter
     private let deinitCallback: DeinitCallback
 
-    public convenience init(_ env: napi_env, from: [String: AnyValue]) throws {
+    public convenience init(_ env: Environment, from: [String: AnyValue]) throws {
         try self.init(env, from: from.napiValue(env))
     }
 
-    public required init(_ env: napi_env, from: napi_value) throws {
+    public required init(_ env: Environment, from: napi_value) throws {
         ref = try createReference(env, from: from, initialRefCount: 1)
         keysGetter = try Self.keysGetter(env, ref: ref)
         setter = try Self.setter(env, ref: ref)
@@ -100,7 +100,7 @@ open class ThreadsafeObjectReference: ValueConvertible {
         deinitCallback = try Self.deinitCallback(env, ref: ref)
     }
 
-    public func napiValue(_ env: napi_env) throws -> napi_value {
+    public func napiValue(_ env: Environment) throws -> napi_value {
         try getReferenceValue(env, ref: ref)
     }
 
@@ -127,36 +127,36 @@ open class ThreadsafeObjectReference: ValueConvertible {
         }
     }
 
-    private static func keysGetter(_ env: napi_env, ref: napi_ref) throws -> KeysGetter {
+    private static func keysGetter(_ env: Environment, ref: napi_ref) throws -> KeysGetter {
         try .init(env, .init(named: "keysGetter") { env, _, _ in
             var namesArray: napi_value!
-            try napi_get_property_names(env, getReferenceValue(env, ref: ref), &namesArray).throwIfError()
+            try napi_get_property_names(env.env, getReferenceValue(env, ref: ref), &namesArray).throwIfError()
             return try [String](env, from: namesArray)
         })
     }
 
-    private static func setter(_ env: napi_env, ref: napi_ref) throws -> Setter {
+    private static func setter(_ env: Environment, ref: napi_ref) throws -> Setter {
         try .init(env, .init(named: "setter") { env, _, args in
-            try napi_set_property(env, getReferenceValue(env, ref: ref), args[0], args[1]).throwIfError()
+            try napi_set_property(env.env, getReferenceValue(env, ref: ref), args[0], args[1]).throwIfError()
             return Undefined.default
         })
     }
 
-    private static func getter(_ env: napi_env, ref: napi_ref) throws -> Getter {
+    private static func getter(_ env: Environment, ref: napi_ref) throws -> Getter {
         try .init(env, .init(named: "getter") { env, _, args in
             var value: napi_value!
-            try napi_get_property(env, getReferenceValue(env, ref: ref), args[0], &value).throwIfError()
+            try napi_get_property(env.env, getReferenceValue(env, ref: ref), args[0], &value).throwIfError()
             return try AnyValue(env, from: value)
         })
     }
 
-    private static func immutableGetter(_ env: napi_env, ref: napi_ref) throws -> ImmutableGetter {
+    private static func immutableGetter(_ env: Environment, ref: napi_ref) throws -> ImmutableGetter {
         try .init(env, .init(named: "immutableGetter") { env, _, _ in
             try [String: AnyValue](env, from: getReferenceValue(env, ref: ref))
         })
     }
 
-    private static func deinitCallback(_ env: napi_env, ref: napi_ref) throws -> DeinitCallback {
+    private static func deinitCallback(_ env: Environment, ref: napi_ref) throws -> DeinitCallback {
         try .init(env, .init(named: "deinit") { env, _, _ in
             try deleteReference(env, ref: ref)
             return Undefined.default
@@ -164,32 +164,32 @@ open class ThreadsafeObjectReference: ValueConvertible {
     }
 }
 
-func createReference(_ env: napi_env, from: napi_value, initialRefCount: UInt32) throws -> napi_ref {
+func createReference(_ env: Environment, from: napi_value, initialRefCount: UInt32) throws -> napi_ref {
     var result: napi_ref!
-    try napi_create_reference(env, from, initialRefCount, &result).throwIfError()
+    try napi_create_reference(env.env, from, initialRefCount, &result).throwIfError()
     return result
 }
 
-func getReferenceValue(_ env: napi_env, ref: napi_ref) throws -> napi_value {
+func getReferenceValue(_ env: Environment, ref: napi_ref) throws -> napi_value {
     var result: napi_value!
-    try napi_get_reference_value(env, ref, &result).throwIfError()
+    try napi_get_reference_value(env.env, ref, &result).throwIfError()
     return result
 }
 
 @discardableResult
-func unref(_ env: napi_env, ref: napi_ref) throws -> UInt32 {
+func unref(_ env: Environment, ref: napi_ref) throws -> UInt32 {
     var result: UInt32 = 0
-    try napi_reference_unref(env, ref, &result).throwIfError()
+    try napi_reference_unref(env.env, ref, &result).throwIfError()
     return result
 }
 
 @discardableResult
-func ref(_ env: napi_env, ref: napi_ref) throws -> UInt32 {
+func ref(_ env: Environment, ref: napi_ref) throws -> UInt32 {
     var result: UInt32 = 0
-    try napi_reference_ref(env, ref, &result).throwIfError()
+    try napi_reference_ref(env.env, ref, &result).throwIfError()
     return result
 }
 
-func deleteReference(_ env: napi_env, ref: napi_ref) throws {
-    try napi_delete_reference(env, ref).throwIfError()
+func deleteReference(_ env: Environment, ref: napi_ref) throws {
+    try napi_delete_reference(env.env, ref).throwIfError()
 }

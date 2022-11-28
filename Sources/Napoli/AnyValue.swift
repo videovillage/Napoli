@@ -27,9 +27,9 @@ public enum AnyValue: ValueConvertible, Codable {
         }
     }
 
-    public init(_ env: napi_env, from value: napi_value) throws {
+    public init(_ env: Environment, from value: napi_value) throws {
         var type: napi_valuetype = napi_undefined
-        try napi_typeof(env, value, &type).throwIfError()
+        try napi_typeof(env.env, value, &type).throwIfError()
         switch type {
         case napi_boolean:
             self = try .boolean(Bool(env, from: value))
@@ -64,7 +64,7 @@ public enum AnyValue: ValueConvertible, Codable {
         self = try value.eraseToAny()
     }
 
-    public func napiValue(_ env: napi_env) throws -> napi_value {
+    public func napiValue(_ env: Environment) throws -> napi_value {
         switch self {
         case let .object(object): return try object.napiValue(env)
         case let .array(array): return try array.napiValue(env)
@@ -133,7 +133,7 @@ public enum AnyValue: ValueConvertible, Codable {
 private enum ObjectType: String {
     case date, array, typedArray, dataView, arrayBuffer, generic
 
-    init(_ env: napi_env, object: napi_value) throws {
+    init(_ env: Environment, object: napi_value) throws {
         if try napiIsDate(env, object) {
             self = .date
         } else if try napiIsArray(env, object) {
@@ -150,32 +150,32 @@ private enum ObjectType: String {
     }
 }
 
-func napiIsDate(_ env: napi_env, _ value: napi_value) throws -> Bool {
+func napiIsDate(_ env: Environment, _ value: napi_value) throws -> Bool {
     var isType = false
-    try napi_is_date(env, value, &isType).throwIfError()
+    try napi_is_date(env.env, value, &isType).throwIfError()
     return isType
 }
 
-func napiIsArray(_ env: napi_env, _ value: napi_value) throws -> Bool {
+func napiIsArray(_ env: Environment, _ value: napi_value) throws -> Bool {
     var isType = false
-    try napi_is_array(env, value, &isType).throwIfError()
+    try napi_is_array(env.env, value, &isType).throwIfError()
     return isType
 }
 
-func napiIsTypedArray(_ env: napi_env, _ value: napi_value) throws -> Bool {
+func napiIsTypedArray(_ env: Environment, _ value: napi_value) throws -> Bool {
     var isType = false
-    try napi_is_typedarray(env, value, &isType).throwIfError()
+    try napi_is_typedarray(env.env, value, &isType).throwIfError()
     return isType
 }
 
-func napiIsDataView(_ env: napi_env, _ value: napi_value) throws -> Bool {
+func napiIsDataView(_ env: Environment, _ value: napi_value) throws -> Bool {
     var isType = false
-    try napi_is_dataview(env, value, &isType).throwIfError()
+    try napi_is_dataview(env.env, value, &isType).throwIfError()
     return isType
 }
 
-func napiIsArrayBuffer(_ env: napi_env, _ value: napi_value) throws -> Bool {
+func napiIsArrayBuffer(_ env: Environment, _ value: napi_value) throws -> Bool {
     var isType = false
-    try napi_is_arraybuffer(env, value, &isType).throwIfError()
+    try napi_is_arraybuffer(env.env, value, &isType).throwIfError()
     return isType
 }

@@ -1,6 +1,6 @@
 import NAPIC
 
-private func defineClass(_ env: napi_env, named name: String, _ constructor: @escaping Callback, _ props: [napi_property_descriptor]) throws -> napi_value {
+private func defineClass(_ env: Environment, named name: String, _ constructor: @escaping Callback, _ props: [napi_property_descriptor]) throws -> napi_value {
     var result: napi_value?
     let nameData = name.data(using: .utf8)!
     let propCount = props.count
@@ -11,7 +11,7 @@ private func defineClass(_ env: napi_env, named name: String, _ constructor: @es
     do {
         try nameData.withUnsafeBytes { nameBytes in
             props.withUnsafeBufferPointer { propertiesBytes in
-                napi_define_class(env, nameBytes.baseAddress?.assumingMemoryBound(to: UInt8.self), nameBytes.count, swiftNAPICallback, unmanagedData.toOpaque(), propCount, propertiesBytes.baseAddress, &result)
+                napi_define_class(env.env, nameBytes.baseAddress?.assumingMemoryBound(to: UInt8.self), nameBytes.count, swiftNAPICallback, unmanagedData.toOpaque(), propCount, propertiesBytes.baseAddress, &result)
             }
         }.throwIfError()
     } catch {
@@ -30,7 +30,7 @@ private enum InternalClass {
 public class Class: ValueConvertible {
     fileprivate let value: InternalClass
 
-    public required init(_: napi_env, from: napi_value) throws {
+    public required init(_: Environment, from: napi_value) throws {
         value = .javascript(from)
     }
 
@@ -38,7 +38,7 @@ public class Class: ValueConvertible {
         value = .swift(name, constructor, properties)
     }
 
-    public func napiValue(_ env: napi_env) throws -> napi_value {
+    public func napiValue(_ env: Environment) throws -> napi_value {
         switch value {
         case let .swift(name, constructor, properties): return try defineClass(env, named: name, constructor, properties.map { try $0.propertyDescriptor(env) })
         case let .javascript(value): return value
@@ -81,7 +81,7 @@ public struct ClassDescriptor: PropertyDescriptor {
                       }, C.jsInstanceProperties + C.jsInstanceMethods))
     }
 
-    public func propertyDescriptor(_ env: napi_env) throws -> napi_property_descriptor {
+    public func propertyDescriptor(_ env: Environment) throws -> napi_property_descriptor {
         try value.propertyDescriptor(env)
     }
 }

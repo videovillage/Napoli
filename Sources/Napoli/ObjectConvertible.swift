@@ -5,13 +5,13 @@ import NAPIC
 public protocol ObjectConvertible: ValueConvertible, Codable, Equatable {}
 
 public extension ObjectConvertible {
-    init(_ env: napi_env, from: napi_value) throws {
+    init(_ env: Environment, from: napi_value) throws {
         let object = try [String: AnyValue](env, from: from)
         let encoded = try JSONEncoder().encode(object)
         self = try JSONDecoder().decode(Self.self, from: encoded)
     }
 
-    func napiValue(_ env: napi_env) throws -> napi_value {
+    func napiValue(_ env: Environment) throws -> napi_value {
         try eraseToAny().napiValue(env)
     }
 

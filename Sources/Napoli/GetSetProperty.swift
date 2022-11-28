@@ -37,7 +37,7 @@ public class GetSetPropertyDescriptor: PropertyDescriptor {
         }
     }
 
-    public func propertyDescriptor(_ env: napi_env) throws -> napi_property_descriptor {
+    public func propertyDescriptor(_ env: Environment) throws -> napi_property_descriptor {
         let _name = try name.napiValue(env)
         let data = GetSetCallbackData(getter: getter, setter: setter)
         let dataPointer = Unmanaged.passRetained(data).toOpaque()

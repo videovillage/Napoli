@@ -5,17 +5,17 @@ public struct Null: ValueConvertible {
 
     private init() {}
 
-    public init(_ env: napi_env, from: napi_value) throws {
+    public init(_ env: Environment, from: napi_value) throws {
         guard try strictlyEquals(env, lhs: from, rhs: Null.default) else {
-            napi_throw_type_error(env, nil, "Expected null")
+            napi_throw_type_error(env.env, nil, "Expected null")
             throw Napoli.Error.pendingException
         }
     }
 
-    public func napiValue(_ env: napi_env) throws -> napi_value {
+    public func napiValue(_ env: Environment) throws -> napi_value {
         var result: napi_value?
 
-        try napi_get_null(env, &result).throwIfError()
+        try napi_get_null(env.env, &result).throwIfError()
 
         return result!
     }

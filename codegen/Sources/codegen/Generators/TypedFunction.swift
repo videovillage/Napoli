@@ -7,7 +7,7 @@ enum TypedFunction {
         source.add("import NAPIC")
         source.newline()
         source.add("""
-        public typealias TypedFunctionCallback = (napi_env, napi_value, [napi_value]) throws -> ValueConvertible
+        public typealias TypedFunctionCallback = (Environment, napi_value, [napi_value]) throws -> ValueConvertible
 
         class TypedFunctionCallbackData {
             let callback: TypedFunctionCallback
@@ -20,6 +20,7 @@ enum TypedFunction {
         }
 
         func typedFuncNAPICallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) -> napi_value? {
+            let env = Environment(env)
             enum Error: ErrorConvertible {
                 case invalidArgCount(actual: Int, expected: Int)
 
@@ -37,7 +38,7 @@ enum TypedFunction {
 
             var this: napi_value!
             let dataPointer = UnsafeMutablePointer<UnsafeMutableRawPointer?>.allocate(capacity: 1)
-            napi_get_cb_info(env, cbinfo, nil, nil, &this, dataPointer)
+            napi_get_cb_info(env.env, cbinfo, nil, nil, &this, dataPointer)
             let data = Unmanaged<TypedFunctionCallbackData>.fromOpaque(dataPointer.pointee!).takeUnretainedValue()
 
             let usedArgs: [napi_value]
@@ -46,7 +47,7 @@ enum TypedFunction {
                 var args = [napi_value?](repeating: nil, count: data.argCount)
 
                 args.withUnsafeMutableBufferPointer {
-                    _ = napi_get_cb_info(env, cbinfo, &actualArgCount, $0.baseAddress, nil, nil)
+                    _ = napi_get_cb_info(env.env, cbinfo, &actualArgCount, $0.baseAddress, nil, nil)
                 }
 
                 usedArgs = args.map { $0! }
@@ -127,7 +128,7 @@ enum TypedFunction {
 
             fileprivate let value: InternalTypedFunction
 
-            public required init(_: napi_env, from: napi_value) throws {
+            public required init(_: Environment, from: napi_value) throws {
                 value = .javascript(from)
             }
 
@@ -166,7 +167,7 @@ enum TypedFunction {
                 }
             }
 
-            public func napiValue(_ env: napi_env) throws -> napi_value {
+            public func napiValue(_ env: Environment) throws -> napi_value {
                 switch value {
                 case let .swift(name, callback):
                     return try Self.createFunction(env, named: name) { env, this, args in
@@ -177,30 +178,30 @@ enum TypedFunction {
                 }
             }
 
-            public func call(_ env: napi_env, this: ValueConvertible = Undefined.default\(inGenericsAsArgs)) throws where Result == Undefined {
+            public func call(_ env: Environment, this: ValueConvertible = Undefined.default\(inGenericsAsArgs)) throws where Result == Undefined {
                 let handle = try napiValue(env)
 
                 let args: [napi_value?] = \(paramCount > 0 ? "try [\(inGenericsAsNAPI)]" : "[]")
 
                 try args.withUnsafeBufferPointer { argsBytes in
-                    try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, nil)
+                    try napi_call_function(env.env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, nil)
                 }.throwIfError()
             }
 
-            public func call(_ env: napi_env, this: ValueConvertible = Undefined.default\(inGenericsAsArgs)) throws -> Result {
+            public func call(_ env: Environment, this: ValueConvertible = Undefined.default\(inGenericsAsArgs)) throws -> Result {
                 let handle = try napiValue(env)
 
                 let args: [napi_value?] = \(paramCount > 0 ? "try [\(inGenericsAsNAPI)]" : "[]")
 
                 var result: napi_value?
                 try args.withUnsafeBufferPointer { argsBytes in
-                    try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, &result)
+                    try napi_call_function(env.env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, &result)
                 }.throwIfError()
 
                 return try Result(env, from: result!)
             }
 
-            private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
+            private static func createFunction(_ env: Environment, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
                 var result: napi_value?
                 let nameData = name.data(using: .utf8)!
 
@@ -209,7 +210,7 @@ enum TypedFunction {
 
                 do {
                     try nameData.withUnsafeBytes {
-                        napi_create_function(env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, typedFuncNAPICallback,  unmanagedData.toOpaque(), &result)
+                        napi_create_function(env.env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, typedFuncNAPICallback,  unmanagedData.toOpaque(), &result)
                     }.throwIfError()
                 } catch {
                     unmanagedData.release()

@@ -22,7 +22,7 @@ enum Method {
                 self.argCount = argCount
             }
 
-            public func propertyDescriptor(_ env: napi_env) throws -> napi_property_descriptor {
+            public func propertyDescriptor(_ env: Environment) throws -> napi_property_descriptor {
                 let _name = try name.napiValue(env)
                 let data = TypedFunctionCallbackData(callback: callback, argCount: argCount)
                 let dataPointer = Unmanaged.passRetained(data).toOpaque()
@@ -81,13 +81,13 @@ enum Method {
                  }
              }
 
-              convenience init\(allGenerics.bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (napi_env\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Result)\(wheres.backspaceIfNotEmpty()) {
+              convenience init\(allGenerics.bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (Environment\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Result)\(wheres.backspaceIfNotEmpty()) {
                   self.init(name, attributes: attributes, argCount: \(paramCount)) { env, this, args in
                       try callback(env\(argListAsParams.prefixCommaIfNotEmpty()))
                   }
               }
 
-              convenience init\(inGenerics.bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (napi_env\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Void)\(voidWheres.backspaceIfNotEmpty()) {
+              convenience init\(inGenerics.bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (Environment\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Void)\(voidWheres.backspaceIfNotEmpty()) {
                   self.init(name, attributes: attributes, argCount: \(paramCount)) { env, this, args in
                       try callback(env\(argListAsParams.prefixCommaIfNotEmpty()))
                       return Undefined.default

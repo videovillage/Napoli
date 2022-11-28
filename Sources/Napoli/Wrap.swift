@@ -5,21 +5,21 @@ func swiftNAPIDeinit(_: napi_env!, pointer: UnsafeMutableRawPointer?, hint _: Un
 }
 
 class Wrap<T: AnyObject> {
-    static func wrap(_ env: napi_env, jsObject: napi_value, nativeObject: T) throws {
+    static func wrap(_ env: Environment, jsObject: napi_value, nativeObject: T) throws {
         let pointerData = Unmanaged.passRetained(nativeObject)
 
         do {
-            try napi_wrap(env, jsObject, pointerData.toOpaque(), swiftNAPIDeinit, nil, nil).throwIfError()
+            try napi_wrap(env.env, jsObject, pointerData.toOpaque(), swiftNAPIDeinit, nil, nil).throwIfError()
         } catch {
             pointerData.release()
             throw error
         }
     }
 
-    static func unwrap(_ env: napi_env, jsObject: napi_value) throws -> T {
+    static func unwrap(_ env: Environment, jsObject: napi_value) throws -> T {
         var pointer: UnsafeMutableRawPointer?
 
-        try napi_unwrap(env, jsObject, &pointer).throwIfError()
+        try napi_unwrap(env.env, jsObject, &pointer).throwIfError()
 
         return Unmanaged<T>.fromOpaque(pointer!).takeUnretainedValue()
     }

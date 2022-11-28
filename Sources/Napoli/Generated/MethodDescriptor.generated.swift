@@ -16,7 +16,7 @@ public class MethodDescriptor: PropertyDescriptor {
         self.argCount = argCount
     }
 
-    public func propertyDescriptor(_ env: napi_env) throws -> napi_property_descriptor {
+    public func propertyDescriptor(_ env: Environment) throws -> napi_property_descriptor {
         let _name = try name.napiValue(env)
         let data = TypedFunctionCallbackData(callback: callback, argCount: argCount)
         let dataPointer = Unmanaged.passRetained(data).toOpaque()
@@ -39,13 +39,13 @@ public extension MethodDescriptor {
         }
     }
 
-    convenience init<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (napi_env, P0, P1, P2, P3, P4, P5, P6, P7, P8) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
+    convenience init<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5, P6, P7, P8) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 9) { env, _, args in
             try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]), P6(env, from: args[6]), P7(env, from: args[7]), P8(env, from: args[8]))
         }
     }
 
-    convenience init<P0, P1, P2, P3, P4, P5, P6, P7, P8>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (napi_env, P0, P1, P2, P3, P4, P5, P6, P7, P8) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
+    convenience init<P0, P1, P2, P3, P4, P5, P6, P7, P8>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5, P6, P7, P8) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 9) { env, _, args in
             try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]), P6(env, from: args[6]), P7(env, from: args[7]), P8(env, from: args[8]))
             return Undefined.default
@@ -87,13 +87,13 @@ public extension MethodDescriptor {
         }
     }
 
-    convenience init<Result, P0, P1, P2, P3, P4, P5, P6, P7>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (napi_env, P0, P1, P2, P3, P4, P5, P6, P7) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
+    convenience init<Result, P0, P1, P2, P3, P4, P5, P6, P7>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5, P6, P7) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 8) { env, _, args in
             try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]), P6(env, from: args[6]), P7(env, from: args[7]))
         }
     }
 
-    convenience init<P0, P1, P2, P3, P4, P5, P6, P7>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (napi_env, P0, P1, P2, P3, P4, P5, P6, P7) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
+    convenience init<P0, P1, P2, P3, P4, P5, P6, P7>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5, P6, P7) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 8) { env, _, args in
             try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]), P6(env, from: args[6]), P7(env, from: args[7]))
             return Undefined.default
@@ -135,13 +135,13 @@ public extension MethodDescriptor {
         }
     }
 
-    convenience init<Result, P0, P1, P2, P3, P4, P5, P6>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (napi_env, P0, P1, P2, P3, P4, P5, P6) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
+    convenience init<Result, P0, P1, P2, P3, P4, P5, P6>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5, P6) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 7) { env, _, args in
             try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]), P6(env, from: args[6]))
         }
     }
 
-    convenience init<P0, P1, P2, P3, P4, P5, P6>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (napi_env, P0, P1, P2, P3, P4, P5, P6) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
+    convenience init<P0, P1, P2, P3, P4, P5, P6>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5, P6) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 7) { env, _, args in
             try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]), P6(env, from: args[6]))
             return Undefined.default
@@ -183,13 +183,13 @@ public extension MethodDescriptor {
         }
     }
 
-    convenience init<Result, P0, P1, P2, P3, P4, P5>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (napi_env, P0, P1, P2, P3, P4, P5) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
+    convenience init<Result, P0, P1, P2, P3, P4, P5>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 6) { env, _, args in
             try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]))
         }
     }
 
-    convenience init<P0, P1, P2, P3, P4, P5>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (napi_env, P0, P1, P2, P3, P4, P5) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
+    convenience init<P0, P1, P2, P3, P4, P5>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 6) { env, _, args in
             try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]), P5(env, from: args[5]))
             return Undefined.default
@@ -231,13 +231,13 @@ public extension MethodDescriptor {
         }
     }
 
-    convenience init<Result, P0, P1, P2, P3, P4>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (napi_env, P0, P1, P2, P3, P4) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
+    convenience init<Result, P0, P1, P2, P3, P4>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (Environment, P0, P1, P2, P3, P4) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 5) { env, _, args in
             try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]))
         }
     }
 
-    convenience init<P0, P1, P2, P3, P4>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (napi_env, P0, P1, P2, P3, P4) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
+    convenience init<P0, P1, P2, P3, P4>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (Environment, P0, P1, P2, P3, P4) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 5) { env, _, args in
             try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]), P4(env, from: args[4]))
             return Undefined.default
@@ -279,13 +279,13 @@ public extension MethodDescriptor {
         }
     }
 
-    convenience init<Result, P0, P1, P2, P3>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (napi_env, P0, P1, P2, P3) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
+    convenience init<Result, P0, P1, P2, P3>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (Environment, P0, P1, P2, P3) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 4) { env, _, args in
             try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]))
         }
     }
 
-    convenience init<P0, P1, P2, P3>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (napi_env, P0, P1, P2, P3) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
+    convenience init<P0, P1, P2, P3>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (Environment, P0, P1, P2, P3) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 4) { env, _, args in
             try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]), P3(env, from: args[3]))
             return Undefined.default
@@ -327,13 +327,13 @@ public extension MethodDescriptor {
         }
     }
 
-    convenience init<Result, P0, P1, P2>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (napi_env, P0, P1, P2) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
+    convenience init<Result, P0, P1, P2>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (Environment, P0, P1, P2) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 3) { env, _, args in
             try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]))
         }
     }
 
-    convenience init<P0, P1, P2>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (napi_env, P0, P1, P2) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
+    convenience init<P0, P1, P2>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (Environment, P0, P1, P2) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 3) { env, _, args in
             try callback(env, P0(env, from: args[0]), P1(env, from: args[1]), P2(env, from: args[2]))
             return Undefined.default
@@ -375,13 +375,13 @@ public extension MethodDescriptor {
         }
     }
 
-    convenience init<Result, P0, P1>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (napi_env, P0, P1) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible {
+    convenience init<Result, P0, P1>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (Environment, P0, P1) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 2) { env, _, args in
             try callback(env, P0(env, from: args[0]), P1(env, from: args[1]))
         }
     }
 
-    convenience init<P0, P1>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (napi_env, P0, P1) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible {
+    convenience init<P0, P1>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (Environment, P0, P1) throws -> Void) where P0: ValueConvertible, P1: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 2) { env, _, args in
             try callback(env, P0(env, from: args[0]), P1(env, from: args[1]))
             return Undefined.default
@@ -423,13 +423,13 @@ public extension MethodDescriptor {
         }
     }
 
-    convenience init<Result, P0>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (napi_env, P0) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible {
+    convenience init<Result, P0>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (Environment, P0) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 1) { env, _, args in
             try callback(env, P0(env, from: args[0]))
         }
     }
 
-    convenience init<P0>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (napi_env, P0) throws -> Void) where P0: ValueConvertible {
+    convenience init<P0>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (Environment, P0) throws -> Void) where P0: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 1) { env, _, args in
             try callback(env, P0(env, from: args[0]))
             return Undefined.default
@@ -471,13 +471,13 @@ public extension MethodDescriptor {
         }
     }
 
-    convenience init<Result>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (napi_env) throws -> Result) where Result: ValueConvertible {
+    convenience init<Result>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (Environment) throws -> Result) where Result: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 0) { env, _, _ in
             try callback(env)
         }
     }
 
-    convenience init(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (napi_env) throws -> Void) {
+    convenience init(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (Environment) throws -> Void) {
         self.init(name, attributes: attributes, argCount: 0) { env, _, _ in
             try callback(env)
             return Undefined.default

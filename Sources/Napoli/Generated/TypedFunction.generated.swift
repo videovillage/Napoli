@@ -1,6 +1,6 @@
 import NAPIC
 
-public typealias TypedFunctionCallback = (napi_env, napi_value, [napi_value]) throws -> ValueConvertible
+public typealias TypedFunctionCallback = (Environment, napi_value, [napi_value]) throws -> ValueConvertible
 
 class TypedFunctionCallbackData {
     let callback: TypedFunctionCallback
@@ -13,6 +13,7 @@ class TypedFunctionCallbackData {
 }
 
 func typedFuncNAPICallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) -> napi_value? {
+    let env = Environment(env)
     enum Error: ErrorConvertible {
         case invalidArgCount(actual: Int, expected: Int)
 
@@ -30,7 +31,7 @@ func typedFuncNAPICallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) -> n
 
     var this: napi_value!
     let dataPointer = UnsafeMutablePointer<UnsafeMutableRawPointer?>.allocate(capacity: 1)
-    napi_get_cb_info(env, cbinfo, nil, nil, &this, dataPointer)
+    napi_get_cb_info(env.env, cbinfo, nil, nil, &this, dataPointer)
     let data = Unmanaged<TypedFunctionCallbackData>.fromOpaque(dataPointer.pointee!).takeUnretainedValue()
 
     let usedArgs: [napi_value]
@@ -39,7 +40,7 @@ func typedFuncNAPICallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) -> n
         var args = [napi_value?](repeating: nil, count: data.argCount)
 
         args.withUnsafeMutableBufferPointer {
-            _ = napi_get_cb_info(env, cbinfo, &actualArgCount, $0.baseAddress, nil, nil)
+            _ = napi_get_cb_info(env.env, cbinfo, &actualArgCount, $0.baseAddress, nil, nil)
         }
 
         usedArgs = args.map { $0! }
@@ -75,7 +76,7 @@ public class TypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>: ValueCo
 
     fileprivate let value: InternalTypedFunction
 
-    public required init(_: napi_env, from: napi_value) throws {
+    public required init(_: Environment, from: napi_value) throws {
         value = .javascript(from)
     }
 
@@ -114,7 +115,7 @@ public class TypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>: ValueCo
         }
     }
 
-    public func napiValue(_ env: napi_env) throws -> napi_value {
+    public func napiValue(_ env: Environment) throws -> napi_value {
         switch value {
         case let .swift(name, callback):
             return try Self.createFunction(env, named: name) { env, this, args in
@@ -125,30 +126,30 @@ public class TypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>: ValueCo
         }
     }
 
-    public func call(_ env: napi_env, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7, _ p8: P8) throws where Result == Undefined {
+    public func call(_ env: Environment, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7, _ p8: P8) throws where Result == Undefined {
         let handle = try napiValue(env)
 
         let args: [napi_value?] = try [p0.napiValue(env), p1.napiValue(env), p2.napiValue(env), p3.napiValue(env), p4.napiValue(env), p5.napiValue(env), p6.napiValue(env), p7.napiValue(env), p8.napiValue(env)]
 
         try args.withUnsafeBufferPointer { argsBytes in
-            try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, nil)
+            try napi_call_function(env.env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, nil)
         }.throwIfError()
     }
 
-    public func call(_ env: napi_env, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7, _ p8: P8) throws -> Result {
+    public func call(_ env: Environment, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7, _ p8: P8) throws -> Result {
         let handle = try napiValue(env)
 
         let args: [napi_value?] = try [p0.napiValue(env), p1.napiValue(env), p2.napiValue(env), p3.napiValue(env), p4.napiValue(env), p5.napiValue(env), p6.napiValue(env), p7.napiValue(env), p8.napiValue(env)]
 
         var result: napi_value?
         try args.withUnsafeBufferPointer { argsBytes in
-            try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, &result)
+            try napi_call_function(env.env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, &result)
         }.throwIfError()
 
         return try Result(env, from: result!)
     }
 
-    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
+    private static func createFunction(_ env: Environment, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
         var result: napi_value?
         let nameData = name.data(using: .utf8)!
 
@@ -157,7 +158,7 @@ public class TypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>: ValueCo
 
         do {
             try nameData.withUnsafeBytes {
-                napi_create_function(env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, typedFuncNAPICallback, unmanagedData.toOpaque(), &result)
+                napi_create_function(env.env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, typedFuncNAPICallback, unmanagedData.toOpaque(), &result)
             }.throwIfError()
         } catch {
             unmanagedData.release()
@@ -182,7 +183,7 @@ public class TypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: ValueConver
 
     fileprivate let value: InternalTypedFunction
 
-    public required init(_: napi_env, from: napi_value) throws {
+    public required init(_: Environment, from: napi_value) throws {
         value = .javascript(from)
     }
 
@@ -221,7 +222,7 @@ public class TypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: ValueConver
         }
     }
 
-    public func napiValue(_ env: napi_env) throws -> napi_value {
+    public func napiValue(_ env: Environment) throws -> napi_value {
         switch value {
         case let .swift(name, callback):
             return try Self.createFunction(env, named: name) { env, this, args in
@@ -232,30 +233,30 @@ public class TypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: ValueConver
         }
     }
 
-    public func call(_ env: napi_env, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7) throws where Result == Undefined {
+    public func call(_ env: Environment, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7) throws where Result == Undefined {
         let handle = try napiValue(env)
 
         let args: [napi_value?] = try [p0.napiValue(env), p1.napiValue(env), p2.napiValue(env), p3.napiValue(env), p4.napiValue(env), p5.napiValue(env), p6.napiValue(env), p7.napiValue(env)]
 
         try args.withUnsafeBufferPointer { argsBytes in
-            try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, nil)
+            try napi_call_function(env.env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, nil)
         }.throwIfError()
     }
 
-    public func call(_ env: napi_env, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7) throws -> Result {
+    public func call(_ env: Environment, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7) throws -> Result {
         let handle = try napiValue(env)
 
         let args: [napi_value?] = try [p0.napiValue(env), p1.napiValue(env), p2.napiValue(env), p3.napiValue(env), p4.napiValue(env), p5.napiValue(env), p6.napiValue(env), p7.napiValue(env)]
 
         var result: napi_value?
         try args.withUnsafeBufferPointer { argsBytes in
-            try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, &result)
+            try napi_call_function(env.env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, &result)
         }.throwIfError()
 
         return try Result(env, from: result!)
     }
 
-    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
+    private static func createFunction(_ env: Environment, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
         var result: napi_value?
         let nameData = name.data(using: .utf8)!
 
@@ -264,7 +265,7 @@ public class TypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: ValueConver
 
         do {
             try nameData.withUnsafeBytes {
-                napi_create_function(env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, typedFuncNAPICallback, unmanagedData.toOpaque(), &result)
+                napi_create_function(env.env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, typedFuncNAPICallback, unmanagedData.toOpaque(), &result)
             }.throwIfError()
         } catch {
             unmanagedData.release()
@@ -289,7 +290,7 @@ public class TypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: ValueConvertibl
 
     fileprivate let value: InternalTypedFunction
 
-    public required init(_: napi_env, from: napi_value) throws {
+    public required init(_: Environment, from: napi_value) throws {
         value = .javascript(from)
     }
 
@@ -328,7 +329,7 @@ public class TypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: ValueConvertibl
         }
     }
 
-    public func napiValue(_ env: napi_env) throws -> napi_value {
+    public func napiValue(_ env: Environment) throws -> napi_value {
         switch value {
         case let .swift(name, callback):
             return try Self.createFunction(env, named: name) { env, this, args in
@@ -339,30 +340,30 @@ public class TypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: ValueConvertibl
         }
     }
 
-    public func call(_ env: napi_env, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6) throws where Result == Undefined {
+    public func call(_ env: Environment, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6) throws where Result == Undefined {
         let handle = try napiValue(env)
 
         let args: [napi_value?] = try [p0.napiValue(env), p1.napiValue(env), p2.napiValue(env), p3.napiValue(env), p4.napiValue(env), p5.napiValue(env), p6.napiValue(env)]
 
         try args.withUnsafeBufferPointer { argsBytes in
-            try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, nil)
+            try napi_call_function(env.env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, nil)
         }.throwIfError()
     }
 
-    public func call(_ env: napi_env, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6) throws -> Result {
+    public func call(_ env: Environment, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6) throws -> Result {
         let handle = try napiValue(env)
 
         let args: [napi_value?] = try [p0.napiValue(env), p1.napiValue(env), p2.napiValue(env), p3.napiValue(env), p4.napiValue(env), p5.napiValue(env), p6.napiValue(env)]
 
         var result: napi_value?
         try args.withUnsafeBufferPointer { argsBytes in
-            try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, &result)
+            try napi_call_function(env.env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, &result)
         }.throwIfError()
 
         return try Result(env, from: result!)
     }
 
-    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
+    private static func createFunction(_ env: Environment, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
         var result: napi_value?
         let nameData = name.data(using: .utf8)!
 
@@ -371,7 +372,7 @@ public class TypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: ValueConvertibl
 
         do {
             try nameData.withUnsafeBytes {
-                napi_create_function(env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, typedFuncNAPICallback, unmanagedData.toOpaque(), &result)
+                napi_create_function(env.env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, typedFuncNAPICallback, unmanagedData.toOpaque(), &result)
             }.throwIfError()
         } catch {
             unmanagedData.release()
@@ -396,7 +397,7 @@ public class TypedFunction6<Result, P0, P1, P2, P3, P4, P5>: ValueConvertible wh
 
     fileprivate let value: InternalTypedFunction
 
-    public required init(_: napi_env, from: napi_value) throws {
+    public required init(_: Environment, from: napi_value) throws {
         value = .javascript(from)
     }
 
@@ -435,7 +436,7 @@ public class TypedFunction6<Result, P0, P1, P2, P3, P4, P5>: ValueConvertible wh
         }
     }
 
-    public func napiValue(_ env: napi_env) throws -> napi_value {
+    public func napiValue(_ env: Environment) throws -> napi_value {
         switch value {
         case let .swift(name, callback):
             return try Self.createFunction(env, named: name) { env, this, args in
@@ -446,30 +447,30 @@ public class TypedFunction6<Result, P0, P1, P2, P3, P4, P5>: ValueConvertible wh
         }
     }
 
-    public func call(_ env: napi_env, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5) throws where Result == Undefined {
+    public func call(_ env: Environment, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5) throws where Result == Undefined {
         let handle = try napiValue(env)
 
         let args: [napi_value?] = try [p0.napiValue(env), p1.napiValue(env), p2.napiValue(env), p3.napiValue(env), p4.napiValue(env), p5.napiValue(env)]
 
         try args.withUnsafeBufferPointer { argsBytes in
-            try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, nil)
+            try napi_call_function(env.env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, nil)
         }.throwIfError()
     }
 
-    public func call(_ env: napi_env, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5) throws -> Result {
+    public func call(_ env: Environment, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5) throws -> Result {
         let handle = try napiValue(env)
 
         let args: [napi_value?] = try [p0.napiValue(env), p1.napiValue(env), p2.napiValue(env), p3.napiValue(env), p4.napiValue(env), p5.napiValue(env)]
 
         var result: napi_value?
         try args.withUnsafeBufferPointer { argsBytes in
-            try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, &result)
+            try napi_call_function(env.env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, &result)
         }.throwIfError()
 
         return try Result(env, from: result!)
     }
 
-    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
+    private static func createFunction(_ env: Environment, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
         var result: napi_value?
         let nameData = name.data(using: .utf8)!
 
@@ -478,7 +479,7 @@ public class TypedFunction6<Result, P0, P1, P2, P3, P4, P5>: ValueConvertible wh
 
         do {
             try nameData.withUnsafeBytes {
-                napi_create_function(env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, typedFuncNAPICallback, unmanagedData.toOpaque(), &result)
+                napi_create_function(env.env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, typedFuncNAPICallback, unmanagedData.toOpaque(), &result)
             }.throwIfError()
         } catch {
             unmanagedData.release()
@@ -503,7 +504,7 @@ public class TypedFunction5<Result, P0, P1, P2, P3, P4>: ValueConvertible where 
 
     fileprivate let value: InternalTypedFunction
 
-    public required init(_: napi_env, from: napi_value) throws {
+    public required init(_: Environment, from: napi_value) throws {
         value = .javascript(from)
     }
 
@@ -542,7 +543,7 @@ public class TypedFunction5<Result, P0, P1, P2, P3, P4>: ValueConvertible where 
         }
     }
 
-    public func napiValue(_ env: napi_env) throws -> napi_value {
+    public func napiValue(_ env: Environment) throws -> napi_value {
         switch value {
         case let .swift(name, callback):
             return try Self.createFunction(env, named: name) { env, this, args in
@@ -553,30 +554,30 @@ public class TypedFunction5<Result, P0, P1, P2, P3, P4>: ValueConvertible where 
         }
     }
 
-    public func call(_ env: napi_env, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4) throws where Result == Undefined {
+    public func call(_ env: Environment, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4) throws where Result == Undefined {
         let handle = try napiValue(env)
 
         let args: [napi_value?] = try [p0.napiValue(env), p1.napiValue(env), p2.napiValue(env), p3.napiValue(env), p4.napiValue(env)]
 
         try args.withUnsafeBufferPointer { argsBytes in
-            try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, nil)
+            try napi_call_function(env.env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, nil)
         }.throwIfError()
     }
 
-    public func call(_ env: napi_env, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4) throws -> Result {
+    public func call(_ env: Environment, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4) throws -> Result {
         let handle = try napiValue(env)
 
         let args: [napi_value?] = try [p0.napiValue(env), p1.napiValue(env), p2.napiValue(env), p3.napiValue(env), p4.napiValue(env)]
 
         var result: napi_value?
         try args.withUnsafeBufferPointer { argsBytes in
-            try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, &result)
+            try napi_call_function(env.env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, &result)
         }.throwIfError()
 
         return try Result(env, from: result!)
     }
 
-    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
+    private static func createFunction(_ env: Environment, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
         var result: napi_value?
         let nameData = name.data(using: .utf8)!
 
@@ -585,7 +586,7 @@ public class TypedFunction5<Result, P0, P1, P2, P3, P4>: ValueConvertible where 
 
         do {
             try nameData.withUnsafeBytes {
-                napi_create_function(env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, typedFuncNAPICallback, unmanagedData.toOpaque(), &result)
+                napi_create_function(env.env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, typedFuncNAPICallback, unmanagedData.toOpaque(), &result)
             }.throwIfError()
         } catch {
             unmanagedData.release()
@@ -610,7 +611,7 @@ public class TypedFunction4<Result, P0, P1, P2, P3>: ValueConvertible where Resu
 
     fileprivate let value: InternalTypedFunction
 
-    public required init(_: napi_env, from: napi_value) throws {
+    public required init(_: Environment, from: napi_value) throws {
         value = .javascript(from)
     }
 
@@ -649,7 +650,7 @@ public class TypedFunction4<Result, P0, P1, P2, P3>: ValueConvertible where Resu
         }
     }
 
-    public func napiValue(_ env: napi_env) throws -> napi_value {
+    public func napiValue(_ env: Environment) throws -> napi_value {
         switch value {
         case let .swift(name, callback):
             return try Self.createFunction(env, named: name) { env, this, args in
@@ -660,30 +661,30 @@ public class TypedFunction4<Result, P0, P1, P2, P3>: ValueConvertible where Resu
         }
     }
 
-    public func call(_ env: napi_env, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3) throws where Result == Undefined {
+    public func call(_ env: Environment, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3) throws where Result == Undefined {
         let handle = try napiValue(env)
 
         let args: [napi_value?] = try [p0.napiValue(env), p1.napiValue(env), p2.napiValue(env), p3.napiValue(env)]
 
         try args.withUnsafeBufferPointer { argsBytes in
-            try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, nil)
+            try napi_call_function(env.env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, nil)
         }.throwIfError()
     }
 
-    public func call(_ env: napi_env, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3) throws -> Result {
+    public func call(_ env: Environment, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3) throws -> Result {
         let handle = try napiValue(env)
 
         let args: [napi_value?] = try [p0.napiValue(env), p1.napiValue(env), p2.napiValue(env), p3.napiValue(env)]
 
         var result: napi_value?
         try args.withUnsafeBufferPointer { argsBytes in
-            try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, &result)
+            try napi_call_function(env.env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, &result)
         }.throwIfError()
 
         return try Result(env, from: result!)
     }
 
-    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
+    private static func createFunction(_ env: Environment, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
         var result: napi_value?
         let nameData = name.data(using: .utf8)!
 
@@ -692,7 +693,7 @@ public class TypedFunction4<Result, P0, P1, P2, P3>: ValueConvertible where Resu
 
         do {
             try nameData.withUnsafeBytes {
-                napi_create_function(env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, typedFuncNAPICallback, unmanagedData.toOpaque(), &result)
+                napi_create_function(env.env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, typedFuncNAPICallback, unmanagedData.toOpaque(), &result)
             }.throwIfError()
         } catch {
             unmanagedData.release()
@@ -717,7 +718,7 @@ public class TypedFunction3<Result, P0, P1, P2>: ValueConvertible where Result: 
 
     fileprivate let value: InternalTypedFunction
 
-    public required init(_: napi_env, from: napi_value) throws {
+    public required init(_: Environment, from: napi_value) throws {
         value = .javascript(from)
     }
 
@@ -756,7 +757,7 @@ public class TypedFunction3<Result, P0, P1, P2>: ValueConvertible where Result: 
         }
     }
 
-    public func napiValue(_ env: napi_env) throws -> napi_value {
+    public func napiValue(_ env: Environment) throws -> napi_value {
         switch value {
         case let .swift(name, callback):
             return try Self.createFunction(env, named: name) { env, this, args in
@@ -767,30 +768,30 @@ public class TypedFunction3<Result, P0, P1, P2>: ValueConvertible where Result: 
         }
     }
 
-    public func call(_ env: napi_env, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2) throws where Result == Undefined {
+    public func call(_ env: Environment, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2) throws where Result == Undefined {
         let handle = try napiValue(env)
 
         let args: [napi_value?] = try [p0.napiValue(env), p1.napiValue(env), p2.napiValue(env)]
 
         try args.withUnsafeBufferPointer { argsBytes in
-            try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, nil)
+            try napi_call_function(env.env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, nil)
         }.throwIfError()
     }
 
-    public func call(_ env: napi_env, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2) throws -> Result {
+    public func call(_ env: Environment, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2) throws -> Result {
         let handle = try napiValue(env)
 
         let args: [napi_value?] = try [p0.napiValue(env), p1.napiValue(env), p2.napiValue(env)]
 
         var result: napi_value?
         try args.withUnsafeBufferPointer { argsBytes in
-            try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, &result)
+            try napi_call_function(env.env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, &result)
         }.throwIfError()
 
         return try Result(env, from: result!)
     }
 
-    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
+    private static func createFunction(_ env: Environment, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
         var result: napi_value?
         let nameData = name.data(using: .utf8)!
 
@@ -799,7 +800,7 @@ public class TypedFunction3<Result, P0, P1, P2>: ValueConvertible where Result: 
 
         do {
             try nameData.withUnsafeBytes {
-                napi_create_function(env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, typedFuncNAPICallback, unmanagedData.toOpaque(), &result)
+                napi_create_function(env.env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, typedFuncNAPICallback, unmanagedData.toOpaque(), &result)
             }.throwIfError()
         } catch {
             unmanagedData.release()
@@ -824,7 +825,7 @@ public class TypedFunction2<Result, P0, P1>: ValueConvertible where Result: Valu
 
     fileprivate let value: InternalTypedFunction
 
-    public required init(_: napi_env, from: napi_value) throws {
+    public required init(_: Environment, from: napi_value) throws {
         value = .javascript(from)
     }
 
@@ -863,7 +864,7 @@ public class TypedFunction2<Result, P0, P1>: ValueConvertible where Result: Valu
         }
     }
 
-    public func napiValue(_ env: napi_env) throws -> napi_value {
+    public func napiValue(_ env: Environment) throws -> napi_value {
         switch value {
         case let .swift(name, callback):
             return try Self.createFunction(env, named: name) { env, this, args in
@@ -874,30 +875,30 @@ public class TypedFunction2<Result, P0, P1>: ValueConvertible where Result: Valu
         }
     }
 
-    public func call(_ env: napi_env, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1) throws where Result == Undefined {
+    public func call(_ env: Environment, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1) throws where Result == Undefined {
         let handle = try napiValue(env)
 
         let args: [napi_value?] = try [p0.napiValue(env), p1.napiValue(env)]
 
         try args.withUnsafeBufferPointer { argsBytes in
-            try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, nil)
+            try napi_call_function(env.env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, nil)
         }.throwIfError()
     }
 
-    public func call(_ env: napi_env, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1) throws -> Result {
+    public func call(_ env: Environment, this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1) throws -> Result {
         let handle = try napiValue(env)
 
         let args: [napi_value?] = try [p0.napiValue(env), p1.napiValue(env)]
 
         var result: napi_value?
         try args.withUnsafeBufferPointer { argsBytes in
-            try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, &result)
+            try napi_call_function(env.env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, &result)
         }.throwIfError()
 
         return try Result(env, from: result!)
     }
 
-    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
+    private static func createFunction(_ env: Environment, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
         var result: napi_value?
         let nameData = name.data(using: .utf8)!
 
@@ -906,7 +907,7 @@ public class TypedFunction2<Result, P0, P1>: ValueConvertible where Result: Valu
 
         do {
             try nameData.withUnsafeBytes {
-                napi_create_function(env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, typedFuncNAPICallback, unmanagedData.toOpaque(), &result)
+                napi_create_function(env.env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, typedFuncNAPICallback, unmanagedData.toOpaque(), &result)
             }.throwIfError()
         } catch {
             unmanagedData.release()
@@ -931,7 +932,7 @@ public class TypedFunction1<Result, P0>: ValueConvertible where Result: ValueCon
 
     fileprivate let value: InternalTypedFunction
 
-    public required init(_: napi_env, from: napi_value) throws {
+    public required init(_: Environment, from: napi_value) throws {
         value = .javascript(from)
     }
 
@@ -970,7 +971,7 @@ public class TypedFunction1<Result, P0>: ValueConvertible where Result: ValueCon
         }
     }
 
-    public func napiValue(_ env: napi_env) throws -> napi_value {
+    public func napiValue(_ env: Environment) throws -> napi_value {
         switch value {
         case let .swift(name, callback):
             return try Self.createFunction(env, named: name) { env, this, args in
@@ -981,30 +982,30 @@ public class TypedFunction1<Result, P0>: ValueConvertible where Result: ValueCon
         }
     }
 
-    public func call(_ env: napi_env, this: ValueConvertible = Undefined.default, _ p0: P0) throws where Result == Undefined {
+    public func call(_ env: Environment, this: ValueConvertible = Undefined.default, _ p0: P0) throws where Result == Undefined {
         let handle = try napiValue(env)
 
         let args: [napi_value?] = try [p0.napiValue(env)]
 
         try args.withUnsafeBufferPointer { argsBytes in
-            try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, nil)
+            try napi_call_function(env.env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, nil)
         }.throwIfError()
     }
 
-    public func call(_ env: napi_env, this: ValueConvertible = Undefined.default, _ p0: P0) throws -> Result {
+    public func call(_ env: Environment, this: ValueConvertible = Undefined.default, _ p0: P0) throws -> Result {
         let handle = try napiValue(env)
 
         let args: [napi_value?] = try [p0.napiValue(env)]
 
         var result: napi_value?
         try args.withUnsafeBufferPointer { argsBytes in
-            try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, &result)
+            try napi_call_function(env.env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, &result)
         }.throwIfError()
 
         return try Result(env, from: result!)
     }
 
-    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
+    private static func createFunction(_ env: Environment, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
         var result: napi_value?
         let nameData = name.data(using: .utf8)!
 
@@ -1013,7 +1014,7 @@ public class TypedFunction1<Result, P0>: ValueConvertible where Result: ValueCon
 
         do {
             try nameData.withUnsafeBytes {
-                napi_create_function(env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, typedFuncNAPICallback, unmanagedData.toOpaque(), &result)
+                napi_create_function(env.env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, typedFuncNAPICallback, unmanagedData.toOpaque(), &result)
             }.throwIfError()
         } catch {
             unmanagedData.release()
@@ -1038,7 +1039,7 @@ public class TypedFunction0<Result>: ValueConvertible where Result: ValueConvert
 
     fileprivate let value: InternalTypedFunction
 
-    public required init(_: napi_env, from: napi_value) throws {
+    public required init(_: Environment, from: napi_value) throws {
         value = .javascript(from)
     }
 
@@ -1077,7 +1078,7 @@ public class TypedFunction0<Result>: ValueConvertible where Result: ValueConvert
         }
     }
 
-    public func napiValue(_ env: napi_env) throws -> napi_value {
+    public func napiValue(_ env: Environment) throws -> napi_value {
         switch value {
         case let .swift(name, callback):
             return try Self.createFunction(env, named: name) { env, this, args in
@@ -1088,30 +1089,30 @@ public class TypedFunction0<Result>: ValueConvertible where Result: ValueConvert
         }
     }
 
-    public func call(_ env: napi_env, this: ValueConvertible = Undefined.default) throws where Result == Undefined {
+    public func call(_ env: Environment, this: ValueConvertible = Undefined.default) throws where Result == Undefined {
         let handle = try napiValue(env)
 
         let args: [napi_value?] = []
 
         try args.withUnsafeBufferPointer { argsBytes in
-            try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, nil)
+            try napi_call_function(env.env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, nil)
         }.throwIfError()
     }
 
-    public func call(_ env: napi_env, this: ValueConvertible = Undefined.default) throws -> Result {
+    public func call(_ env: Environment, this: ValueConvertible = Undefined.default) throws -> Result {
         let handle = try napiValue(env)
 
         let args: [napi_value?] = []
 
         var result: napi_value?
         try args.withUnsafeBufferPointer { argsBytes in
-            try napi_call_function(env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, &result)
+            try napi_call_function(env.env, this.napiValue(env), handle, args.count, argsBytes.baseAddress, &result)
         }.throwIfError()
 
         return try Result(env, from: result!)
     }
 
-    private static func createFunction(_ env: napi_env, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
+    private static func createFunction(_ env: Environment, named name: String, _ callback: @escaping TypedFunctionCallback) throws -> napi_value {
         var result: napi_value?
         let nameData = name.data(using: .utf8)!
 
@@ -1120,7 +1121,7 @@ public class TypedFunction0<Result>: ValueConvertible where Result: ValueConvert
 
         do {
             try nameData.withUnsafeBytes {
-                napi_create_function(env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, typedFuncNAPICallback, unmanagedData.toOpaque(), &result)
+                napi_create_function(env.env, $0.baseAddress?.assumingMemoryBound(to: UInt8.self), $0.count, typedFuncNAPICallback, unmanagedData.toOpaque(), &result)
             }.throwIfError()
         } catch {
             unmanagedData.release()

@@ -5,17 +5,17 @@ public struct Undefined: ValueConvertible {
 
     private init() {}
 
-    public init(_ env: napi_env, from: napi_value) throws {
+    public init(_ env: Environment, from: napi_value) throws {
         guard try strictlyEquals(env, lhs: from, rhs: Undefined.default) else {
-            napi_throw_type_error(env, nil, "Expected undefined")
+            napi_throw_type_error(env.env, nil, "Expected undefined")
             throw Napoli.Error.pendingException
         }
     }
 
-    public func napiValue(_ env: napi_env) throws -> napi_value {
+    public func napiValue(_ env: Environment) throws -> napi_value {
         var result: napi_value?
 
-        try napi_get_undefined(env, &result).throwIfError()
+        try napi_get_undefined(env.env, &result).throwIfError()
 
         return result!
     }

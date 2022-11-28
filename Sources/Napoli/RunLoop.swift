@@ -1,12 +1,12 @@
 import Foundation
 import NAPIC
 
-private func setTimeout(_ env: napi_env, _ fn: Function, _ ms: Double) throws {
+private func setTimeout(_ env: Environment, _ fn: Function, _ ms: Double) throws {
     var global: napi_value!
-    try napi_get_global(env, &global).throwIfError()
+    try napi_get_global(env.env, &global).throwIfError()
 
     var setTimeout: napi_value!
-    try napi_get_named_property(env, global, "setTimeout", &setTimeout).throwIfError()
+    try napi_get_named_property(env.env, global, "setTimeout", &setTimeout).throwIfError()
 
     try Function(env, from: setTimeout).call(env, fn, ms)
 }
@@ -15,7 +15,7 @@ public enum RunLoop {
     private static var refCount = 0
     private static var scheduled = false
 
-    private static func tick(_ env: napi_env) throws {
+    private static func tick(_ env: Environment) throws {
         guard RunLoop.refCount > 0 else {
             RunLoop.scheduled = false
             return
@@ -26,7 +26,7 @@ public enum RunLoop {
         try setTimeout(env, Function(named: "tick", RunLoop.tick), 0)
     }
 
-    public static func ref(_ env: napi_env) throws {
+    public static func ref(_ env: Environment) throws {
         RunLoop.refCount += 1
 
         if RunLoop.scheduled == false {

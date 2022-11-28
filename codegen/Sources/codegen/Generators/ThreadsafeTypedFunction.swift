@@ -9,7 +9,7 @@ enum ThreadsafeTypedFunction {
         source.add("""
         class ThreadsafeFunctionCallbackData {
             typealias Continuation = CheckedContinuation<ValueConvertible, Swift.Error>
-            typealias ResultConstructor = (napi_env, napi_value) throws -> ValueConvertible
+            typealias ResultConstructor = (Environment, napi_value) throws -> ValueConvertible
             let this: ValueConvertible
             let args: [ValueConvertible]
             let continuation: Continuation
@@ -38,18 +38,19 @@ enum ThreadsafeTypedFunction {
             var result: napi_value?
 
             if let env {
+                let env = Environment(env)
                 do {
                     let this = try callbackData.this.napiValue(env)
                     let args: [napi_value?] = try callbackData.args.map { try $0.napiValue(env) }
                     try args.withUnsafeBufferPointer { argsBytes in
-                        napi_call_function(env, this, js_callback, args.count, argsBytes.baseAddress, &result)
+                        napi_call_function(env.env, this, js_callback, args.count, argsBytes.baseAddress, &result)
                     }.throwIfError()
 
                     try callbackData.continuation.resume(returning: callbackData.resultConstructor(env, result!))
                 } catch {
                     if try! exceptionIsPending(env) {
                         var errorResult: napi_value!
-                        try! napi_get_and_clear_last_exception(env, &errorResult).throwIfError()
+                        try! napi_get_and_clear_last_exception(env.env, &errorResult).throwIfError()
                         callbackData.continuation.resume(throwing: JSException(value: errorResult))
                     } else {
                         callbackData.continuation.resume(throwing: error)
@@ -109,17 +110,17 @@ enum ThreadsafeTypedFunction {
             public typealias InternalFunction = TypedFunction\(paramCount)\(allGenerics.bracketedOrNone)
             fileprivate var tsfn: napi_threadsafe_function!
 
-            public required convenience init(_ env: napi_env, from: napi_value) throws {
+            public required convenience init(_ env: Environment, from: napi_value) throws {
                 let function = try InternalFunction(env, from: from)
                 try self.init(env, function)
             }
 
-            public func napiValue(_ env: napi_env) throws -> napi_value {
+            public func napiValue(_ env: Environment) throws -> napi_value {
                 try Undefined.default.napiValue(env)
             }
 
-            public init(_ env: napi_env, _ function: InternalFunction) throws {
-                try napi_create_threadsafe_function(env,
+            public init(_ env: Environment, _ function: InternalFunction) throws {
+                try napi_create_threadsafe_function(env.env,
                                                     function.napiValue(env),
                                                     nil,
                                                     "ThreadsafeWrapper".napiValue(env),
