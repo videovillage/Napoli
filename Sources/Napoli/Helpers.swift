@@ -26,7 +26,7 @@ public func defineProperties(_ env: Environment, _ object: napi_value, _ propert
     }.throwIfError()
 }
 
-public func initModule(_ env: Environment, _ exports: napi_value, _ properties: [PropertyDescriptor]) -> napi_value {
-    try! defineProperties(env, exports, properties)
+public func initModule(_ env: napi_env, _ exports: napi_value, _ properties: [PropertyDescriptor]) -> napi_value {
+    try! defineProperties(Environment(env), exports, properties)
     return exports
 }

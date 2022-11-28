@@ -136,7 +136,7 @@ func returnThrowingPromise(msg _: String) async throws {
     try throwError()
 }
 
-func takeTypedCallback(env: OpaquePointer, fn: TypedFunction2<String, Int32, Bool>) throws {
+func takeTypedCallback(env: Environment, fn: TypedFunction2<String, Int32, Bool>) throws {
     try assertEqual(expected: "23true", actual: try fn.call(env, 23, true))
 }
 
