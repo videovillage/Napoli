@@ -255,7 +255,7 @@ extension Date: ValueConvertible {
 extension Data: ValueConvertible {
     public init(_ env: napi_env, from: napi_value) throws {
         var data: UnsafeMutableRawPointer!
-        var count: Int = 0
+        var count = 0
         try napi_get_arraybuffer_info(env, from, &data, &count).throwIfError()
 
         self = Data(bytes: data, count: count)
