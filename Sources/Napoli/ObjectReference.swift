@@ -2,7 +2,7 @@ import Foundation
 import NAPIC
 
 @available(*, noasync)
-public class ObjectReference: ValueConvertible {
+open class ObjectReference: ValueConvertible {
     enum Error: LocalizedError {
         case envRequired
 
@@ -73,7 +73,7 @@ private func envCleanupCallback(_ pointer: UnsafeMutableRawPointer?) {
     Unmanaged<ObjectReference>.fromOpaque(pointer).takeUnretainedValue().envCleanup()
 }
 
-public class ThreadsafeObjectReference: ValueConvertible {
+open class ThreadsafeObjectReference: ValueConvertible {
     private typealias KeysGetter = ThreadsafeTypedFunction0<[String]>
     private typealias Setter = ThreadsafeTypedFunction2<Undefined, String, AnyValue>
     private typealias Getter = ThreadsafeTypedFunction1<AnyValue, String>
