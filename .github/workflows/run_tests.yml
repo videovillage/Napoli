@@ -70,6 +70,9 @@ jobs:
           Add-Content $env:GITHUB_PATH "C:\Program Files\swift\runtime-development\usr\bin"
           Add-Content $env:GITHUB_PATH "C:\Program Files\swift\icu-69.1\usr\bin"
           Add-Content $env:GITHUB_ENV "SDKROOT=C:\Library\Developer\Platforms\Windows.platform\Developer\SDKs\Windows.sdk"
+      - name: Enable MS Developer Command Prompt
+        if: ${{ runner.os == 'Windows' }}
+        uses: ilammy/msvc-dev-cmd@v1
       - name: Install Node ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
