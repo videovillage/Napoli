@@ -7,7 +7,7 @@
     "postinstall": "node bin/npm-postinstall.js NapoliTests"
   },
   "devDependencies": {
-    "mocha": "^6.0.0",
+    "mocha": "^10.1.0",
     "node-gyp": "^9.3.0",
     "prettier": "2.7.1"
   }
