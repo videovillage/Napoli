@@ -30,14 +30,14 @@ enum ThreadsafeTypedFunction {
             }
         }
 
-        func typedFuncNAPIThreadsafeFinalize(_: napi_env!, pointer _: UnsafeMutableRawPointer?, hint _: UnsafeMutableRawPointer?) {}
+        func typedFuncNAPIThreadsafeFinalize(_: napi_env!, pointer: UnsafeMutableRawPointer?, hint _: UnsafeMutableRawPointer?) {}
 
         func typedFuncNAPIThreadsafeCallback(_ env: napi_env?, _ js_callback: napi_value?, _: UnsafeMutableRawPointer?, _ data: UnsafeMutableRawPointer!) {
             let callbackData = Unmanaged<ThreadsafeFunctionCallbackData>.fromOpaque(data).takeRetainedValue()
 
             var result: napi_value?
 
-            if let env {
+            if let env, let js_callback {
                 let env = Environment(env)
                 do {
                     let this = try callbackData.this.napiValue(env)

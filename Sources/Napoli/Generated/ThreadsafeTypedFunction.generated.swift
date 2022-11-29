@@ -30,7 +30,7 @@ func typedFuncNAPIThreadsafeCallback(_ env: napi_env?, _ js_callback: napi_value
 
     var result: napi_value?
 
-    if let env {
+    if let env, let js_callback {
         let env = Environment(env)
         do {
             let this = try callbackData.this.napiValue(env)
@@ -58,7 +58,7 @@ private func _call(tsfn: napi_threadsafe_function, this: ValueConvertible, args:
 
     _ = try await withCheckedThrowingContinuation { continuation in
         let unmanagedData = Unmanaged.passRetained(ThreadsafeFunctionCallbackData(this: this, args: args, continuation: continuation))
-        napi_call_threadsafe_function(tsfn, unmanagedData.toOpaque(), napi_tsfn_nonblocking)
+        napi_call_threadsafe_function(tsfn, unmanagedData.toOpaque(), napi_tsfn_blocking)
     }
 }
 
@@ -68,7 +68,7 @@ private func _call<Result: ValueConvertible>(tsfn: napi_threadsafe_function, thi
 
     return try await withCheckedThrowingContinuation { continuation in
         let unmanagedData = Unmanaged.passRetained(ThreadsafeFunctionCallbackData(this: this, args: args, continuation: continuation, resultType: resultType))
-        napi_call_threadsafe_function(tsfn, unmanagedData.toOpaque(), napi_tsfn_nonblocking)
+        napi_call_threadsafe_function(tsfn, unmanagedData.toOpaque(), napi_tsfn_blocking)
     } as! Result
 }
 
