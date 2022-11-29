@@ -46,9 +46,9 @@ jobs:
     needs: swift-format
     strategy:
       matrix:
-        os: [macos-12, ubuntu-latest, windows-latest]
+        os: [macos-latest, ubuntu-latest, windows-latest]
         node-version: ["19.1.0"]
-        swift-version: ["5.7"]
+        swift-version: ["5.7.1"]
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -62,14 +62,15 @@ jobs:
         uses: swift-actions/setup-swift@v1
         with:
           swift-version: ${{ matrix.swift-version }}
-      - name: Install Swift 5.7.1 on Windows
+      - name: Install Swift ${{ matrix.swift-version }} on Windows
         if: ${{ runner.os == 'Windows' }}
         run: |
-          Install-Binary -Url "https://download.swift.org/swift-5.7.1-release/windows10/swift-5.7.1-RELEASE/swift-5.7.1-RELEASE-windows10.exe" -Name "installer.exe" -ArgumentList ("-q")
+          Install-Binary -Url "https://download.swift.org/swift-${{ matrix.swift-version }}-release/windows10/swift-${{ matrix.swift-version }}-RELEASE/swift-${{ matrix.swift-version }}-RELEASE-windows10.exe" -Name "installer.exe" -ArgumentList ("-q")
           Add-Content $env:GITHUB_PATH "C:\Library\Developer\Toolchains\unknown-Asserts-development.xctoolchain\usr\bin"
           Add-Content $env:GITHUB_PATH "C:\Program Files\swift\runtime-development\usr\bin"
           Add-Content $env:GITHUB_PATH "C:\Program Files\swift\icu-69.1\usr\bin"
           Add-Content $env:GITHUB_ENV "SDKROOT=C:\Library\Developer\Platforms\Windows.platform\Developer\SDKs\Windows.sdk"
+          Add-Content $env:GITHUB_ENV "DEVELOPER_DIR=C:\Library\Developer"
       - name: Enable MS Developer Command Prompt
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
