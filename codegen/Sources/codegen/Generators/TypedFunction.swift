@@ -19,6 +19,10 @@ enum TypedFunction {
             }
         }
 
+        func typedFuncNAPIFinalize(_ env: napi_env?, _ data: UnsafeMutableRawPointer!, _ hint: UnsafeMutableRawPointer?) {
+            Unmanaged<TypedFunctionCallbackData>.fromOpaque(data).release()
+        }
+
         func typedFuncNAPICallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) -> napi_value? {
             let env = Environment(env)
             enum Error: ErrorConvertible {
@@ -252,6 +256,8 @@ enum TypedFunction {
                     unmanagedData.release()
                     throw error
                 }
+
+                try napi_add_finalizer(env.env, result!, unmanagedData.toOpaque(), typedFuncNAPIFinalize, nil, nil).throwIfError()
 
                 return result!
             }

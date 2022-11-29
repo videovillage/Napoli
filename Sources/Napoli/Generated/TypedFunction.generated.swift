@@ -12,6 +12,10 @@ class TypedFunctionCallbackData {
     }
 }
 
+func typedFuncNAPIFinalize(_: napi_env?, _ data: UnsafeMutableRawPointer!, _: UnsafeMutableRawPointer?) {
+    Unmanaged<TypedFunctionCallbackData>.fromOpaque(data).release()
+}
+
 func typedFuncNAPICallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) -> napi_value? {
     let env = Environment(env)
     enum Error: ErrorConvertible {
@@ -201,6 +205,8 @@ public class TypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>: ValueCo
             throw error
         }
 
+        try napi_add_finalizer(env.env, result!, unmanagedData.toOpaque(), typedFuncNAPIFinalize, nil, nil).throwIfError()
+
         return result!
     }
 }
@@ -343,6 +349,8 @@ public class TypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: ValueConver
             unmanagedData.release()
             throw error
         }
+
+        try napi_add_finalizer(env.env, result!, unmanagedData.toOpaque(), typedFuncNAPIFinalize, nil, nil).throwIfError()
 
         return result!
     }
@@ -487,6 +495,8 @@ public class TypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: ValueConvertibl
             throw error
         }
 
+        try napi_add_finalizer(env.env, result!, unmanagedData.toOpaque(), typedFuncNAPIFinalize, nil, nil).throwIfError()
+
         return result!
     }
 }
@@ -629,6 +639,8 @@ public class TypedFunction6<Result, P0, P1, P2, P3, P4, P5>: ValueConvertible wh
             unmanagedData.release()
             throw error
         }
+
+        try napi_add_finalizer(env.env, result!, unmanagedData.toOpaque(), typedFuncNAPIFinalize, nil, nil).throwIfError()
 
         return result!
     }
@@ -773,6 +785,8 @@ public class TypedFunction5<Result, P0, P1, P2, P3, P4>: ValueConvertible where 
             throw error
         }
 
+        try napi_add_finalizer(env.env, result!, unmanagedData.toOpaque(), typedFuncNAPIFinalize, nil, nil).throwIfError()
+
         return result!
     }
 }
@@ -915,6 +929,8 @@ public class TypedFunction4<Result, P0, P1, P2, P3>: ValueConvertible where Resu
             unmanagedData.release()
             throw error
         }
+
+        try napi_add_finalizer(env.env, result!, unmanagedData.toOpaque(), typedFuncNAPIFinalize, nil, nil).throwIfError()
 
         return result!
     }
@@ -1059,6 +1075,8 @@ public class TypedFunction3<Result, P0, P1, P2>: ValueConvertible where Result: 
             throw error
         }
 
+        try napi_add_finalizer(env.env, result!, unmanagedData.toOpaque(), typedFuncNAPIFinalize, nil, nil).throwIfError()
+
         return result!
     }
 }
@@ -1201,6 +1219,8 @@ public class TypedFunction2<Result, P0, P1>: ValueConvertible where Result: Valu
             unmanagedData.release()
             throw error
         }
+
+        try napi_add_finalizer(env.env, result!, unmanagedData.toOpaque(), typedFuncNAPIFinalize, nil, nil).throwIfError()
 
         return result!
     }
@@ -1345,6 +1365,8 @@ public class TypedFunction1<Result, P0>: ValueConvertible where Result: ValueCon
             throw error
         }
 
+        try napi_add_finalizer(env.env, result!, unmanagedData.toOpaque(), typedFuncNAPIFinalize, nil, nil).throwIfError()
+
         return result!
     }
 }
@@ -1487,6 +1509,8 @@ public class TypedFunction0<Result>: ValueConvertible where Result: ValueConvert
             unmanagedData.release()
             throw error
         }
+
+        try napi_add_finalizer(env.env, result!, unmanagedData.toOpaque(), typedFuncNAPIFinalize, nil, nil).throwIfError()
 
         return result!
     }

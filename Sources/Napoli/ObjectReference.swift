@@ -20,16 +20,16 @@ open class Reference: ValueConvertible {
     }
 
     @discardableResult
-    public func unref(_ env: Environment, ref: napi_ref) throws -> UInt32 {
+    public func unref(_ env: Environment) throws -> UInt32 {
         var result: UInt32 = 0
-        try napi_reference_unref(env.env, ref, &result).throwIfError()
+        try napi_reference_unref(env.env, internalRef, &result).throwIfError()
         return result
     }
 
     @discardableResult
-    func ref(_ env: Environment, ref: napi_ref) throws -> UInt32 {
+    func ref(_ env: Environment) throws -> UInt32 {
         var result: UInt32 = 0
-        try napi_reference_ref(env.env, ref, &result).throwIfError()
+        try napi_reference_ref(env.env, internalRef, &result).throwIfError()
         return result
     }
 
@@ -56,7 +56,7 @@ open class ObjectReference: Reference {
     }
 
     public func keys() async throws -> [String] {
-        try await envAccessor.withEnvironment { [unowned self] env in
+        try await envAccessor.withEnvironment { env in
             try self.keys(env)
         }
     }
@@ -66,7 +66,7 @@ open class ObjectReference: Reference {
     }
 
     public func set(_ key: String, value: some ValueConvertible) async throws {
-        try await envAccessor.withEnvironment { [unowned self] env in
+        try await envAccessor.withEnvironment { env in
             try self.set(env, key, value: value)
         }
     }
@@ -78,7 +78,7 @@ open class ObjectReference: Reference {
     }
 
     public func get<V: ValueConvertible>(_ key: String) async throws -> V {
-        try await envAccessor.withEnvironment { [unowned self] env in
+        try await envAccessor.withEnvironment { env in
             try self.get(env, key)
         }
     }
@@ -88,7 +88,7 @@ open class ObjectReference: Reference {
     }
 
     public func immutable() async throws -> [String: AnyValue] {
-        try await envAccessor.withEnvironment { [unowned self] env in
+        try await envAccessor.withEnvironment { env in
             try self.immutable(env)
         }
     }

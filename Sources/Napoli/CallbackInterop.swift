@@ -100,7 +100,11 @@ func swiftNAPISetterCallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) ->
     }
 }
 
-func swiftNAPIThreadsafeFinalize(_: napi_env!, pointer _: UnsafeMutableRawPointer?, hint _: UnsafeMutableRawPointer?) {}
+func swiftNAPIFunctionFinalize(_ env: napi_env!, _ data: UnsafeMutableRawPointer!, _ hint: UnsafeMutableRawPointer?) {
+    Unmanaged<CallbackData>.fromOpaque(data).release()
+}
+
+func swiftNAPIThreadsafeFinalize(_: napi_env!, _ pointer: UnsafeMutableRawPointer?, _ hint: UnsafeMutableRawPointer?) {}
 
 func swiftNAPIThreadsafeCallback(_ env: napi_env?, _ js_callback: napi_value?, _: UnsafeMutableRawPointer?, _ data: UnsafeMutableRawPointer!) {
     let callbackData = Unmanaged<ThreadsafeFunction.CallbackData>.fromOpaque(data).takeRetainedValue()

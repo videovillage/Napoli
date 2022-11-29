@@ -16,6 +16,8 @@ func createFunction(_ env: Environment, named name: String, _ function: @escapin
         throw error
     }
 
+    try napi_add_finalizer(env.env, result!, unmanagedData.toOpaque(), swiftNAPIFunctionFinalize, nil, nil).throwIfError()
+
     return result!
 }
 

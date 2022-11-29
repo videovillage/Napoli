@@ -26,7 +26,7 @@ public func defineProperties(_ env: Environment, _ object: napi_value, _ propert
     }.throwIfError()
 }
 
-public class EnvironmentAccessor {
+public actor EnvironmentAccessor {
     private let function: ThreadsafeTypedFunction1<Undefined, TypedFunction0<Undefined>>
 
     public init(_ env: Environment) throws {
