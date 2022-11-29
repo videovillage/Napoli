@@ -1,14 +1,14 @@
 import Foundation
 import NAPIC
 
-private func setTimeout(_ env: Environment, _ fn: Function, _ ms: Double) throws {
+private func setTimeout(_ env: Environment, _ fn: TypedFunction0<Undefined>, _ ms: Double) throws {
     var global: napi_value!
     try napi_get_global(env.env, &global).throwIfError()
 
     var setTimeout: napi_value!
     try napi_get_named_property(env.env, global, "setTimeout", &setTimeout).throwIfError()
 
-    try Function(env, from: setTimeout).call(env, fn, ms)
+    try TypedFunction2<Undefined, TypedFunction0<Undefined>, Double>(env, from: setTimeout).call(env, fn, ms)
 }
 
 public enum RunLoop {
@@ -23,7 +23,7 @@ public enum RunLoop {
 
         _ = Foundation.RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 0.02))
 
-        try setTimeout(env, Function(named: "tick", RunLoop.tick), 0)
+        try setTimeout(env, .init(named: "tick", RunLoop.tick), 0)
     }
 
     public static func ref(_ env: Environment) throws {
@@ -31,7 +31,7 @@ public enum RunLoop {
 
         if RunLoop.scheduled == false {
             RunLoop.scheduled = true
-            try setTimeout(env, Function(named: "tick", RunLoop.tick), 0)
+            try setTimeout(env, .init(named: "tick", RunLoop.tick), 0)
         }
     }
 

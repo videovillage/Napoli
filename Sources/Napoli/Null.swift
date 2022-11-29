@@ -19,6 +19,8 @@ public struct Null: ValueConvertible {
 
         return result!
     }
+
+    public static let defaultValue: Null = .default
 }
 
 extension Null: CustomStringConvertible {

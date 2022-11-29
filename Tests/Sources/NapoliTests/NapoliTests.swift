@@ -140,10 +140,18 @@ func takeTypedCallback(env: Environment, fn: TypedFunction2<String, Int32, Bool>
     try assertEqual(expected: "23true", actual: try fn.call(env, 23, true))
 }
 
-final class TestClass1: ClassConvertible {
+final class TestClass1: ClassDescribable {
     var testString: String = "Cool"
     var testNumber: Double = 1234
-    var testObject = TestObject(testString: "testString", optionalString: "optionalTestString", nested: .init(nestedTestString: "nestedTestString"), optionalNested: nil)
+    var testObject = TestObject {
+        $0.testString = "testString"
+        $0.optionalString = "optionalTestString"
+        $0.optionalString2 = nil
+        $0.nested = .init {
+            $0.nestedTestString = "nestedTestString"
+        }
+        $0.optionalNested = nil
+    }
 
     var readOnlyTestString: String {
         "ReadOnlyTest"
@@ -152,7 +160,15 @@ final class TestClass1: ClassConvertible {
     func reset() {
         testString = "Cool"
         testNumber = 1234
-        testObject = TestObject(testString: "testString", optionalString: "optionalTestString", nested: .init(nestedTestString: "nestedTestString"), optionalNested: nil)
+        testObject = TestObject {
+            $0.testString = "testString"
+            $0.optionalString = "optionalTestString"
+            $0.optionalString2 = nil
+            $0.nested = .init {
+                $0.nestedTestString = "nestedTestString"
+            }
+            $0.optionalNested = nil
+        }
     }
 
     func assertTestString(_ string: String) throws {
@@ -185,13 +201,14 @@ final class TestClass1: ClassConvertible {
 }
 
 struct TestObject: ObjectConvertible {
-    let testString: String
-    let optionalString: String?
-    let nested: Nested
-    let optionalNested: Nested?
+    @ObjectProperty var testString: String
+    @ObjectProperty var optionalString: String?
+    @ObjectProperty var optionalString2: String?
+    @ObjectProperty var nested: Nested
+    @ObjectProperty var optionalNested: Nested?
 
     struct Nested: ObjectConvertible {
-        let nestedTestString: String
+        @ObjectProperty var nestedTestString: String
     }
 }
 

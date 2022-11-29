@@ -125,9 +125,15 @@ public enum AnyValue: ValueConvertible, Codable {
         }
     }
 
+    public init(_ any: AnyValue) {
+        self = any
+    }
+
     public func eraseToAny() throws -> AnyValue {
         self
     }
+
+    public static let defaultValue: AnyValue = .null
 }
 
 private enum ObjectType: String {

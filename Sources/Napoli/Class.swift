@@ -46,7 +46,7 @@ public class Class: ValueConvertible {
     }
 }
 
-public protocol ClassConvertible: AnyObject {
+public protocol ClassDescribable: AnyObject {
     init()
     static var jsName: String { get }
     static var jsInstanceProperties: [InstanceGetSetPropertyDescriptor<Self>] { get }
@@ -54,7 +54,7 @@ public protocol ClassConvertible: AnyObject {
     static var jsAttributes: napi_property_attributes { get }
 }
 
-public extension ClassConvertible {
+public extension ClassDescribable {
     static var jsAttributes: napi_property_attributes {
         napi_default
     }
@@ -71,7 +71,7 @@ public struct ClassDescriptor: PropertyDescriptor {
 
     private let value: ValueProperty
 
-    public init<C: ClassConvertible>(_: C.Type) {
+    public init<C: ClassDescribable>(_: C.Type) {
         value = .init(C.jsName,
                       attributes: C.jsAttributes,
                       value: Class(named: C.jsName, { env, args in

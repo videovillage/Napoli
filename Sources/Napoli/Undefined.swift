@@ -19,6 +19,8 @@ public struct Undefined: ValueConvertible {
 
         return result!
     }
+
+    public static let defaultValue: Undefined = .default
 }
 
 extension Undefined: CustomStringConvertible {

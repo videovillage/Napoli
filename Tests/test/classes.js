@@ -25,6 +25,7 @@ describe("Classes", () => {
 
     assert.strictEqual(object.testObject.testString, "testString")
     assert.strictEqual(object.testObject.optionalString, "optionalTestString")
+    assert.strictEqual(object.testObject.optionalString2, null)
     assert.strictEqual(
       object.testObject.nested.nestedTestString,
       "nestedTestString"
@@ -37,10 +38,15 @@ describe("Classes", () => {
     changedTestObject.optionalNested = {
       nestedTestString: "replacementOptionalNestedTestString",
     }
+    changedTestObject.optionalString2 = "replacementOptionalString2"
 
     object.testObject = changedTestObject
 
     assert.strictEqual(object.testObject.testString, "replacementTestString")
+    assert.strictEqual(
+      object.testObject.optionalString2,
+      "replacementOptionalString2"
+    )
     assert.strictEqual(
       object.testObject.nested.nestedTestString,
       "replacementNestedTestString"

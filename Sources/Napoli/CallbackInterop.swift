@@ -103,32 +103,3 @@ func swiftNAPISetterCallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) ->
 func swiftNAPIFunctionFinalize(_: napi_env!, _ data: UnsafeMutableRawPointer!, _: UnsafeMutableRawPointer?) {
     Unmanaged<CallbackData>.fromOpaque(data).release()
 }
-
-func swiftNAPIThreadsafeFinalize(_: napi_env!, _: UnsafeMutableRawPointer?, _: UnsafeMutableRawPointer?) {}
-
-func swiftNAPIThreadsafeCallback(_ env: napi_env?, _ js_callback: napi_value?, _: UnsafeMutableRawPointer?, _ data: UnsafeMutableRawPointer!) {
-    let callbackData = Unmanaged<ThreadsafeFunction.CallbackData>.fromOpaque(data).takeRetainedValue()
-
-    var result: napi_value?
-
-    if let env {
-        let env = Environment(env)
-        do {
-            let this = try callbackData.this.napiValue(env)
-            let args: [napi_value?] = try callbackData.args.map { try $0.napiValue(env) }
-            try args.withUnsafeBufferPointer { argsBytes in
-                napi_call_function(env.env, this, js_callback, args.count, argsBytes.baseAddress, &result)
-            }.throwIfError()
-
-            try callbackData.continuation.resume(returning: callbackData.resultConstructor(env, result!))
-        } catch {
-            if try! exceptionIsPending(env) {
-                var errorResult: napi_value!
-                try! napi_get_and_clear_last_exception(env.env, &errorResult).throwIfError()
-                callbackData.continuation.resume(throwing: JSException(value: errorResult))
-            } else {
-                callbackData.continuation.resume(throwing: error)
-            }
-        }
-    }
-}
