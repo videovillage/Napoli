@@ -65,7 +65,7 @@ enum ThreadsafeTypedFunction {
 
             _ = try await withCheckedThrowingContinuation { continuation in
                 let unmanagedData = Unmanaged.passRetained(ThreadsafeFunctionCallbackData(this: this, args: args, continuation: continuation))
-                napi_call_threadsafe_function(tsfn, unmanagedData.toOpaque(), napi_tsfn_nonblocking)
+                napi_call_threadsafe_function(tsfn, unmanagedData.toOpaque(), napi_tsfn_blocking)
             }
         }
 
@@ -75,7 +75,7 @@ enum ThreadsafeTypedFunction {
 
             return try await withCheckedThrowingContinuation { continuation in
                 let unmanagedData = Unmanaged.passRetained(ThreadsafeFunctionCallbackData(this: this, args: args, continuation: continuation, resultType: resultType))
-                napi_call_threadsafe_function(tsfn, unmanagedData.toOpaque(), napi_tsfn_nonblocking)
+                napi_call_threadsafe_function(tsfn, unmanagedData.toOpaque(), napi_tsfn_blocking)
             } as! Result
         }
         """)
