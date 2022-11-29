@@ -1,6 +1,8 @@
 import Foundation
 import NAPIC
 
+public typealias VoidPromise = Promise<Undefined>
+
 public class Promise<Result: ValueConvertible>: ValueConvertible {
     public required init(_: Environment, from _: napi_value) throws {
         fatalError("not implemented")

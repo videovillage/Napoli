@@ -12,7 +12,7 @@ describe("Pass by reference", () => {
     assert.equal(anon.additional, "good")
   })
 
-  it("modifies objects syncronously", async () => {
+  it("modifies objects syncronously", () => {
     let anon = { cool: "bad" }
     addon.modifyObjectByReferenceSync(anon)
 

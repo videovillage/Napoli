@@ -49,7 +49,7 @@ public class InstanceMethodDescriptor<This>: MethodDescriptor where This: AnyObj
         super.init(name, attributes: attributes, argCount: 9) { env, this, args in
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4]); let p5 = try P5(env, from: args[5]); let p6 = try P6(env, from: args[6]); let p7 = try P7(env, from: args[7]); let p8 = try P8(env, from: args[8])
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
-            return Promise<Undefined> {
+            return VoidPromise {
                 try await callback(p0, p1, p2, p3, p4, p5, p6, p7, p8)
                 return Undefined.default
             }
@@ -101,7 +101,7 @@ public class InstanceMethodDescriptor<This>: MethodDescriptor where This: AnyObj
         super.init(name, attributes: attributes, argCount: 8) { env, this, args in
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4]); let p5 = try P5(env, from: args[5]); let p6 = try P6(env, from: args[6]); let p7 = try P7(env, from: args[7])
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
-            return Promise<Undefined> {
+            return VoidPromise {
                 try await callback(p0, p1, p2, p3, p4, p5, p6, p7)
                 return Undefined.default
             }
@@ -153,7 +153,7 @@ public class InstanceMethodDescriptor<This>: MethodDescriptor where This: AnyObj
         super.init(name, attributes: attributes, argCount: 7) { env, this, args in
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4]); let p5 = try P5(env, from: args[5]); let p6 = try P6(env, from: args[6])
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
-            return Promise<Undefined> {
+            return VoidPromise {
                 try await callback(p0, p1, p2, p3, p4, p5, p6)
                 return Undefined.default
             }
@@ -205,7 +205,7 @@ public class InstanceMethodDescriptor<This>: MethodDescriptor where This: AnyObj
         super.init(name, attributes: attributes, argCount: 6) { env, this, args in
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4]); let p5 = try P5(env, from: args[5])
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
-            return Promise<Undefined> {
+            return VoidPromise {
                 try await callback(p0, p1, p2, p3, p4, p5)
                 return Undefined.default
             }
@@ -257,7 +257,7 @@ public class InstanceMethodDescriptor<This>: MethodDescriptor where This: AnyObj
         super.init(name, attributes: attributes, argCount: 5) { env, this, args in
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4])
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
-            return Promise<Undefined> {
+            return VoidPromise {
                 try await callback(p0, p1, p2, p3, p4)
                 return Undefined.default
             }
@@ -309,7 +309,7 @@ public class InstanceMethodDescriptor<This>: MethodDescriptor where This: AnyObj
         super.init(name, attributes: attributes, argCount: 4) { env, this, args in
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3])
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
-            return Promise<Undefined> {
+            return VoidPromise {
                 try await callback(p0, p1, p2, p3)
                 return Undefined.default
             }
@@ -361,7 +361,7 @@ public class InstanceMethodDescriptor<This>: MethodDescriptor where This: AnyObj
         super.init(name, attributes: attributes, argCount: 3) { env, this, args in
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2])
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
-            return Promise<Undefined> {
+            return VoidPromise {
                 try await callback(p0, p1, p2)
                 return Undefined.default
             }
@@ -413,7 +413,7 @@ public class InstanceMethodDescriptor<This>: MethodDescriptor where This: AnyObj
         super.init(name, attributes: attributes, argCount: 2) { env, this, args in
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1])
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
-            return Promise<Undefined> {
+            return VoidPromise {
                 try await callback(p0, p1)
                 return Undefined.default
             }
@@ -465,7 +465,7 @@ public class InstanceMethodDescriptor<This>: MethodDescriptor where This: AnyObj
         super.init(name, attributes: attributes, argCount: 1) { env, this, args in
             let p0 = try P0(env, from: args[0])
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
-            return Promise<Undefined> {
+            return VoidPromise {
                 try await callback(p0)
                 return Undefined.default
             }
@@ -517,7 +517,7 @@ public class InstanceMethodDescriptor<This>: MethodDescriptor where This: AnyObj
         super.init(name, attributes: attributes, argCount: 0) { env, this, _ in
 
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
-            return Promise<Undefined> {
+            return VoidPromise {
                 try await callback()
                 return Undefined.default
             }

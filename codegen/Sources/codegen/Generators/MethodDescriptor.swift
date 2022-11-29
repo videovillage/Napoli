@@ -106,7 +106,7 @@ enum Method {
              convenience init\(inGenerics.bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (\(commaSeparatedInGenerics)) async throws -> Void)\(voidWheres.backspaceIfNotEmpty()) {
                 self.init(name, attributes: attributes, argCount: \(paramCount)) { env, this, args in
                     \(argListAssignedToValues)
-                    return Promise<Undefined> {
+                    return VoidPromise {
                         try await callback(\(argValueList))
                         return Undefined.default
                     }

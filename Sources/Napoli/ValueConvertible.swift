@@ -2,7 +2,10 @@ import Foundation
 import NAPIC
 
 public protocol ValueConvertible {
+    @available(*, noasync)
     init(_ env: Environment, from: napi_value) throws
+
+    @available(*, noasync)
     func napiValue(_ env: Environment) throws -> napi_value
 
     init(_ any: AnyValue) throws
@@ -92,6 +95,8 @@ extension Optional: ValueConvertible where Wrapped: ValueConvertible {
         nil
     }
 }
+
+public typealias ImmutableObject = [String: AnyValue]
 
 extension Dictionary: ValueConvertible where Key == String, Value: ValueConvertible {
     public init(_ env: Environment, from: napi_value) throws {

@@ -110,6 +110,20 @@ func modifyObjectByReferenceSync(env: Environment, object: ObjectReference) thro
     try assertEqual(expected: "good", actual: try object.get(env, "additional"))
 }
 
+func testEnvironment(env: Environment) throws -> String {
+    try env.global().json().stringify(TestObject())
+}
+
+func testEnvironmentAsync(env: Environment) throws -> Promise<String> {
+    let accessor = try EnvironmentAccessor(env)
+
+    return Promise {
+        try await accessor.withEnvironment { env in
+            try env.global().json().stringify(TestObject())
+        }
+    }
+}
+
 func throwError() throws {
     throw TestError(message: "Error message", code: "ETEST")
 }
@@ -143,15 +157,7 @@ func takeTypedCallback(env: Environment, fn: TypedFunction2<String, Int32, Bool>
 final class TestClass1: ClassDescribable {
     var testString: String = "Cool"
     var testNumber: Double = 1234
-    var testObject = TestObject {
-        $0.testString = "testString"
-        $0.optionalString = "optionalTestString"
-        $0.optionalString2 = nil
-        $0.nested = .init {
-            $0.nestedTestString = "nestedTestString"
-        }
-        $0.optionalNested = nil
-    }
+    var testObject = TestObject()
 
     var readOnlyTestString: String {
         "ReadOnlyTest"
@@ -160,15 +166,7 @@ final class TestClass1: ClassDescribable {
     func reset() {
         testString = "Cool"
         testNumber = 1234
-        testObject = TestObject {
-            $0.testString = "testString"
-            $0.optionalString = "optionalTestString"
-            $0.optionalString2 = nil
-            $0.nested = .init {
-                $0.nestedTestString = "nestedTestString"
-            }
-            $0.optionalNested = nil
-        }
+        testObject = TestObject()
     }
 
     func assertTestString(_ string: String) throws {
@@ -201,14 +199,14 @@ final class TestClass1: ClassDescribable {
 }
 
 struct TestObject: ObjectConvertible {
-    @ObjectProperty var testString: String
-    @ObjectProperty var optionalString: String?
-    @ObjectProperty var optionalString2: String?
-    @ObjectProperty var nested: Nested
-    @ObjectProperty var optionalNested: Nested?
+    var testString: String = "testString"
+    var optionalString: String? = "optionalTestString"
+    var optionalString2: String?
+    var nested: Nested = .init(nestedTestString: "nestedTestString")
+    var optionalNested: Nested?
 
     struct Nested: ObjectConvertible {
-        @ObjectProperty var nestedTestString: String
+        var nestedTestString: String
     }
 }
 
@@ -237,6 +235,9 @@ func initNapoliTests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointe
         MethodDescriptor("takeOptionalString", takeOptionalString),
         MethodDescriptor("takeOptionalDouble", takeOptionalDouble),
         MethodDescriptor("takeOptionalBoolean", takeOptionalBoolean),
+
+        MethodDescriptor("testEnvironment", testEnvironment),
+        MethodDescriptor("testEnvironmentAsync", testEnvironmentAsync),
 
         MethodDescriptor("throwError", throwError),
         MethodDescriptor("runThreadsafeCallback", runThreadsafeCallback),

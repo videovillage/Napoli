@@ -2,8 +2,13 @@ import Foundation
 import NAPIC
 
 open class Reference: ValueConvertible {
-    private let internalRef: napi_ref
     public let envAccessor: EnvironmentAccessor
+
+    /// be careful!
+    @available(*, noasync)
+    let storedEnvironment: Environment
+
+    private let internalRef: napi_ref
 
     /// initializes with a default reference count of 1
     public required init(_ env: Environment, from value: napi_value) throws {
@@ -11,6 +16,7 @@ open class Reference: ValueConvertible {
         try napi_create_reference(env.env, value, 1, &result).throwIfError()
         internalRef = result!
         envAccessor = try .init(env)
+        storedEnvironment = env
     }
 
     public func napiValue(_ env: Environment) throws -> napi_value {
@@ -45,7 +51,7 @@ open class Reference: ValueConvertible {
 }
 
 open class ObjectReference: Reference {
-    public convenience init(_ env: Environment, from: [String: AnyValue]) throws {
+    public convenience init(_ env: Environment, from: ImmutableObject) throws {
         try self.init(env, from: from.napiValue(env))
     }
 
@@ -83,11 +89,11 @@ open class ObjectReference: Reference {
         }
     }
 
-    public func immutable(_ env: Environment) throws -> [String: AnyValue] {
+    public func immutable(_ env: Environment) throws -> ImmutableObject {
         try .init(env, from: napiValue(env))
     }
 
-    public func immutable() async throws -> [String: AnyValue] {
+    public func immutable() async throws -> ImmutableObject {
         try await envAccessor.withEnvironment { env in
             try self.immutable(env)
         }

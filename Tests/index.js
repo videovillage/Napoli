@@ -1,5 +1,4 @@
 const assert = require("assert")
-
 module.exports = require("./.build/release/NapoliTests.node")
 
 function dataToUint8Array(data) {

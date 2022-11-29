@@ -93,7 +93,7 @@ enum InstanceMethod {
              super.init(name, attributes: attributes, argCount: \(paramCount)) { env, this, args in
                  \(argListAssignedToValues)
                  let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
-                 return Promise<Undefined> {
+                 return VoidPromise {
                      try await callback(\(argValueList))
                      return Undefined.default
                  }

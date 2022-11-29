@@ -3,7 +3,7 @@ import NAPIC
 
 /// Type-erased `ValueConvertible` for types that conform to `Codable`
 public enum AnyValue: ValueConvertible, Codable {
-    case object([String: AnyValue])
+    case object(ImmutableObject)
     case array([AnyValue])
     case arrayBuffer(Data)
     case string(String)
@@ -41,7 +41,7 @@ public enum AnyValue: ValueConvertible, Codable {
             case .date:
                 self = try .date(Date(env, from: value))
             case .generic:
-                self = try .object([String: AnyValue](env, from: value))
+                self = try .object(ImmutableObject(env, from: value))
             case .arrayBuffer:
                 self = try .arrayBuffer(Data(env, from: value))
             default:
@@ -93,7 +93,7 @@ public enum AnyValue: ValueConvertible, Codable {
             self = .boolean(boolean)
         } else if let data = try? container.decode(Data.self) {
             self = .arrayBuffer(data)
-        } else if let object = try? container.decode([String: AnyValue].self) {
+        } else if let object = try? container.decode(ImmutableObject.self) {
             self = .object(object)
         } else if container.decodeNil() {
             self = .null
