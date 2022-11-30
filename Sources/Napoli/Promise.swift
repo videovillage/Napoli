@@ -51,14 +51,17 @@ private class JSPromise: ObjectReference {
 
 public class Promise<Result: ValueConvertible>: ValueConvertible {
     private enum Storage {
-        case javascript(JSPromise)
-        case swift(Task<Result, Swift.Error>)
+        case javascript(JSPromise, Task<Result, Error>)
+        case swift(Task<Result, Error>)
     }
 
     private let storage: Storage
 
     public required init(_ env: Environment, from: napi_value) throws {
-        storage = .javascript(try .init(env, from: from))
+        let promise = try JSPromise(env, from: from)
+        storage = .javascript(promise, Task {
+            try await promise.getValue()
+        })
     }
 
     public init(_ closure: @escaping () async throws -> Result) {
@@ -76,7 +79,7 @@ public class Promise<Result: ValueConvertible>: ValueConvertible {
 
     public func napiValue(_ env: Environment) throws -> napi_value {
         switch storage {
-        case let .javascript(ref):
+        case let .javascript(ref, _):
             return try ref.napiValue(env)
         case let .swift(task):
             var promise: napi_value!
@@ -97,8 +100,8 @@ public class Promise<Result: ValueConvertible>: ValueConvertible {
     public var value: Result {
         get async throws {
             switch storage {
-            case let .javascript(jsPromise):
-                return try await jsPromise.getValue()
+            case let .javascript(_, task):
+                return try await task.value
             case let .swift(task):
                 return try await task.value
             }
