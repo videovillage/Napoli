@@ -55,19 +55,43 @@ open class ObjectReference: Reference {
         try self.init(env, from: from.napiValue(env))
     }
 
-    public func keys(_ env: Environment) throws -> [String] {
+    @available(*, noasync)
+    public func propertyNames(_ env: Environment? = nil) throws -> [String] {
+        let env = env ?? self.storedEnvironment
         var namesArray: napi_value!
-        try napi_get_property_names(env.env, napiValue(env), &namesArray).throwIfError()
-        return try [String](env, from: namesArray)
+        try napi_get_all_property_names(env.env,
+                                        napiValue(env),
+                                        napi_key_include_prototypes,
+                                        napi_key_all_properties,
+                                        napi_key_numbers_to_strings,
+                                        &namesArray).throwIfError()
+        var count: UInt32 = .zero
+        try napi_get_array_length(env.env, namesArray, &count).throwIfError()
+        var keys = [String]()
+
+        for i in 0 ..< count {
+            let scope = try Scope.open(env)
+            defer { scope.close(env) }
+            var key: napi_value!
+            try napi_get_element(env.env, namesArray, i, &key).throwIfError()
+
+            if let key = try? String(env, from: key) {
+                keys.append(key)
+            }
+        }
+
+        return keys
     }
 
-    public func keys() async throws -> [String] {
+    public func propertyNames() async throws -> [String] {
         try await envAccessor.withEnvironment { env in
-            try self.keys(env)
+            try self.propertyNames(env)
         }
     }
 
-    public func set(_ env: Environment, _ key: String, value: some ValueConvertible) throws {
+    @available(*, noasync)
+    public func set(_ env: Environment? = nil, _ key: String, value: some ValueConvertible) throws {
+        let env = env ?? self.storedEnvironment
         try napi_set_property(env.env, napiValue(env), key.napiValue(env), value.napiValue(env)).throwIfError()
     }
 
@@ -77,7 +101,9 @@ open class ObjectReference: Reference {
         }
     }
 
-    public func get<V: ValueConvertible>(_ env: Environment, _ key: String) throws -> V {
+    @available(*, noasync)
+    public func get<V: ValueConvertible>(_ env: Environment? = nil, _ key: String) throws -> V {
+        let env = env ?? self.storedEnvironment
         var value: napi_value!
         try napi_get_property(env.env, napiValue(env), key.napiValue(env), &value).throwIfError()
         return try V(env, from: value)
@@ -89,8 +115,10 @@ open class ObjectReference: Reference {
         }
     }
 
-    public func immutable(_ env: Environment) throws -> ImmutableObject {
-        try .init(env, from: napiValue(env))
+    @available(*, noasync)
+    public func immutable(_ env: Environment? = nil) throws -> ImmutableObject {
+        let env = env ?? self.storedEnvironment
+        return try .init(env, from: napiValue(env))
     }
 
     public func immutable() async throws -> ImmutableObject {

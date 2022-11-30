@@ -44,6 +44,10 @@ func returnNull() -> Null {
     Null.default
 }
 
+func returnError() -> JSError {
+    .init(code: "ERR_TEST_ERROR", message: "a glorious message")
+}
+
 func returnUndefined() -> Undefined {
     Undefined.default
 }
@@ -90,6 +94,25 @@ func takeOptionalDouble(value: Double?) -> Double {
 
 func takeOptionalBoolean(value: Bool?) -> Bool {
     value ?? true
+}
+
+func takeError(value: JSError) throws {
+    try assertEqual(expected: .init(code: "neat code", message: "a message"), actual: value)
+}
+
+func takeSuccessfulPromise(promise: Promise<String>) async throws {
+    try assertEqual(expected: try await promise.value, actual: "cool I did it!")
+}
+
+func takeThrowingPromise(promise: Promise<String>) async throws {
+    do {
+        _ = try await promise.value
+        throw TestError(message: "promise must throw")
+    } catch let error as JSError {
+        try assertEqual(expected: "lol sorry", actual: error.message)
+    } catch {
+        throw TestError(message: "promise error must be JSError")
+    }
 }
 
 func modifyObjectByReferenceAsync(object: ObjectReference) async throws {
@@ -223,6 +246,7 @@ func initNapoliTests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointe
         MethodDescriptor("returnUInt32", returnUInt32),
         MethodDescriptor("returnNull", returnNull),
         MethodDescriptor("returnUndefined", returnUndefined),
+        MethodDescriptor("returnError", returnError),
 
         MethodDescriptor("takeString", takeString),
         MethodDescriptor("takeDouble", takeDouble),
@@ -231,6 +255,9 @@ func initNapoliTests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointe
         MethodDescriptor("takeNull", takeNull),
         MethodDescriptor("takeUndefined", takeUndefined),
         MethodDescriptor("takeArrayBuffer", takeArrayBuffer),
+        MethodDescriptor("takeError", takeError),
+        MethodDescriptor("takeSuccessfulPromise", takeSuccessfulPromise),
+        MethodDescriptor("takeThrowingPromise", takeThrowingPromise),
 
         MethodDescriptor("takeOptionalString", takeOptionalString),
         MethodDescriptor("takeOptionalDouble", takeOptionalDouble),

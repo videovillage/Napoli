@@ -40,6 +40,48 @@ enum AnyValueError: LocalizedError {
     }
 }
 
+public struct JSError: ValueConvertible, ErrorConvertible, Codable, Equatable, CustomStringConvertible {
+    public var description: String {
+        "\(message) (code: \(code ?? "nil"))"
+    }
+
+    public let code: String?
+    public let message: String
+
+    public init(code: String? = nil, message: String) {
+        self.code = code
+        self.message = message
+    }
+
+    public init(_ env: Environment, from: napi_value) throws {
+        let object = try ImmutableObject(env, from: from)
+        code = try .init(object["code"] ?? .null)
+        message = try .init(object["message"] ?? .undefined)
+    }
+
+    public func napiValue(_ env: Environment) throws -> napi_value {
+        var value: napi_value?
+        try napi_create_error(env.env,
+                          code?.napiValue(env),
+                          message.napiValue(env),
+                          &value).throwIfError()
+        return value!
+    }
+
+    public init(_ any: AnyValue) throws {
+        switch any {
+        case let .error(error):
+            self = error
+        default:
+            throw AnyValueError.initNotSupported(Self.self, from: any)
+        }
+    }
+
+    public func eraseToAny() throws -> AnyValue {
+        .error(self)
+    }
+}
+
 public extension ValueConvertible {
     init(_: AnyValue) throws {
         throw AnyValueError.initNotSupported(Self.self, from: nil)
@@ -101,7 +143,12 @@ public typealias ImmutableObject = [String: AnyValue]
 extension Dictionary: ValueConvertible where Key == String, Value: ValueConvertible {
     public init(_ env: Environment, from: napi_value) throws {
         var namesArray: napi_value!
-        try napi_get_property_names(env.env, from, &namesArray).throwIfError()
+        try napi_get_all_property_names(env.env,
+                                        from,
+                                        napi_key_own_only,
+                                        napi_key_all_properties,
+                                        napi_key_numbers_to_strings,
+                                        &namesArray).throwIfError()
 
         var count: UInt32 = .zero
         try napi_get_array_length(env.env, namesArray, &count).throwIfError()
@@ -116,7 +163,9 @@ extension Dictionary: ValueConvertible where Key == String, Value: ValueConverti
             var value: napi_value!
             try napi_get_property(env.env, from, key, &value).throwIfError()
 
-            try dict[String(env, from: key)] = Value(env, from: value)
+            if let key = try? String(env, from: key), let value = try? Value(env, from: value) {
+                dict[key] = value
+            }
         }
 
         self = dict

@@ -3,40 +3,106 @@ import NAPIC
 
 public typealias VoidPromise = Promise<Undefined>
 
-public class Promise<Result: ValueConvertible>: ValueConvertible {
-    public required init(_: Environment, from _: napi_value) throws {
-        fatalError("not implemented")
+private class JSPromise: ObjectReference {
+    required init(_ env: Environment, from value: napi_value) throws {
+        try super.init(env, from: value)
+        try attachDummyCatch(env)
     }
 
-    private var deferred: ThreadSafeDeferred!
-    private let task: Task<ValueConvertible, Swift.Error>
+    func attachDummyCatch(_ env: Environment? = nil) throws {
+        let env = env ?? storedEnvironment
+        let catchFunction: TypedFunction1<Undefined, TypedFunction1<Null, JSError>> = try get(env, "catch")
+        try catchFunction.call(env, this: self, .init(named: "dummy") { _, _ in
+            Null.default
+        })
+    }
+
+    func then<V: ValueConvertible>(_ env: Environment? = nil, onFulfilled: @escaping (Environment, V) -> Void, onReject: @escaping (Environment, JSError) -> Void) throws {
+        let env = env ?? storedEnvironment
+        let function: TypedFunction2<Undefined, TypedFunction1<Undefined, V>, TypedFunction1<Undefined, JSError>> = try get(env, "then")
+
+        try function.call(env,
+                          this: self,
+                          .init(named: "onFulfilled", onFulfilled),
+                          .init(named: "onReject", onReject))
+    }
+
+    func getValue<V: ValueConvertible>() async throws -> V {
+        try await withCheckedThrowingContinuation { continuation in
+            Task {
+                do {
+                    try await envAccessor.withEnvironment { env in
+                        try self.then(env,
+                                      onFulfilled: { _, value in
+                            continuation.resume(returning: value)
+
+                        },
+                                      onReject: { _, error in
+                            continuation.resume(throwing: error)
+                        })
+                    }
+                } catch {
+                    continuation.resume(throwing: error as! JSError)
+                }
+            }
+        }
+    }
+}
+
+public class Promise<Result: ValueConvertible>: ValueConvertible {
+    private enum Storage {
+        case javascript(JSPromise)
+        case swift(Task<Result, Swift.Error>)
+    }
+
+    private let storage: Storage
+
+    public required init(_ env: Environment, from: napi_value) throws {
+        storage = .javascript(try .init(env, from: from))
+    }
 
     public init(_ closure: @escaping () async throws -> Result) {
-        task = Task {
+        storage = .swift(Task {
             try await closure()
-        }
+        })
     }
 
     public init(_ closure: @escaping () async throws -> Void) where Result == Undefined {
-        task = Task {
+        storage = .swift(Task {
             try await closure()
             return Undefined.default
-        }
+        })
     }
 
     public func napiValue(_ env: Environment) throws -> napi_value {
-        var promise: napi_value!
-        deferred = try .init(env, &promise)
-        Task {
-            do {
-                let result = try await task.result.get()
-                try! await deferred.resolve(result)
-            } catch {
-                try! await deferred.reject(error)
+        switch storage {
+        case let .javascript(ref):
+            return try ref.napiValue(env)
+        case let .swift(task):
+            var promise: napi_value!
+            let deferred = try ThreadSafeDeferred(env, &promise)
+            Task {
+                do {
+                    let result = try await task.result.get()
+                    try! await deferred.resolve(result)
+                } catch {
+                    try! await deferred.reject(error)
+                }
+            }
+
+            return promise
+        }
+    }
+
+    public var value: Result {
+        get async throws {
+            switch storage {
+            case let .javascript(jsPromise):
+                return try await jsPromise.getValue()
+            case let .swift(task):
+                return try await task.value
             }
         }
-
-        return promise
     }
 }
 
@@ -60,19 +126,15 @@ private actor ThreadSafeDeferred {
                 let success = try storage.result!.get().napiValue(env)
                 try! napi_resolve_deferred(env.env, deferred, success).throwIfError()
             } catch let error as ErrorConvertible {
-                var jsError: napi_value!
-                try! napi_create_error(env.env,
-                                       error.code.napiValue(env),
-                                       error.message.napiValue(env),
-                                       &jsError).throwIfError()
-                try! napi_reject_deferred(env.env, deferred, jsError).throwIfError()
+                try! napi_reject_deferred(env.env,
+                                          deferred,
+                                          JSError(code: error.code,
+                                                  message: error.message).napiValue(env)).throwIfError()
             } catch {
-                var jsError: napi_value!
-                try! napi_create_error(env.env,
-                                       "swift_promise_internal".napiValue(env),
-                                       error.localizedDescription.napiValue(env),
-                                       &jsError).throwIfError()
-                try! napi_reject_deferred(env.env, deferred, jsError).throwIfError()
+                try! napi_reject_deferred(env.env,
+                                          deferred,
+                                          JSError(code: "ERR_SWIFT_PROMISE_INTERNAL",
+                                                  message: error.localizedDescription).napiValue(env)).throwIfError()
             }
             return Undefined.default
         })

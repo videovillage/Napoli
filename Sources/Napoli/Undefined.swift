@@ -8,7 +8,7 @@ public struct Undefined: ValueConvertible {
     public init(_ env: Environment, from: napi_value) throws {
         guard try strictlyEquals(env, lhs: from, rhs: Undefined.default) else {
             napi_throw_type_error(env.env, nil, "Expected undefined")
-            throw Napoli.Error.pendingException
+            throw NAPIError.pendingException
         }
     }
 

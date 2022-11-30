@@ -16,6 +16,12 @@ describe("Return Values", () => {
     assert.strictEqual(addon.returnBoolean(), true)
   })
 
+  it("returns errors", () => {
+    let error = addon.returnError()
+    assert.strictEqual(error.message, "a glorious message")
+    assert.strictEqual(error.code, "ERR_TEST_ERROR")
+  })
+
   it("returns dates", () => {
     assert.strictEqual(addon.returnDate().getTime(), 1000)
   })

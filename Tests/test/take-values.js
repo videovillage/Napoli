@@ -34,6 +34,12 @@ describe("Take Values", () => {
     addon.takeUndefined(undefined)
   })
 
+  it("takes error", () => {
+    var error = new Error("a message")
+    error.code = "neat code"
+    addon.takeError(error)
+  })
+
   describe("Errors", () => {
     it("expects strings", () => {
       assert.throws(

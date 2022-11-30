@@ -33,4 +33,12 @@ describe("Callbacks:", function () {
       return true
     })
   })
+
+  it("takes successful promise", async function () {
+    await addon.takeSuccessfulPromise(Promise.resolve("cool I did it!"))
+  })
+
+  it("takes throwing promise", async function () {
+    await addon.takeThrowingPromise(Promise.reject(new Error("lol sorry")))
+  })
 })

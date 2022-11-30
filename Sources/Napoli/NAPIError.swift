@@ -1,6 +1,6 @@
 import NAPIC
 
-public enum Error: Swift.Error {
+public enum NAPIError: Swift.Error {
     case invalidArg
     case objectExpected
     case stringExpected
@@ -52,11 +52,7 @@ public enum Error: Swift.Error {
     }
 }
 
-public struct JSException: Swift.Error {
-    let value: napi_value
-}
-
-extension Error {
+extension NAPIError {
     func napi_throw(_ env: Environment) -> napi_status {
         switch self {
         case .objectExpected: return napi_throw_type_error(env.env, nil, "Expected object")
@@ -78,7 +74,7 @@ extension Error {
 extension napi_status {
     func throwIfError() throws {
         guard self == napi_ok else {
-            throw Napoli.Error(self)
+            throw NAPIError(self)
         }
     }
 }
