@@ -11,7 +11,7 @@ public struct NAPIValue: ValueConvertible {
         value = from
     }
 
-    public func napiValue(_ env: Environment) throws -> napi_value {
+    public func napiValue(_: Environment) throws -> napi_value {
         value
     }
 }
