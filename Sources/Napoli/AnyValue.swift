@@ -1,7 +1,7 @@
 import Foundation
 import NAPIC
 
-/// Type-erased `ValueConvertible` for types that conform to `Codable`
+/// Type-erased `ValueConvertible` for types that don't have reference semantics
 public enum AnyValue: ValueConvertible {
     case object(ImmutableObject)
     case array([AnyValue])

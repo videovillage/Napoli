@@ -4,7 +4,7 @@ const assert = require("assert")
 const addon = require("../")
 
 const expectedJSON = global.JSON.parse(
-  `{"testString":"testString","optionalString2":null,"nested":{"nestedTestString":"nestedTestString"},"optionalNested":null,"optionalString":"optionalTestString"}`
+  `{"testString":"testString","nested":{"nestedTestString":"nestedTestString"},"optionalString":"optionalTestString"}`
 )
 
 describe("Environment", () => {

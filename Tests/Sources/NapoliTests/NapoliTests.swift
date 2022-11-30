@@ -221,14 +221,14 @@ final class TestClass1: ClassDescribable {
     ]
 }
 
-struct TestObject: ObjectConvertible {
+struct TestObject: ImmutableObjectConvertible {
     var testString: String = "testString"
     var optionalString: String? = "optionalTestString"
     var optionalString2: String?
     var nested: Nested = .init(nestedTestString: "nestedTestString")
     var optionalNested: Nested?
 
-    struct Nested: ObjectConvertible {
+    struct Nested: ImmutableObjectConvertible {
         var nestedTestString: String
     }
 }
