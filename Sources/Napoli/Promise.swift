@@ -42,7 +42,7 @@ private class JSPromise: ObjectReference {
                                       })
                     }
                 } catch {
-                    continuation.resume(throwing: error as! JSError)
+                    continuation.resume(throwing: error)
                 }
             }
         }
