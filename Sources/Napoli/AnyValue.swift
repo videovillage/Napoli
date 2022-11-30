@@ -2,7 +2,7 @@ import Foundation
 import NAPIC
 
 /// Type-erased `ValueConvertible` for types that conform to `Codable`
-public enum AnyValue: ValueConvertible, Codable {
+public enum AnyValue: ValueConvertible {
     case object(ImmutableObject)
     case array([AnyValue])
     case arrayBuffer(Data)
@@ -84,57 +84,6 @@ public enum AnyValue: ValueConvertible, Codable {
         }
     }
 
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-
-        if let array = try? container.decode([AnyValue].self) {
-            self = .array(array)
-        } else if let date = try? container.decode(Date.self) {
-            self = .date(date)
-        } else if let string = try? container.decode(String.self) {
-            self = .string(string)
-        } else if let number = try? container.decode(Double.self) {
-            self = .number(number)
-        } else if let boolean = try? container.decode(Bool.self) {
-            self = .boolean(boolean)
-        } else if let data = try? container.decode(Data.self) {
-            self = .arrayBuffer(data)
-        } else if let error = try? container.decode(JSError.self) {
-            self = .error(error)
-        } else if let object = try? container.decode(ImmutableObject.self) {
-            self = .object(object)
-        } else if container.decodeNil() {
-            self = .null
-        } else {
-            throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Failed to decode value"))
-        }
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-
-        switch self {
-        case let .object(object):
-            try container.encode(object)
-        case let .array(array):
-            try container.encode(array)
-        case let .string(string):
-            try container.encode(string)
-        case let .number(number):
-            try container.encode(number)
-        case let .boolean(bool):
-            try container.encode(bool)
-        case let .date(date):
-            try container.encode(date)
-        case let .arrayBuffer(data):
-            try container.encode(data)
-        case let .error(error):
-            try container.encode(error)
-        case .null, .undefined:
-            try container.encodeNil()
-        }
-    }
-
     public init(_ any: AnyValue) {
         self = any
     }
@@ -142,8 +91,6 @@ public enum AnyValue: ValueConvertible, Codable {
     public func eraseToAny() throws -> AnyValue {
         self
     }
-
-    public static let defaultValue: AnyValue = .null
 }
 
 private enum ObjectType: String {

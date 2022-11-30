@@ -10,8 +10,6 @@ public protocol ValueConvertible {
 
     init(_ any: AnyValue) throws
     func eraseToAny() throws -> AnyValue
-
-    static var defaultValue: Self { get }
 }
 
 enum AnyValueError: LocalizedError {
@@ -90,10 +88,6 @@ public extension ValueConvertible {
     func eraseToAny() throws -> AnyValue {
         throw AnyValueError.erasingNotSupported(type: String(describing: Self.self), label: nil)
     }
-
-    static var defaultValue: Self {
-        fatalError("defaultValue not implemented for \(String(describing: Self.self))")
-    }
 }
 
 extension Optional: ValueConvertible where Wrapped: ValueConvertible {
@@ -131,10 +125,6 @@ extension Optional: ValueConvertible where Wrapped: ValueConvertible {
         case .none:
             return .null
         }
-    }
-
-    public static var defaultValue: Wrapped? {
-        nil
     }
 }
 
@@ -202,10 +192,6 @@ extension Dictionary: ValueConvertible where Key == String, Value: ValueConverti
             try value.eraseToAny()
         })
     }
-
-    public static var defaultValue: [String: Value] {
-        .init()
-    }
 }
 
 extension Array: ValueConvertible where Element: ValueConvertible {
@@ -251,10 +237,6 @@ extension Array: ValueConvertible where Element: ValueConvertible {
     public func eraseToAny() throws -> AnyValue {
         try .array(map { try $0.eraseToAny() })
     }
-
-    public static var defaultValue: [Element] {
-        .init()
-    }
 }
 
 extension String: ValueConvertible {
@@ -295,8 +277,6 @@ extension String: ValueConvertible {
     public func eraseToAny() throws -> AnyValue {
         .string(self)
     }
-
-    public static let defaultValue: String = ""
 }
 
 extension Date: ValueConvertible {
@@ -324,8 +304,6 @@ extension Date: ValueConvertible {
     public func eraseToAny() throws -> AnyValue {
         .date(self)
     }
-
-    public static let defaultValue: Date = .init(timeIntervalSince1970: 0)
 }
 
 extension Data: ValueConvertible {
@@ -359,12 +337,10 @@ extension Data: ValueConvertible {
     public func eraseToAny() throws -> AnyValue {
         .arrayBuffer(self)
     }
-
-    public static let defaultValue: Data = .init()
 }
 
 extension Double: PrimitiveValueConvertible {
-    public static let defaultValue = Self.nan
+    public static let defaultValue = Self.zero
     static let initWithValue = napi_get_value_double
     static let createValue = napi_create_double
 
@@ -495,6 +471,7 @@ extension Bool: PrimitiveValueConvertible {
 protocol PrimitiveValueConvertible: ValueConvertible {
     static var initWithValue: (_ env: napi_env?, _ value: napi_value?, _ result: UnsafeMutablePointer<Self>?) -> napi_status { get }
     static var createValue: (_ env: napi_env?, _ value: Self, _ result: UnsafeMutablePointer<napi_value?>?) -> napi_status { get }
+    static var defaultValue: Self { get }
 }
 
 extension PrimitiveValueConvertible {
