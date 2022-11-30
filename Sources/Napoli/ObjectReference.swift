@@ -57,7 +57,7 @@ open class ObjectReference: Reference {
 
     @available(*, noasync)
     public func propertyNames(_ env: Environment? = nil) throws -> [String] {
-        let env = env ?? self.storedEnvironment
+        let env = env ?? storedEnvironment
         var namesArray: napi_value!
         try napi_get_all_property_names(env.env,
                                         napiValue(env),
@@ -91,7 +91,7 @@ open class ObjectReference: Reference {
 
     @available(*, noasync)
     public func set(_ env: Environment? = nil, _ key: String, value: some ValueConvertible) throws {
-        let env = env ?? self.storedEnvironment
+        let env = env ?? storedEnvironment
         try napi_set_property(env.env, napiValue(env), key.napiValue(env), value.napiValue(env)).throwIfError()
     }
 
@@ -103,7 +103,7 @@ open class ObjectReference: Reference {
 
     @available(*, noasync)
     public func get<V: ValueConvertible>(_ env: Environment? = nil, _ key: String) throws -> V {
-        let env = env ?? self.storedEnvironment
+        let env = env ?? storedEnvironment
         var value: napi_value!
         try napi_get_property(env.env, napiValue(env), key.napiValue(env), &value).throwIfError()
         return try V(env, from: value)
@@ -117,7 +117,7 @@ open class ObjectReference: Reference {
 
     @available(*, noasync)
     public func immutable(_ env: Environment? = nil) throws -> ImmutableObject {
-        let env = env ?? self.storedEnvironment
+        let env = env ?? storedEnvironment
         return try .init(env, from: napiValue(env))
     }
 

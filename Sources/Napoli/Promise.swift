@@ -34,12 +34,12 @@ private class JSPromise: ObjectReference {
                     try await envAccessor.withEnvironment { env in
                         try self.then(env,
                                       onFulfilled: { _, value in
-                            continuation.resume(returning: value)
+                                          continuation.resume(returning: value)
 
-                        },
+                                      },
                                       onReject: { _, error in
-                            continuation.resume(throwing: error)
-                        })
+                                          continuation.resume(throwing: error)
+                                      })
                     }
                 } catch {
                     continuation.resume(throwing: error as! JSError)

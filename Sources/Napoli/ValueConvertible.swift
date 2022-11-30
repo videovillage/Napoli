@@ -62,9 +62,9 @@ public struct JSError: ValueConvertible, ErrorConvertible, Codable, Equatable, C
     public func napiValue(_ env: Environment) throws -> napi_value {
         var value: napi_value?
         try napi_create_error(env.env,
-                          code?.napiValue(env),
-                          message.napiValue(env),
-                          &value).throwIfError()
+                              code?.napiValue(env),
+                              message.napiValue(env),
+                              &value).throwIfError()
         return value!
     }
 
