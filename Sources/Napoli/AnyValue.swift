@@ -1,7 +1,7 @@
 import Foundation
 import NAPIC
 
-/// Type-erased `ValueConvertible` for types that don't have reference semantics
+/// Type-erased `ValueConvertible`
 public enum AnyValue: ValueConvertible {
     case object(ImmutableObject)
     case array([AnyValue])
@@ -13,6 +13,7 @@ public enum AnyValue: ValueConvertible {
     case error(JSError)
     case null
     case undefined
+    case unknown(napi_value)
 
     enum Error: LocalizedError {
         case unknownType(UInt32)
@@ -61,7 +62,7 @@ public enum AnyValue: ValueConvertible {
         case napi_undefined:
             self = .undefined
         default:
-            throw Error.unknownType(UInt32(type.rawValue))
+            self = .unknown(value)
         }
     }
 
@@ -81,6 +82,7 @@ public enum AnyValue: ValueConvertible {
         case let .error(error): return try error.napiValue(env)
         case .null: return try Null.default.napiValue(env)
         case .undefined: return try Undefined.default.napiValue(env)
+        case let .unknown(value): return value
         }
     }
 
