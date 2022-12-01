@@ -68,23 +68,19 @@ enum ObjectReferenceMethods {
                 }
 
                 func callSelf\(allGenerics.bracketedOrNone)(_ name: String\(inGenericsAsArgs)) async throws -> Result\(allWheres.backspaceIfNotEmpty()) {
-                    let function: ThreadsafeTypedFunction\(paramCount)\(allGenerics.bracketedOrNone) = try await get(name)
-                    return try await function.call(this: self\(inGenericsAsCallArgs))
+                    try await withEnvironment { env in try self.callSelf(env, name\(inGenericsAsCallArgs)) }
                 }
 
                 func call\(allGenerics.bracketedOrNone)(_ name: String\(inGenericsAsArgs)) async throws -> Result\(allWheres.backspaceIfNotEmpty()) {
-                    let function: ThreadsafeTypedFunction\(paramCount)\(allGenerics.bracketedOrNone) = try await get(name)
-                    return try await function.call(this: Undefined.default\(inGenericsAsCallArgs))
+                    try await withEnvironment { env in try self.call(env, name\(inGenericsAsCallArgs)) }
                 }
 
                 func callSelf\(inGenerics.bracketedOrNone)(_ name: String\(inGenericsAsArgs)) async throws \(inWheres.backspaceIfNotEmpty()) {
-                    let function: ThreadsafeTypedFunction\(paramCount)<Undefined\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())> = try await get(name)
-                    try await function.call(this: self\(inGenericsAsCallArgs))
+                    try await withEnvironment { env in try self.callSelf(env, name\(inGenericsAsCallArgs)) }
                 }
 
                 func call\(inGenerics.bracketedOrNone)(_ name: String\(inGenericsAsArgs)) async throws \(inWheres.backspaceIfNotEmpty()) {
-                    let function: ThreadsafeTypedFunction\(paramCount)<Undefined\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())> = try await get(name)
-                    try await function.call(this: Undefined.default\(inGenericsAsCallArgs))
+                    try await withEnvironment { env in try self.call(env, name\(inGenericsAsCallArgs)) }
                 }
             }
         """)

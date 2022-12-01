@@ -49,23 +49,6 @@ public actor EnvironmentAccessor {
 
         return try result.get()
     }
-
-    public func withEnvironment(_ closure: @escaping (Environment) throws -> Void) async throws {
-        var resultError: Swift.Error?
-        try await function.call(.init(named: "withEnvironmentCallback") { env in
-            do {
-                try closure(env)
-            } catch {
-                resultError = error
-            }
-
-            return Undefined.default
-        })
-
-        if let resultError {
-            throw resultError
-        }
-    }
 }
 
 public func initModule(_ env: napi_env, _ exports: napi_value, _ properties: [PropertyDescriptor]) -> napi_value {

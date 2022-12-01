@@ -34,23 +34,19 @@ public extension ObjectReference {
     }
 
     func callSelf<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7, _ p8: P8) async throws -> Result where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
-        let function: ThreadsafeTypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8> = try await get(name)
-        return try await function.call(this: self, p0, p1, p2, p3, p4, p5, p6, p7, p8)
+        try await withEnvironment { env in try self.callSelf(env, name, p0, p1, p2, p3, p4, p5, p6, p7, p8) }
     }
 
     func call<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7, _ p8: P8) async throws -> Result where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
-        let function: ThreadsafeTypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8> = try await get(name)
-        return try await function.call(this: Undefined.default, p0, p1, p2, p3, p4, p5, p6, p7, p8)
+        try await withEnvironment { env in try self.call(env, name, p0, p1, p2, p3, p4, p5, p6, p7, p8) }
     }
 
     func callSelf<P0, P1, P2, P3, P4, P5, P6, P7, P8>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7, _ p8: P8) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
-        let function: ThreadsafeTypedFunction9<Undefined, P0, P1, P2, P3, P4, P5, P6, P7, P8> = try await get(name)
-        try await function.call(this: self, p0, p1, p2, p3, p4, p5, p6, p7, p8)
+        try await withEnvironment { env in try self.callSelf(env, name, p0, p1, p2, p3, p4, p5, p6, p7, p8) }
     }
 
     func call<P0, P1, P2, P3, P4, P5, P6, P7, P8>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7, _ p8: P8) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
-        let function: ThreadsafeTypedFunction9<Undefined, P0, P1, P2, P3, P4, P5, P6, P7, P8> = try await get(name)
-        try await function.call(this: Undefined.default, p0, p1, p2, p3, p4, p5, p6, p7, p8)
+        try await withEnvironment { env in try self.call(env, name, p0, p1, p2, p3, p4, p5, p6, p7, p8) }
     }
 }
 
@@ -85,23 +81,19 @@ public extension ObjectReference {
     }
 
     func callSelf<Result, P0, P1, P2, P3, P4, P5, P6, P7>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7) async throws -> Result where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
-        let function: ThreadsafeTypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7> = try await get(name)
-        return try await function.call(this: self, p0, p1, p2, p3, p4, p5, p6, p7)
+        try await withEnvironment { env in try self.callSelf(env, name, p0, p1, p2, p3, p4, p5, p6, p7) }
     }
 
     func call<Result, P0, P1, P2, P3, P4, P5, P6, P7>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7) async throws -> Result where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
-        let function: ThreadsafeTypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7> = try await get(name)
-        return try await function.call(this: Undefined.default, p0, p1, p2, p3, p4, p5, p6, p7)
+        try await withEnvironment { env in try self.call(env, name, p0, p1, p2, p3, p4, p5, p6, p7) }
     }
 
     func callSelf<P0, P1, P2, P3, P4, P5, P6, P7>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
-        let function: ThreadsafeTypedFunction8<Undefined, P0, P1, P2, P3, P4, P5, P6, P7> = try await get(name)
-        try await function.call(this: self, p0, p1, p2, p3, p4, p5, p6, p7)
+        try await withEnvironment { env in try self.callSelf(env, name, p0, p1, p2, p3, p4, p5, p6, p7) }
     }
 
     func call<P0, P1, P2, P3, P4, P5, P6, P7>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
-        let function: ThreadsafeTypedFunction8<Undefined, P0, P1, P2, P3, P4, P5, P6, P7> = try await get(name)
-        try await function.call(this: Undefined.default, p0, p1, p2, p3, p4, p5, p6, p7)
+        try await withEnvironment { env in try self.call(env, name, p0, p1, p2, p3, p4, p5, p6, p7) }
     }
 }
 
@@ -136,23 +128,19 @@ public extension ObjectReference {
     }
 
     func callSelf<Result, P0, P1, P2, P3, P4, P5, P6>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6) async throws -> Result where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
-        let function: ThreadsafeTypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6> = try await get(name)
-        return try await function.call(this: self, p0, p1, p2, p3, p4, p5, p6)
+        try await withEnvironment { env in try self.callSelf(env, name, p0, p1, p2, p3, p4, p5, p6) }
     }
 
     func call<Result, P0, P1, P2, P3, P4, P5, P6>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6) async throws -> Result where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
-        let function: ThreadsafeTypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6> = try await get(name)
-        return try await function.call(this: Undefined.default, p0, p1, p2, p3, p4, p5, p6)
+        try await withEnvironment { env in try self.call(env, name, p0, p1, p2, p3, p4, p5, p6) }
     }
 
     func callSelf<P0, P1, P2, P3, P4, P5, P6>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
-        let function: ThreadsafeTypedFunction7<Undefined, P0, P1, P2, P3, P4, P5, P6> = try await get(name)
-        try await function.call(this: self, p0, p1, p2, p3, p4, p5, p6)
+        try await withEnvironment { env in try self.callSelf(env, name, p0, p1, p2, p3, p4, p5, p6) }
     }
 
     func call<P0, P1, P2, P3, P4, P5, P6>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
-        let function: ThreadsafeTypedFunction7<Undefined, P0, P1, P2, P3, P4, P5, P6> = try await get(name)
-        try await function.call(this: Undefined.default, p0, p1, p2, p3, p4, p5, p6)
+        try await withEnvironment { env in try self.call(env, name, p0, p1, p2, p3, p4, p5, p6) }
     }
 }
 
@@ -187,23 +175,19 @@ public extension ObjectReference {
     }
 
     func callSelf<Result, P0, P1, P2, P3, P4, P5>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5) async throws -> Result where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
-        let function: ThreadsafeTypedFunction6<Result, P0, P1, P2, P3, P4, P5> = try await get(name)
-        return try await function.call(this: self, p0, p1, p2, p3, p4, p5)
+        try await withEnvironment { env in try self.callSelf(env, name, p0, p1, p2, p3, p4, p5) }
     }
 
     func call<Result, P0, P1, P2, P3, P4, P5>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5) async throws -> Result where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
-        let function: ThreadsafeTypedFunction6<Result, P0, P1, P2, P3, P4, P5> = try await get(name)
-        return try await function.call(this: Undefined.default, p0, p1, p2, p3, p4, p5)
+        try await withEnvironment { env in try self.call(env, name, p0, p1, p2, p3, p4, p5) }
     }
 
     func callSelf<P0, P1, P2, P3, P4, P5>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
-        let function: ThreadsafeTypedFunction6<Undefined, P0, P1, P2, P3, P4, P5> = try await get(name)
-        try await function.call(this: self, p0, p1, p2, p3, p4, p5)
+        try await withEnvironment { env in try self.callSelf(env, name, p0, p1, p2, p3, p4, p5) }
     }
 
     func call<P0, P1, P2, P3, P4, P5>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
-        let function: ThreadsafeTypedFunction6<Undefined, P0, P1, P2, P3, P4, P5> = try await get(name)
-        try await function.call(this: Undefined.default, p0, p1, p2, p3, p4, p5)
+        try await withEnvironment { env in try self.call(env, name, p0, p1, p2, p3, p4, p5) }
     }
 }
 
@@ -238,23 +222,19 @@ public extension ObjectReference {
     }
 
     func callSelf<Result, P0, P1, P2, P3, P4>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4) async throws -> Result where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
-        let function: ThreadsafeTypedFunction5<Result, P0, P1, P2, P3, P4> = try await get(name)
-        return try await function.call(this: self, p0, p1, p2, p3, p4)
+        try await withEnvironment { env in try self.callSelf(env, name, p0, p1, p2, p3, p4) }
     }
 
     func call<Result, P0, P1, P2, P3, P4>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4) async throws -> Result where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
-        let function: ThreadsafeTypedFunction5<Result, P0, P1, P2, P3, P4> = try await get(name)
-        return try await function.call(this: Undefined.default, p0, p1, p2, p3, p4)
+        try await withEnvironment { env in try self.call(env, name, p0, p1, p2, p3, p4) }
     }
 
     func callSelf<P0, P1, P2, P3, P4>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
-        let function: ThreadsafeTypedFunction5<Undefined, P0, P1, P2, P3, P4> = try await get(name)
-        try await function.call(this: self, p0, p1, p2, p3, p4)
+        try await withEnvironment { env in try self.callSelf(env, name, p0, p1, p2, p3, p4) }
     }
 
     func call<P0, P1, P2, P3, P4>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
-        let function: ThreadsafeTypedFunction5<Undefined, P0, P1, P2, P3, P4> = try await get(name)
-        try await function.call(this: Undefined.default, p0, p1, p2, p3, p4)
+        try await withEnvironment { env in try self.call(env, name, p0, p1, p2, p3, p4) }
     }
 }
 
@@ -289,23 +269,19 @@ public extension ObjectReference {
     }
 
     func callSelf<Result, P0, P1, P2, P3>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3) async throws -> Result where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
-        let function: ThreadsafeTypedFunction4<Result, P0, P1, P2, P3> = try await get(name)
-        return try await function.call(this: self, p0, p1, p2, p3)
+        try await withEnvironment { env in try self.callSelf(env, name, p0, p1, p2, p3) }
     }
 
     func call<Result, P0, P1, P2, P3>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3) async throws -> Result where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
-        let function: ThreadsafeTypedFunction4<Result, P0, P1, P2, P3> = try await get(name)
-        return try await function.call(this: Undefined.default, p0, p1, p2, p3)
+        try await withEnvironment { env in try self.call(env, name, p0, p1, p2, p3) }
     }
 
     func callSelf<P0, P1, P2, P3>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
-        let function: ThreadsafeTypedFunction4<Undefined, P0, P1, P2, P3> = try await get(name)
-        try await function.call(this: self, p0, p1, p2, p3)
+        try await withEnvironment { env in try self.callSelf(env, name, p0, p1, p2, p3) }
     }
 
     func call<P0, P1, P2, P3>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
-        let function: ThreadsafeTypedFunction4<Undefined, P0, P1, P2, P3> = try await get(name)
-        try await function.call(this: Undefined.default, p0, p1, p2, p3)
+        try await withEnvironment { env in try self.call(env, name, p0, p1, p2, p3) }
     }
 }
 
@@ -340,23 +316,19 @@ public extension ObjectReference {
     }
 
     func callSelf<Result, P0, P1, P2>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2) async throws -> Result where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
-        let function: ThreadsafeTypedFunction3<Result, P0, P1, P2> = try await get(name)
-        return try await function.call(this: self, p0, p1, p2)
+        try await withEnvironment { env in try self.callSelf(env, name, p0, p1, p2) }
     }
 
     func call<Result, P0, P1, P2>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2) async throws -> Result where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
-        let function: ThreadsafeTypedFunction3<Result, P0, P1, P2> = try await get(name)
-        return try await function.call(this: Undefined.default, p0, p1, p2)
+        try await withEnvironment { env in try self.call(env, name, p0, p1, p2) }
     }
 
     func callSelf<P0, P1, P2>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
-        let function: ThreadsafeTypedFunction3<Undefined, P0, P1, P2> = try await get(name)
-        try await function.call(this: self, p0, p1, p2)
+        try await withEnvironment { env in try self.callSelf(env, name, p0, p1, p2) }
     }
 
     func call<P0, P1, P2>(_ name: String, _ p0: P0, _ p1: P1, _ p2: P2) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
-        let function: ThreadsafeTypedFunction3<Undefined, P0, P1, P2> = try await get(name)
-        try await function.call(this: Undefined.default, p0, p1, p2)
+        try await withEnvironment { env in try self.call(env, name, p0, p1, p2) }
     }
 }
 
@@ -391,23 +363,19 @@ public extension ObjectReference {
     }
 
     func callSelf<Result, P0, P1>(_ name: String, _ p0: P0, _ p1: P1) async throws -> Result where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible {
-        let function: ThreadsafeTypedFunction2<Result, P0, P1> = try await get(name)
-        return try await function.call(this: self, p0, p1)
+        try await withEnvironment { env in try self.callSelf(env, name, p0, p1) }
     }
 
     func call<Result, P0, P1>(_ name: String, _ p0: P0, _ p1: P1) async throws -> Result where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible {
-        let function: ThreadsafeTypedFunction2<Result, P0, P1> = try await get(name)
-        return try await function.call(this: Undefined.default, p0, p1)
+        try await withEnvironment { env in try self.call(env, name, p0, p1) }
     }
 
     func callSelf<P0, P1>(_ name: String, _ p0: P0, _ p1: P1) async throws where P0: ValueConvertible, P1: ValueConvertible {
-        let function: ThreadsafeTypedFunction2<Undefined, P0, P1> = try await get(name)
-        try await function.call(this: self, p0, p1)
+        try await withEnvironment { env in try self.callSelf(env, name, p0, p1) }
     }
 
     func call<P0, P1>(_ name: String, _ p0: P0, _ p1: P1) async throws where P0: ValueConvertible, P1: ValueConvertible {
-        let function: ThreadsafeTypedFunction2<Undefined, P0, P1> = try await get(name)
-        try await function.call(this: Undefined.default, p0, p1)
+        try await withEnvironment { env in try self.call(env, name, p0, p1) }
     }
 }
 
@@ -442,23 +410,19 @@ public extension ObjectReference {
     }
 
     func callSelf<Result, P0>(_ name: String, _ p0: P0) async throws -> Result where Result: ValueConvertible, P0: ValueConvertible {
-        let function: ThreadsafeTypedFunction1<Result, P0> = try await get(name)
-        return try await function.call(this: self, p0)
+        try await withEnvironment { env in try self.callSelf(env, name, p0) }
     }
 
     func call<Result, P0>(_ name: String, _ p0: P0) async throws -> Result where Result: ValueConvertible, P0: ValueConvertible {
-        let function: ThreadsafeTypedFunction1<Result, P0> = try await get(name)
-        return try await function.call(this: Undefined.default, p0)
+        try await withEnvironment { env in try self.call(env, name, p0) }
     }
 
     func callSelf<P0>(_ name: String, _ p0: P0) async throws where P0: ValueConvertible {
-        let function: ThreadsafeTypedFunction1<Undefined, P0> = try await get(name)
-        try await function.call(this: self, p0)
+        try await withEnvironment { env in try self.callSelf(env, name, p0) }
     }
 
     func call<P0>(_ name: String, _ p0: P0) async throws where P0: ValueConvertible {
-        let function: ThreadsafeTypedFunction1<Undefined, P0> = try await get(name)
-        try await function.call(this: Undefined.default, p0)
+        try await withEnvironment { env in try self.call(env, name, p0) }
     }
 }
 
@@ -493,22 +457,18 @@ public extension ObjectReference {
     }
 
     func callSelf<Result>(_ name: String) async throws -> Result where Result: ValueConvertible {
-        let function: ThreadsafeTypedFunction0<Result> = try await get(name)
-        return try await function.call(this: self)
+        try await withEnvironment { env in try self.callSelf(env, name) }
     }
 
     func call<Result>(_ name: String) async throws -> Result where Result: ValueConvertible {
-        let function: ThreadsafeTypedFunction0<Result> = try await get(name)
-        return try await function.call(this: Undefined.default)
+        try await withEnvironment { env in try self.call(env, name) }
     }
 
     func callSelf(_ name: String) async throws {
-        let function: ThreadsafeTypedFunction0<Undefined> = try await get(name)
-        try await function.call(this: self)
+        try await withEnvironment { env in try self.callSelf(env, name) }
     }
 
     func call(_ name: String) async throws {
-        let function: ThreadsafeTypedFunction0<Undefined> = try await get(name)
-        try await function.call(this: Undefined.default)
+        try await withEnvironment { env in try self.call(env, name) }
     }
 }

@@ -9,7 +9,15 @@ enum EventEmitter {
         import Foundation
         import NAPIC
 
-        public class EventEmitter: ObjectReference {}
+        public class EventEmitter: ObjectReference {
+            func removeAllListeners(_ event: String? = nil) {
+                if let event {
+
+                } else {
+
+                }
+            }
+        }
         """)
         source.newline()
 
@@ -55,15 +63,42 @@ enum EventEmitter {
             }
 
             func on\(inGenerics.bracketedOrNone)(_ event: String, _ callback: @escaping (\(commaSeparatedInGenerics)) throws -> Void) async throws\(wheres.backspaceIfNotEmpty()) {
-                try await callSelf("on", event, TypedFunction\(paramCount)(named: "on", callback))
+                try await withEnvironment { env in try self.on(env, event, callback) }
             }
 
             func on\(inGenerics.bracketedOrNone)(_ event: String, _ callback: @escaping (Environment\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Void) async throws\(wheres.backspaceIfNotEmpty()) {
-                try await callSelf("on", event, TypedFunction\(paramCount)(named: "on", callback))
+                try await withEnvironment { env in try self.on(env, event, callback) }
             }
 
             func on\(inGenerics.bracketedOrNone)(_ event: String, _ callback: @escaping (\(commaSeparatedInGenerics)) async throws -> Void) async throws\(wheres.backspaceIfNotEmpty()) {
-                try await callSelf("on", event, TypedFunction\(paramCount)(named: "on", callback))
+                try await withEnvironment { env in try self.on(env, event, callback) }
+            }
+
+            @available(*, noasync)
+            func once\(inGenerics.bracketedOrNone)(_ env: Environment? = nil, _ event: String, _ callback: @escaping (\(commaSeparatedInGenerics)) throws -> Void) throws\(wheres.backspaceIfNotEmpty()) {
+                try callSelf(env, "once", event, TypedFunction\(paramCount)(named: "once", callback))
+            }
+
+            @available(*, noasync)
+            func once\(inGenerics.bracketedOrNone)(_ env: Environment? = nil, _ event: String, _ callback: @escaping (Environment\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Void) throws\(wheres.backspaceIfNotEmpty()) {
+                try callSelf(env, "once", event, TypedFunction\(paramCount)(named: "once", callback))
+            }
+
+            @available(*, noasync)
+            func once\(inGenerics.bracketedOrNone)(_ env: Environment? = nil, _ event: String, _ callback: @escaping (\(commaSeparatedInGenerics)) async throws -> Void) throws\(wheres.backspaceIfNotEmpty()) {
+                try callSelf(env, "once", event, TypedFunction\(paramCount)(named: "once", callback))
+            }
+
+            func once\(inGenerics.bracketedOrNone)(_ event: String, _ callback: @escaping (\(commaSeparatedInGenerics)) throws -> Void) async throws\(wheres.backspaceIfNotEmpty()) {
+                try await withEnvironment { env in try self.once(env, event, callback) }
+            }
+
+            func once\(inGenerics.bracketedOrNone)(_ event: String, _ callback: @escaping (Environment\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Void) async throws\(wheres.backspaceIfNotEmpty()) {
+                try await withEnvironment { env in try self.once(env, event, callback) }
+            }
+
+            func once\(inGenerics.bracketedOrNone)(_ event: String, _ callback: @escaping (\(commaSeparatedInGenerics)) async throws -> Void) async throws\(wheres.backspaceIfNotEmpty()) {
+                try await withEnvironment { env in try self.once(env, event, callback) }
             }
 
             @available(*, noasync)
@@ -72,7 +107,7 @@ enum EventEmitter {
             }
 
             func emit\(inGenerics.bracketedOrNone)(_ event: String\(inGenericsAsArgs)) async throws\(wheres.backspaceIfNotEmpty()) {
-                try await callSelf("emit", event\(argValueList))
+                try await withEnvironment { env in try self.emit(env, event\(argValueList)) }
             }
         }
         """)

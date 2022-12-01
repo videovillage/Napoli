@@ -43,6 +43,10 @@ open class Reference: ValueConvertible {
         return result
     }
 
+    public func withEnvironment<T>(_ closure: @escaping (Environment) throws -> T) async throws -> T {
+        try await envAccessor.withEnvironment(closure)
+    }
+
     deinit {
         let internalRef = internalRef
         let envAccessor = envAccessor
@@ -88,7 +92,7 @@ open class ObjectReference: Reference {
     }
 
     public func propertyNames() async throws -> [String] {
-        try await envAccessor.withEnvironment { env in
+        try await withEnvironment { env in
             try self.propertyNames(env)
         }
     }
@@ -100,7 +104,7 @@ open class ObjectReference: Reference {
     }
 
     public func set(_ key: String, value: some ValueConvertible) async throws {
-        try await envAccessor.withEnvironment { env in
+        try await withEnvironment { env in
             try self.set(env, key, value: value)
         }
     }
@@ -114,7 +118,7 @@ open class ObjectReference: Reference {
     }
 
     public func get<V: ValueConvertible>(_ key: String) async throws -> V {
-        try await envAccessor.withEnvironment { env in
+        try await withEnvironment { env in
             try self.get(env, key)
         }
     }
@@ -126,7 +130,7 @@ open class ObjectReference: Reference {
     }
 
     public func immutable() async throws -> ImmutableObject {
-        try await envAccessor.withEnvironment { env in
+        try await withEnvironment { env in
             try self.immutable(env)
         }
     }
