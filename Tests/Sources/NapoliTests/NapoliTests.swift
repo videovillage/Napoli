@@ -205,7 +205,7 @@ final class TestClass1: ClassDescribable {
     }
 
     required init() {}
-    
+
     static let jsInstanceProperties: [InstanceGetSetPropertyDescriptor<TestClass1>] = [
         .init("testObject", keyPath: \.testObject),
         .init("testString", keyPath: \.testString),
