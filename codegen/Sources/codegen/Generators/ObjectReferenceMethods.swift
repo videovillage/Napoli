@@ -40,7 +40,7 @@ enum ObjectReferenceMethods {
             // \(paramCount) param methods
             public extension ObjectReference {
                 @available(*, noasync)
-                func callThis\(allGenerics.bracketedOrNone)(_ env: Environment? = nil, _ name: String\(inGenericsAsArgs)) throws -> Result\(allWheres.backspaceIfNotEmpty()) {
+                func callSelf\(allGenerics.bracketedOrNone)(_ env: Environment? = nil, _ name: String\(inGenericsAsArgs)) throws -> Result\(allWheres.backspaceIfNotEmpty()) {
                     let env = env ?? storedEnvironment
                     let function: TypedFunction\(paramCount)\(allGenerics.bracketedOrNone) = try get(env, name)
                     return try function.call(env, this: self\(inGenericsAsCallArgs))
@@ -54,17 +54,37 @@ enum ObjectReferenceMethods {
                 }
 
                 @available(*, noasync)
-                func callThis\(inGenerics.bracketedOrNone)(_ env: Environment? = nil, _ name: String\(inGenericsAsArgs)) throws \(inWheres.backspaceIfNotEmpty()) {
+                func callSelf\(inGenerics.bracketedOrNone)(_ env: Environment? = nil, _ name: String\(inGenericsAsArgs)) throws \(inWheres.backspaceIfNotEmpty()) {
                     let env = env ?? storedEnvironment
                     let function: TypedFunction\(paramCount)<Undefined\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())> = try get(env, name)
-                    return try function.call(env, this: self\(inGenericsAsCallArgs))
+                    try function.call(env, this: self\(inGenericsAsCallArgs))
                 }
 
                 @available(*, noasync)
                 func call\(inGenerics.bracketedOrNone)(_ env: Environment? = nil, _ name: String\(inGenericsAsArgs)) throws \(inWheres.backspaceIfNotEmpty()) {
                     let env = env ?? storedEnvironment
                     let function: TypedFunction\(paramCount)<Undefined\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())> = try get(env, name)
-                    return try function.call(env, this: Undefined.default\(inGenericsAsCallArgs))
+                    try function.call(env, this: Undefined.default\(inGenericsAsCallArgs))
+                }
+
+                func callSelf\(allGenerics.bracketedOrNone)(_ name: String\(inGenericsAsArgs)) async throws -> Result\(allWheres.backspaceIfNotEmpty()) {
+                    let function: ThreadsafeTypedFunction\(paramCount)\(allGenerics.bracketedOrNone) = try await get(name)
+                    return try await function.call(this: self\(inGenericsAsCallArgs))
+                }
+
+                func call\(allGenerics.bracketedOrNone)(_ name: String\(inGenericsAsArgs)) async throws -> Result\(allWheres.backspaceIfNotEmpty()) {
+                    let function: ThreadsafeTypedFunction\(paramCount)\(allGenerics.bracketedOrNone) = try await get(name)
+                    return try await function.call(this: Undefined.default\(inGenericsAsCallArgs))
+                }
+
+                func callSelf\(inGenerics.bracketedOrNone)(_ name: String\(inGenericsAsArgs)) async throws \(inWheres.backspaceIfNotEmpty()) {
+                    let function: ThreadsafeTypedFunction\(paramCount)<Undefined\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())> = try await get(name)
+                    try await function.call(this: self\(inGenericsAsCallArgs))
+                }
+
+                func call\(inGenerics.bracketedOrNone)(_ name: String\(inGenericsAsArgs)) async throws \(inWheres.backspaceIfNotEmpty()) {
+                    let function: ThreadsafeTypedFunction\(paramCount)<Undefined\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())> = try await get(name)
+                    try await function.call(this: Undefined.default\(inGenericsAsCallArgs))
                 }
             }
         """)

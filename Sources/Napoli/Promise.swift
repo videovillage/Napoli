@@ -12,33 +12,37 @@ private class JSPromise: ObjectReference {
     @available(*, noasync)
     func attachDummyCatch(_ env: Environment? = nil) throws {
         typealias CatchCallback = TypedFunction1<Undefined, JSError>
-        try callThis(env, "catch", CatchCallback(named: "dummyCatch") { _, _ in })
+        try callSelf(env, "catch", CatchCallback(named: "dummyCatch") { _, _ in })
     }
 
     @available(*, noasync)
     func then<V: ValueConvertible>(_ env: Environment? = nil, onFulfilled: @escaping (Environment, V) -> Void, onReject: @escaping (Environment, JSError) -> Void) throws {
         typealias OnFullfillCallback = TypedFunction1<Undefined, V>
         typealias OnRejectCallback = TypedFunction1<Undefined, JSError>
-        try callThis(env,
+        try callSelf(env,
                      "then",
                      OnFullfillCallback(named: "onFulfilled", onFulfilled),
                      OnRejectCallback(named: "onReject", onReject))
+    }
+
+    func then<V: ValueConvertible>(onFulfilled: @escaping (Environment, V) -> Void, onReject: @escaping (Environment, JSError) -> Void) async throws {
+        typealias OnFullfillCallback = TypedFunction1<Undefined, V>
+        typealias OnRejectCallback = TypedFunction1<Undefined, JSError>
+        try await callSelf("then",
+                           OnFullfillCallback(named: "onFulfilled", onFulfilled),
+                           OnRejectCallback(named: "onReject", onReject))
     }
 
     func getValue<V: ValueConvertible>() async throws -> V {
         try await withCheckedThrowingContinuation { continuation in
             Task {
                 do {
-                    try await envAccessor.withEnvironment { env in
-                        try self.then(env,
-                                      onFulfilled: { _, value in
-                                          continuation.resume(returning: value)
-
-                                      },
-                                      onReject: { _, error in
-                                          continuation.resume(throwing: error)
-                                      })
-                    }
+                    try await self.then(onFulfilled: { _, value in
+                                            continuation.resume(returning: value)
+                                        },
+                                        onReject: { _, error in
+                                            continuation.resume(throwing: error)
+                                        })
                 } catch {
                     continuation.resume(throwing: error)
                 }
