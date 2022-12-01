@@ -13,11 +13,11 @@ async function run() {
   const exec = require("node:child_process").exec
 
   if (platform == "darwin" || platform == "linux") {
-    downloadHeadersCommand = `npx node-gyp install ${nodeHeadersVersion} --devdir=node_headers --ensure`
+    downloadHeadersCommand = `npm node-gyp install ${nodeHeadersVersion} --devdir=node_headers --ensure`
     var libExtension = platform == "darwin" ? ".dylib" : ".so"
     moveLibraryCommand = `mv .build/release/lib${libraryName}${libExtension} .build/release/${libraryName}.node`
   } else if (platform === "win32") {
-    downloadHeadersCommand = `npx node-gyp install ${nodeHeadersVersion} --arch=x64 --devdir=node_headers --ensure`
+    downloadHeadersCommand = `npm node-gyp install ${nodeHeadersVersion} --arch=x64 --devdir=node_headers --ensure`
     moveLibraryCommand = `move /Y .build\\release\\${libraryName}.dll .build\\release\\${libraryName}.node`
     swiftBuildCommand = `${swiftBuildCommand} -Xlinker -Lnode_headers\\${nodeHeadersVersion}\\x64`
   } else {
