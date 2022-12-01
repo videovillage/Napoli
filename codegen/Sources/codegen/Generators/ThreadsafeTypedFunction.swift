@@ -51,7 +51,8 @@ enum ThreadsafeTypedFunction {
                     if try! exceptionIsPending(env) {
                         var errorResult: napi_value!
                         try! napi_get_and_clear_last_exception(env.env, &errorResult).throwIfError()
-                        callbackData.continuation.resume(throwing: JSException(value: errorResult))
+                        let error = try! JSError(env, from: errorResult)
+                        callbackData.continuation.resume(throwing: error)
                     } else {
                         callbackData.continuation.resume(throwing: error)
                     }

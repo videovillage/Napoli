@@ -9,22 +9,20 @@ private class JSPromise: ObjectReference {
         try attachDummyCatch(env)
     }
 
+    @available(*, noasync)
     func attachDummyCatch(_ env: Environment? = nil) throws {
-        let env = env ?? storedEnvironment
-        let catchFunction: TypedFunction1<Undefined, TypedFunction1<Null, JSError>> = try get(env, "catch")
-        try catchFunction.call(env, this: self, .init(named: "dummy") { _, _ in
-            Null.default
-        })
+        typealias CatchCallback = TypedFunction1<Undefined, JSError>
+        try callThis(env, "catch", CatchCallback(named: "dummyCatch", { _, _ in }))
     }
 
+    @available(*, noasync)
     func then<V: ValueConvertible>(_ env: Environment? = nil, onFulfilled: @escaping (Environment, V) -> Void, onReject: @escaping (Environment, JSError) -> Void) throws {
-        let env = env ?? storedEnvironment
-        let function: TypedFunction2<Undefined, TypedFunction1<Undefined, V>, TypedFunction1<Undefined, JSError>> = try get(env, "then")
-
-        try function.call(env,
-                          this: self,
-                          .init(named: "onFulfilled", onFulfilled),
-                          .init(named: "onReject", onReject))
+        typealias OnFullfillCallback = TypedFunction1<Undefined, V>
+        typealias OnRejectCallback = TypedFunction1<Undefined, JSError>
+        try callThis(env,
+                     "then",
+                     OnFullfillCallback(named: "onFulfilled", onFulfilled),
+                     OnRejectCallback(named: "onReject", onReject))
     }
 
     func getValue<V: ValueConvertible>() async throws -> V {

@@ -36,6 +36,7 @@ struct Codegen: ParsableCommand {
         try ThreadsafeTypedFunction.generate(maxParams: params).result().write(to: generatedFile(named: "ThreadsafeTypedFunction"), atomically: true, encoding: .utf8)
         try Method.generate(maxParams: params).result().write(to: generatedFile(named: "MethodDescriptor"), atomically: true, encoding: .utf8)
         try InstanceMethod.generate(maxParams: params).result().write(to: generatedFile(named: "InstanceMethodDescriptor"), atomically: true, encoding: .utf8)
+        try ObjectReferenceMethods.generate(maxParams: params).result().write(to: generatedFile(named: "ObjectReferenceMethods"), atomically: true, encoding: .utf8)
     }
 }
 

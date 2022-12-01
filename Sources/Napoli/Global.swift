@@ -3,13 +3,15 @@ import NAPIC
 
 public extension Environment {
     final class Global: ObjectReference {
-        public convenience init(_ env: Environment) throws {
+        @available(*, noasync)
+        fileprivate convenience init(_ env: Environment) throws {
             var global: napi_value?
             try napi_get_global(env.env, &global).throwIfError()
             try self.init(env, from: global!)
         }
     }
 
+    @available(*, noasync)
     func global() throws -> Global {
         try Global(self)
     }
@@ -17,18 +19,19 @@ public extension Environment {
 
 public extension Environment.Global {
     final class JSON: ObjectReference {
-        public func stringify<V: ValueConvertible>(_ value: V) throws -> String {
-            let function: TypedFunction1<String, V> = try get(storedEnvironment, "stringify")
-            return try function.call(storedEnvironment, value)
+        @available(*, noasync)
+        public func stringify<V: ValueConvertible>(env: Environment? = nil, _ value: V) throws -> String {
+            try call(env, "stringify", value)
         }
 
-        public func parse<V: ValueConvertible>(_ string: String) throws -> V {
-            let function: TypedFunction1<V, String> = try get(storedEnvironment, "parse")
-            return try function.call(storedEnvironment, string)
+        @available(*, noasync)
+        public func parse<V: ValueConvertible>(env: Environment? = nil, _ string: String) throws -> V {
+            try call(env, "parse", string)
         }
     }
 
-    func json() throws -> JSON {
-        try get(storedEnvironment, "JSON")
+    @available(*, noasync)
+    func json(_ env: Environment? = nil) throws -> JSON {
+        try get(env, "JSON")
     }
 }
