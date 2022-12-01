@@ -57,15 +57,15 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: ${{ needs.swift-format.outputs.commitSHA }}
-      - uses: sushichop/gha-swift-env@v1
-        with:
-          swift-version: ${{ matrix.swift-version }}
       - name: Install Node ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
           cache-dependency-path: "Tests/package-lock.json"
+      - uses: sushichop/gha-swift-env@v1
+        with:
+          swift-version: ${{ matrix.swift-version }}
       - name: Test
         run: |
           npm install
