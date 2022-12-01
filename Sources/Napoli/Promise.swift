@@ -12,7 +12,7 @@ private class JSPromise: ObjectReference {
     @available(*, noasync)
     func attachDummyCatch(_ env: Environment? = nil) throws {
         typealias CatchCallback = TypedFunction1<Undefined, JSError>
-        try callThis(env, "catch", CatchCallback(named: "dummyCatch", { _, _ in }))
+        try callThis(env, "catch", CatchCallback(named: "dummyCatch") { _, _ in })
     }
 
     @available(*, noasync)

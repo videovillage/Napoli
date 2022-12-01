@@ -20,7 +20,7 @@ public extension Environment {
 public extension Environment.Global {
     final class JSON: ObjectReference {
         @available(*, noasync)
-        public func stringify<V: ValueConvertible>(env: Environment? = nil, _ value: V) throws -> String {
+        public func stringify(env: Environment? = nil, _ value: some ValueConvertible) throws -> String {
             try call(env, "stringify", value)
         }
 
