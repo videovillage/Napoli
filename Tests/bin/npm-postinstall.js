@@ -1,4 +1,10 @@
-// check os
+function ensureExecSuccess(code) {
+  if (code !== 0) {
+    console.error(`Command failed with exit code ${code}`)
+    process.exit(1)
+  }
+}
+
 async function run() {
   const process = require("process")
   var os = require("os")
@@ -34,6 +40,8 @@ async function run() {
       download.on("close", resolve)
     })
 
+    ensureExecSuccess(download.exitCode)
+
     console.log(`Build: \"${swiftBuildCommand}\"`)
     var build = exec(swiftBuildCommand)
     build.stdout.pipe(process.stdout)
@@ -42,6 +50,8 @@ async function run() {
       build.on("close", resolve)
     })
 
+    ensureExecSuccess(build.exitCode)
+
     console.log(`Renaming library to .node: \"${moveLibraryCommand}\"`)
     var move = exec(moveLibraryCommand)
     move.stdout.pipe(process.stdout)
@@ -49,6 +59,8 @@ async function run() {
     await new Promise((resolve) => {
       move.on("close", resolve)
     })
+
+    ensureExecSuccess(move.exitCode)
   } catch (e) {
     console.error(e)
     process.exit(1)

@@ -46,12 +46,19 @@ public class Class: ValueConvertible {
     }
 }
 
+/// The name of the class exposed in JavaScript will be the same name as the Swift class by default, but can be overriden using the static `jsName` property.
 public protocol ClassDescribable: AnyObject {
     init()
     static var jsName: String { get }
     static var jsInstanceProperties: [InstanceGetSetPropertyDescriptor<Self>] { get }
     static var jsInstanceMethods: [InstanceMethodDescriptor<Self>] { get }
     static var jsAttributes: napi_property_attributes { get }
+}
+
+public extension ClassDescribable {
+    static var jsName: String {
+        String(describing: Self.self)
+    }
 }
 
 public extension ClassDescribable {
