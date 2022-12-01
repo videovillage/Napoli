@@ -177,6 +177,14 @@ func takeTypedCallback(env: Environment, fn: TypedFunction2<String, Int32, Bool>
     try assertEqual(expected: "23true", actual: try fn.call(env, 23, true))
 }
 
+func emitOnEventEmitter(env: Environment, emitter: EventEmitter) throws {
+    try emitter.emit(env, "channel5", "hello from swiftland", "hello from swiftland2")
+}
+
+func emitOnEventEmitterAsync(emitter: EventEmitter) async throws {
+    try await emitter.emit("channel11", "hello from swiftland async")
+}
+
 final class TestClass1: ClassDescribable {
     var testString: String = "Cool"
     var testNumber: Double = 1234
@@ -272,6 +280,9 @@ func initNapoliTests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointe
         MethodDescriptor("takeTypedCallback", takeTypedCallback),
         MethodDescriptor("modifyObjectByReferenceAsync", modifyObjectByReferenceAsync),
         MethodDescriptor("modifyObjectByReferenceSync", modifyObjectByReferenceSync),
+
+        MethodDescriptor("emitOnEventEmitter", emitOnEventEmitter),
+        MethodDescriptor("emitOnEventEmitterAsync", emitOnEventEmitterAsync),
         ClassDescriptor(TestClass1.self),
     ])
 }

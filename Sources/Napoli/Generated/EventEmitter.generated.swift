@@ -3,13 +3,6 @@
 import Foundation
 import NAPIC
 
-public class EventEmitter: ObjectReference {
-    func removeAllListeners(_ event: String? = nil) {
-        if let event {
-        } else {}
-    }
-}
-
 // 8 param methods
 public extension EventEmitter {
     @available(*, noasync)
