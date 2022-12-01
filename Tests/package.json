@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "test": "npm prettier --check . && mocha --trace-warnings",
+    "test": "npx prettier --check . && mocha --trace-warnings",
     "postinstall": "node bin/npm-postinstall.js NapoliTests"
   },
   "devDependencies": {
