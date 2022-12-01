@@ -25,15 +25,19 @@ open class Reference: ValueConvertible {
         return result
     }
 
+    @available(*, noasync)
     @discardableResult
-    public func unref(_ env: Environment) throws -> UInt32 {
+    public func unref(_ env: Environment? = nil) throws -> UInt32 {
+        let env = env ?? storedEnvironment
         var result: UInt32 = 0
         try napi_reference_unref(env.env, internalRef, &result).throwIfError()
         return result
     }
 
+    @available(*, noasync)
     @discardableResult
-    func ref(_ env: Environment) throws -> UInt32 {
+    func ref(_ env: Environment? = nil) throws -> UInt32 {
+        let env = env ?? storedEnvironment
         var result: UInt32 = 0
         try napi_reference_ref(env.env, internalRef, &result).throwIfError()
         return result
