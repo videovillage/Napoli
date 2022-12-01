@@ -66,8 +66,16 @@ func typedFuncNAPICallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) -> n
     }
 }
 
+/// A type-erased typed function
+public protocol Function: ValueConvertible {}
+
+/// A mostly type-erased typed function with a typed `Result`
+public protocol TypedResultFunction: Function {
+    associatedtype Result: ValueConvertible
+}
+
 /// A type-safe function with return type `Result` and 9 parameters.
-public class TypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
+public class TypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>: TypedResultFunction where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
     public typealias ConvenienceCallback = (P0, P1, P2, P3, P4, P5, P6, P7, P8) throws -> Result
     public typealias ConvenienceVoidCallback = (P0, P1, P2, P3, P4, P5, P6, P7, P8) throws -> Void
     public typealias AsyncConvenienceCallback<R: ValueConvertible> = (P0, P1, P2, P3, P4, P5, P6, P7, P8) async throws -> R
@@ -192,7 +200,7 @@ public class TypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>: ValueCo
 }
 
 /// A type-safe function with return type `Result` and 8 parameters.
-public class TypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
+public class TypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: TypedResultFunction where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
     public typealias ConvenienceCallback = (P0, P1, P2, P3, P4, P5, P6, P7) throws -> Result
     public typealias ConvenienceVoidCallback = (P0, P1, P2, P3, P4, P5, P6, P7) throws -> Void
     public typealias AsyncConvenienceCallback<R: ValueConvertible> = (P0, P1, P2, P3, P4, P5, P6, P7) async throws -> R
@@ -317,7 +325,7 @@ public class TypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: ValueConver
 }
 
 /// A type-safe function with return type `Result` and 7 parameters.
-public class TypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
+public class TypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: TypedResultFunction where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
     public typealias ConvenienceCallback = (P0, P1, P2, P3, P4, P5, P6) throws -> Result
     public typealias ConvenienceVoidCallback = (P0, P1, P2, P3, P4, P5, P6) throws -> Void
     public typealias AsyncConvenienceCallback<R: ValueConvertible> = (P0, P1, P2, P3, P4, P5, P6) async throws -> R
@@ -442,7 +450,7 @@ public class TypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: ValueConvertibl
 }
 
 /// A type-safe function with return type `Result` and 6 parameters.
-public class TypedFunction6<Result, P0, P1, P2, P3, P4, P5>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
+public class TypedFunction6<Result, P0, P1, P2, P3, P4, P5>: TypedResultFunction where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
     public typealias ConvenienceCallback = (P0, P1, P2, P3, P4, P5) throws -> Result
     public typealias ConvenienceVoidCallback = (P0, P1, P2, P3, P4, P5) throws -> Void
     public typealias AsyncConvenienceCallback<R: ValueConvertible> = (P0, P1, P2, P3, P4, P5) async throws -> R
@@ -567,7 +575,7 @@ public class TypedFunction6<Result, P0, P1, P2, P3, P4, P5>: ValueConvertible wh
 }
 
 /// A type-safe function with return type `Result` and 5 parameters.
-public class TypedFunction5<Result, P0, P1, P2, P3, P4>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
+public class TypedFunction5<Result, P0, P1, P2, P3, P4>: TypedResultFunction where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
     public typealias ConvenienceCallback = (P0, P1, P2, P3, P4) throws -> Result
     public typealias ConvenienceVoidCallback = (P0, P1, P2, P3, P4) throws -> Void
     public typealias AsyncConvenienceCallback<R: ValueConvertible> = (P0, P1, P2, P3, P4) async throws -> R
@@ -692,7 +700,7 @@ public class TypedFunction5<Result, P0, P1, P2, P3, P4>: ValueConvertible where 
 }
 
 /// A type-safe function with return type `Result` and 4 parameters.
-public class TypedFunction4<Result, P0, P1, P2, P3>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
+public class TypedFunction4<Result, P0, P1, P2, P3>: TypedResultFunction where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
     public typealias ConvenienceCallback = (P0, P1, P2, P3) throws -> Result
     public typealias ConvenienceVoidCallback = (P0, P1, P2, P3) throws -> Void
     public typealias AsyncConvenienceCallback<R: ValueConvertible> = (P0, P1, P2, P3) async throws -> R
@@ -817,7 +825,7 @@ public class TypedFunction4<Result, P0, P1, P2, P3>: ValueConvertible where Resu
 }
 
 /// A type-safe function with return type `Result` and 3 parameters.
-public class TypedFunction3<Result, P0, P1, P2>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
+public class TypedFunction3<Result, P0, P1, P2>: TypedResultFunction where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
     public typealias ConvenienceCallback = (P0, P1, P2) throws -> Result
     public typealias ConvenienceVoidCallback = (P0, P1, P2) throws -> Void
     public typealias AsyncConvenienceCallback<R: ValueConvertible> = (P0, P1, P2) async throws -> R
@@ -942,7 +950,7 @@ public class TypedFunction3<Result, P0, P1, P2>: ValueConvertible where Result: 
 }
 
 /// A type-safe function with return type `Result` and 2 parameters.
-public class TypedFunction2<Result, P0, P1>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible {
+public class TypedFunction2<Result, P0, P1>: TypedResultFunction where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible {
     public typealias ConvenienceCallback = (P0, P1) throws -> Result
     public typealias ConvenienceVoidCallback = (P0, P1) throws -> Void
     public typealias AsyncConvenienceCallback<R: ValueConvertible> = (P0, P1) async throws -> R
@@ -1067,7 +1075,7 @@ public class TypedFunction2<Result, P0, P1>: ValueConvertible where Result: Valu
 }
 
 /// A type-safe function with return type `Result` and 1 parameter.
-public class TypedFunction1<Result, P0>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible {
+public class TypedFunction1<Result, P0>: TypedResultFunction where Result: ValueConvertible, P0: ValueConvertible {
     public typealias ConvenienceCallback = (P0) throws -> Result
     public typealias ConvenienceVoidCallback = (P0) throws -> Void
     public typealias AsyncConvenienceCallback<R: ValueConvertible> = (P0) async throws -> R
@@ -1192,7 +1200,7 @@ public class TypedFunction1<Result, P0>: ValueConvertible where Result: ValueCon
 }
 
 /// A type-safe function with return type `Result`.
-public class TypedFunction0<Result>: ValueConvertible where Result: ValueConvertible {
+public class TypedFunction0<Result>: TypedResultFunction where Result: ValueConvertible {
     public typealias ConvenienceCallback = () throws -> Result
     public typealias ConvenienceVoidCallback = () throws -> Void
     public typealias AsyncConvenienceCallback<R: ValueConvertible> = () async throws -> R

@@ -79,6 +79,9 @@ enum ThreadsafeTypedFunction {
                 napi_call_threadsafe_function(tsfn, unmanagedData.toOpaque(), napi_tsfn_blocking)
             } as! Result
         }
+
+        /// A type-erased threadsafe typed function
+        public protocol ThreadsafeTypedFunction: ValueConvertible {}
         """)
         source.newline()
 
@@ -106,7 +109,7 @@ enum ThreadsafeTypedFunction {
         A threadsafe and type-safe function with return type `Result`\(paramCount > 0 ? " and \(paramCount) parameter\(paramCount == 1 ? "" : "s")" : "").
         """
 
-        try source.declareClass(.public, "ThreadsafeTypedFunction\(paramCount)", genericParams: allGenerics, conformsTo: Types.valueConvertible, wheres: wheres, docs: docs) { source in
+        try source.declareClass(.public, "ThreadsafeTypedFunction\(paramCount)", genericParams: allGenerics, conformsTo: "ThreadsafeTypedFunction", wheres: wheres, docs: docs) { source in
             source.add("""
             public typealias InternalFunction = TypedFunction\(paramCount)\(allGenerics.bracketedOrNone)
             fileprivate var tsfn: napi_threadsafe_function!

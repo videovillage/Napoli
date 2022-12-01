@@ -73,8 +73,11 @@ private func _call<Result: ValueConvertible>(tsfn: napi_threadsafe_function, thi
     } as! Result
 }
 
+/// A type-erased threadsafe typed function
+public protocol ThreadsafeTypedFunction: ValueConvertible {}
+
 /// A threadsafe and type-safe function with return type `Result` and 9 parameters.
-public class ThreadsafeTypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
+public class ThreadsafeTypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>: ThreadsafeTypedFunction where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
     public typealias InternalFunction = TypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>
     fileprivate var tsfn: napi_threadsafe_function!
 
@@ -117,7 +120,7 @@ public class ThreadsafeTypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8
 }
 
 /// A threadsafe and type-safe function with return type `Result` and 8 parameters.
-public class ThreadsafeTypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
+public class ThreadsafeTypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: ThreadsafeTypedFunction where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
     public typealias InternalFunction = TypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>
     fileprivate var tsfn: napi_threadsafe_function!
 
@@ -160,7 +163,7 @@ public class ThreadsafeTypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: V
 }
 
 /// A threadsafe and type-safe function with return type `Result` and 7 parameters.
-public class ThreadsafeTypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
+public class ThreadsafeTypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: ThreadsafeTypedFunction where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
     public typealias InternalFunction = TypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>
     fileprivate var tsfn: napi_threadsafe_function!
 
@@ -203,7 +206,7 @@ public class ThreadsafeTypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: Value
 }
 
 /// A threadsafe and type-safe function with return type `Result` and 6 parameters.
-public class ThreadsafeTypedFunction6<Result, P0, P1, P2, P3, P4, P5>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
+public class ThreadsafeTypedFunction6<Result, P0, P1, P2, P3, P4, P5>: ThreadsafeTypedFunction where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
     public typealias InternalFunction = TypedFunction6<Result, P0, P1, P2, P3, P4, P5>
     fileprivate var tsfn: napi_threadsafe_function!
 
@@ -246,7 +249,7 @@ public class ThreadsafeTypedFunction6<Result, P0, P1, P2, P3, P4, P5>: ValueConv
 }
 
 /// A threadsafe and type-safe function with return type `Result` and 5 parameters.
-public class ThreadsafeTypedFunction5<Result, P0, P1, P2, P3, P4>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
+public class ThreadsafeTypedFunction5<Result, P0, P1, P2, P3, P4>: ThreadsafeTypedFunction where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
     public typealias InternalFunction = TypedFunction5<Result, P0, P1, P2, P3, P4>
     fileprivate var tsfn: napi_threadsafe_function!
 
@@ -289,7 +292,7 @@ public class ThreadsafeTypedFunction5<Result, P0, P1, P2, P3, P4>: ValueConverti
 }
 
 /// A threadsafe and type-safe function with return type `Result` and 4 parameters.
-public class ThreadsafeTypedFunction4<Result, P0, P1, P2, P3>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
+public class ThreadsafeTypedFunction4<Result, P0, P1, P2, P3>: ThreadsafeTypedFunction where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
     public typealias InternalFunction = TypedFunction4<Result, P0, P1, P2, P3>
     fileprivate var tsfn: napi_threadsafe_function!
 
@@ -332,7 +335,7 @@ public class ThreadsafeTypedFunction4<Result, P0, P1, P2, P3>: ValueConvertible 
 }
 
 /// A threadsafe and type-safe function with return type `Result` and 3 parameters.
-public class ThreadsafeTypedFunction3<Result, P0, P1, P2>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
+public class ThreadsafeTypedFunction3<Result, P0, P1, P2>: ThreadsafeTypedFunction where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
     public typealias InternalFunction = TypedFunction3<Result, P0, P1, P2>
     fileprivate var tsfn: napi_threadsafe_function!
 
@@ -375,7 +378,7 @@ public class ThreadsafeTypedFunction3<Result, P0, P1, P2>: ValueConvertible wher
 }
 
 /// A threadsafe and type-safe function with return type `Result` and 2 parameters.
-public class ThreadsafeTypedFunction2<Result, P0, P1>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible {
+public class ThreadsafeTypedFunction2<Result, P0, P1>: ThreadsafeTypedFunction where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible {
     public typealias InternalFunction = TypedFunction2<Result, P0, P1>
     fileprivate var tsfn: napi_threadsafe_function!
 
@@ -418,7 +421,7 @@ public class ThreadsafeTypedFunction2<Result, P0, P1>: ValueConvertible where Re
 }
 
 /// A threadsafe and type-safe function with return type `Result` and 1 parameter.
-public class ThreadsafeTypedFunction1<Result, P0>: ValueConvertible where Result: ValueConvertible, P0: ValueConvertible {
+public class ThreadsafeTypedFunction1<Result, P0>: ThreadsafeTypedFunction where Result: ValueConvertible, P0: ValueConvertible {
     public typealias InternalFunction = TypedFunction1<Result, P0>
     fileprivate var tsfn: napi_threadsafe_function!
 
@@ -461,7 +464,7 @@ public class ThreadsafeTypedFunction1<Result, P0>: ValueConvertible where Result
 }
 
 /// A threadsafe and type-safe function with return type `Result`.
-public class ThreadsafeTypedFunction0<Result>: ValueConvertible where Result: ValueConvertible {
+public class ThreadsafeTypedFunction0<Result>: ThreadsafeTypedFunction where Result: ValueConvertible {
     public typealias InternalFunction = TypedFunction0<Result>
     fileprivate var tsfn: napi_threadsafe_function!
 

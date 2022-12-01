@@ -72,6 +72,14 @@ enum TypedFunction {
                 return nil
             }
         }
+
+        /// A type-erased typed function
+        public protocol Function: ValueConvertible {}
+
+        /// A mostly type-erased typed function with a typed `Result`
+        public protocol TypedResultFunction: Function {
+            associatedtype Result: ValueConvertible
+        }
         """)
         source.newline()
 
@@ -118,7 +126,7 @@ enum TypedFunction {
         A type-safe function with return type `Result`\(paramCount > 0 ? " and \(paramCount) parameter\(paramCount == 1 ? "" : "s")" : "").
         """
 
-        try source.declareClass(.public, "TypedFunction\(paramCount)", genericParams: allGenerics, conformsTo: Types.valueConvertible, wheres: wheres, docs: docs) { source in
+        try source.declareClass(.public, "TypedFunction\(paramCount)", genericParams: allGenerics, conformsTo: "TypedResultFunction", wheres: wheres, docs: docs) { source in
             source.add("""
             public typealias ConvenienceCallback = (\(commaSeparatedInGenerics)) throws -> Result
             public typealias ConvenienceVoidCallback = (\(commaSeparatedInGenerics)) throws -> Void
