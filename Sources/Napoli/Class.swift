@@ -59,9 +59,15 @@ public extension ClassDescribable {
     static var jsName: String {
         String(describing: Self.self)
     }
-}
 
-public extension ClassDescribable {
+    static var jsInstanceProperties: [InstanceGetSetPropertyDescriptor<Self>] {
+        .init()
+    }
+
+    static var jsInstanceMethods: [InstanceMethodDescriptor<Self>] {
+        .init()
+    }
+
     static var jsAttributes: napi_property_attributes {
         napi_default
     }
