@@ -75,4 +75,16 @@ public class InstanceGetSetPropertyDescriptor<This: AnyObject>: GetSetPropertyDe
                    },
                    setter: nil)
     }
+
+    public init<V: ValueConvertible>(_ name: String, attributes: napi_property_attributes = napi_default, _ get: @escaping (_ this: isolated This) async throws -> V) where This: Actor {
+        super.init(name,
+                   attributes: attributes,
+                   getter: { env, args in
+                       let this = try Wrap<This>.unwrap(env, jsObject: args.this)
+                       return Promise {
+                           try await get(this)
+                       }
+                   },
+                   setter: nil)
+    }
 }

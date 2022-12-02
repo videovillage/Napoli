@@ -80,9 +80,11 @@ describe("Classes", () => {
     const actor = new addon.TestActor()
     assert.strictEqual(await actor.cool("I love actors!"), 44)
 
-    assert.strictEqual(await actor.getStorage(), 24)
+    assert.strictEqual(await actor.storage, 24)
 
     await actor.mutateStorage(75)
-    assert.strictEqual(await actor.getStorage(), 75)
+    assert.strictEqual(await actor.storage, 75)
+
+    assert.strictEqual(await actor.anotherVar, "another")
   })
 })

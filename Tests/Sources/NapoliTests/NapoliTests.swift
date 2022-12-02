@@ -205,6 +205,7 @@ func receiveOnEventEmitter(emitter: EventEmitter, onReady: ThreadsafeTypedFuncti
 
 actor TestActor: ClassDescribable {
     var storage: Int32 = 24
+    var anotherVar: String = "another"
     init() {}
 
     @Sendable func cool(_ string: String) async throws -> Int32 {
@@ -216,14 +217,14 @@ actor TestActor: ClassDescribable {
         storage = new
     }
 
-    @Sendable func getStorage() async -> Int32 {
-        storage
-    }
-
     static let jsInstanceMethods: [InstanceMethodDescriptor<TestActor>] = [
         .init("cool", cool),
         .init("mutateStorage", mutateStorage),
-        .init("getStorage", getStorage),
+    ]
+
+    static let jsInstanceProperties: [InstanceGetSetPropertyDescriptor<TestActor>] = [
+        .init("storage") { $0.storage },
+        .init("anotherVar") { $0.anotherVar }
     ]
 }
 
