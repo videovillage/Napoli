@@ -223,7 +223,7 @@ actor TestActor: ClassDescribable {
     static let jsInstanceMethods: [InstanceMethodDescriptor<TestActor>] = [
         .init("cool", cool),
         .init("mutateStorage", mutateStorage),
-        .init("getStorage", getStorage)
+        .init("getStorage", getStorage),
     ]
 }
 
@@ -327,7 +327,7 @@ func initNapoliTests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointe
         MethodDescriptor("emitOnEventEmitterAsync", emitOnEventEmitterAsync),
         MethodDescriptor("receiveOnEventEmitter", receiveOnEventEmitter),
         ClassDescriptor(TestClass1.self),
-        ClassDescriptor(TestActor.self)
+        ClassDescriptor(TestActor.self),
     ])
 }
 
