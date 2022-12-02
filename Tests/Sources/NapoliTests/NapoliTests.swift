@@ -185,6 +185,24 @@ func emitOnEventEmitterAsync(emitter: EventEmitter) async throws {
     try await emitter.emit("channel11", "hello from swiftland async")
 }
 
+func receiveOnEventEmitter(emitter: EventEmitter, onReady: ThreadsafeTypedFunction0<Undefined>) async throws {
+    _ = try await withCheckedThrowingContinuation { c in
+        Task {
+            try await emitter.on("channel23Async") { (int: Int32, string: String, dict: [String: Int32]) in
+                do {
+                    try assertEqual(expected: 22, actual: int)
+                    try assertEqual(expected: "test", actual: string)
+                    try assertEqual(expected: ["a": 1, "b": 2], actual: dict)
+                    c.resume()
+                } catch {
+                    c.resume(throwing: error)
+                }
+            }
+            try await onReady.call()
+        }
+    }
+}
+
 final class TestClass1: ClassDescribable {
     var testString: String = "Cool"
     var testNumber: Double = 1234
@@ -283,6 +301,7 @@ func initNapoliTests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointe
 
         MethodDescriptor("emitOnEventEmitter", emitOnEventEmitter),
         MethodDescriptor("emitOnEventEmitterAsync", emitOnEventEmitterAsync),
+        MethodDescriptor("receiveOnEventEmitter", receiveOnEventEmitter),
         ClassDescriptor(TestClass1.self),
     ])
 }
