@@ -203,6 +203,30 @@ func receiveOnEventEmitter(emitter: EventEmitter, onReady: ThreadsafeTypedFuncti
     }
 }
 
+actor TestActor: ClassDescribable {
+    var storage: Int32 = 24
+    init() {}
+
+    @Sendable func cool(_ string: String) async throws -> Int32 {
+        try assertEqual(expected: "I love actors!", actual: string)
+        return 44
+    }
+
+    @Sendable func mutateStorage(_ new: Int32) async {
+        storage = new
+    }
+
+    @Sendable func getStorage() async -> Int32 {
+        storage
+    }
+
+    static let jsInstanceMethods: [InstanceMethodDescriptor<TestActor>] = [
+        .init("cool", cool),
+        .init("mutateStorage", mutateStorage),
+        .init("getStorage", getStorage)
+    ]
+}
+
 final class TestClass1: ClassDescribable {
     var testString: String = "Cool"
     var testNumber: Double = 1234
@@ -303,6 +327,7 @@ func initNapoliTests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointe
         MethodDescriptor("emitOnEventEmitterAsync", emitOnEventEmitterAsync),
         MethodDescriptor("receiveOnEventEmitter", receiveOnEventEmitter),
         ClassDescriptor(TestClass1.self),
+        ClassDescriptor(TestActor.self)
     ])
 }
 

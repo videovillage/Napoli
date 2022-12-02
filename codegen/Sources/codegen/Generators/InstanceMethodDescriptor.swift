@@ -126,7 +126,7 @@ enum InstanceMethod {
 
         source.add("""
           // \(paramCount) param methods
-          public init\((allGenerics + [thisGeneric]).bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: isolated ThisActor) -> (\(commaSeparatedInGenerics)) throws -> Result)\(wheres.backspaceIfNotEmpty()) {
+          public init\((allGenerics + [thisGeneric]).bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: isolated ThisActor) -> @Sendable (\(commaSeparatedInGenerics)) throws -> Result)\(wheres.backspaceIfNotEmpty()) {
              super.init(name, attributes: attributes, argCount: \(paramCount)) { env, this, args in
                  \(argListAssignedToValues)
                  let this = try Wrap<ThisActor>.unwrap(env, jsObject: this)
@@ -136,7 +136,7 @@ enum InstanceMethod {
              }
           }
 
-          public init\((inGenerics + [thisGeneric]).bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: isolated ThisActor) -> (\(commaSeparatedInGenerics)) throws -> Void)\(voidWheres.backspaceIfNotEmpty()) {
+          public init\((inGenerics + [thisGeneric]).bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: isolated ThisActor) -> @Sendable (\(commaSeparatedInGenerics)) throws -> Void)\(voidWheres.backspaceIfNotEmpty()) {
              super.init(name, attributes: attributes, argCount: \(paramCount)) { env, this, args in
                  \(argListAssignedToValues)
                  let this = try Wrap<ThisActor>.unwrap(env, jsObject: this)
@@ -147,7 +147,7 @@ enum InstanceMethod {
              }
           }
 
-          public init\((allGenerics + [thisGeneric]).bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: isolated ThisActor) -> (\(commaSeparatedInGenerics)) async throws -> Result)\(wheres.backspaceIfNotEmpty()) {
+          public init\((allGenerics + [thisGeneric]).bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: isolated ThisActor) -> @Sendable (\(commaSeparatedInGenerics)) async throws -> Result)\(wheres.backspaceIfNotEmpty()) {
              super.init(name, attributes: attributes, argCount: \(paramCount)) { env, this, args in
                  \(argListAssignedToValues)
                  let this = try Wrap<ThisActor>.unwrap(env, jsObject: this)
@@ -157,7 +157,7 @@ enum InstanceMethod {
              }
           }
 
-          public init\((inGenerics + [thisGeneric]).bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: isolated ThisActor) -> (\(commaSeparatedInGenerics)) async throws -> Void)\(voidWheres.backspaceIfNotEmpty()) {
+          public init\((inGenerics + [thisGeneric]).bracketedOrNone)(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: isolated ThisActor) -> @Sendable (\(commaSeparatedInGenerics)) async throws -> Void)\(voidWheres.backspaceIfNotEmpty()) {
              super.init(name, attributes: attributes, argCount: \(paramCount)) { env, this, args in
                  \(argListAssignedToValues)
                  let this = try Wrap<ThisActor>.unwrap(env, jsObject: this)
