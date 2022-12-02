@@ -66,7 +66,7 @@ extension NAPIError {
         case .dateExpected: return napi_throw_type_error(env.env, nil, "Expected Date")
         case .arrayBufferExpected: return napi_throw_type_error(env.env, nil, "Expected Array Buffer")
         case .detachableArrayBufferExpected: return napi_throw_type_error(env.env, nil, "Expected Detachable Array Buffer")
-        default: return napi_throw_error(env.env, nil, localizedDescription)
+        default: return napi_throw_error(env.env, nil, String(describing: self))
         }
     }
 }
