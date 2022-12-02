@@ -41,7 +41,7 @@ func typedFuncNAPIThreadsafeCallback(_ env: napi_env?, _ js_callback: napi_value
 
             try callbackData.continuation.resume(returning: callbackData.resultConstructor(env, result!))
         } catch {
-            if try! exceptionIsPending(env) {
+            if env.exceptionIsPending() {
                 var errorResult: napi_value!
                 try! napi_get_and_clear_last_exception(env.env, &errorResult).throwIfError()
                 let error = try! JSError(env, from: errorResult)

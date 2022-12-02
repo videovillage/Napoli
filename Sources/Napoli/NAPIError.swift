@@ -52,25 +52,6 @@ public enum NAPIError: Swift.Error {
     }
 }
 
-extension NAPIError {
-    func napi_throw(_ env: Environment) -> napi_status {
-        switch self {
-        case .objectExpected: return napi_throw_type_error(env.env, nil, "Expected object")
-        case .stringExpected: return napi_throw_type_error(env.env, nil, "Expected string")
-        case .nameExpected: return napi_throw_type_error(env.env, nil, "Expected Symbol or string")
-        case .functionExpected: return napi_throw_type_error(env.env, nil, "Expected function")
-        case .numberExpected: return napi_throw_type_error(env.env, nil, "Expected number")
-        case .booleanExpected: return napi_throw_type_error(env.env, nil, "Expected boolean")
-        case .arrayExpected: return napi_throw_type_error(env.env, nil, "Expected array")
-        case .bigintExpected: return napi_throw_type_error(env.env, nil, "Expected BigInt")
-        case .dateExpected: return napi_throw_type_error(env.env, nil, "Expected Date")
-        case .arrayBufferExpected: return napi_throw_type_error(env.env, nil, "Expected Array Buffer")
-        case .detachableArrayBufferExpected: return napi_throw_type_error(env.env, nil, "Expected Detachable Array Buffer")
-        default: return napi_throw_error(env.env, nil, String(describing: self))
-        }
-    }
-}
-
 extension napi_status {
     func throwIfError() throws {
         guard self == napi_ok else {

@@ -6,24 +6,16 @@ public protocol ErrorConvertible: Swift.Error {
     var code: String? { get }
 }
 
-internal func throwError(_ env: Environment, _ error: Swift.Error) throws {
-    if let error = error as? NAPIError {
-        try error.napi_throw(env).throwIfError()
-    } else if let error = error as? ValueConvertible {
-        try napi_throw(env.env, error.napiValue(env)).throwIfError()
-    } else if let error = error as? ErrorConvertible {
-        try napi_throw_error(env.env, error.code, error.message).throwIfError()
-    } else {
-        try napi_throw_error(env.env, nil, error.localizedDescription).throwIfError()
+extension Error {
+    func throwInJS(_ env: Environment) {
+        if let error = self as? JSError {
+            try! napi_throw(env.env, error.napiValue(env)).throwIfError()
+        } else if let error = self as? ErrorConvertible {
+            try! napi_throw_error(env.env, error.code, error.message).throwIfError()
+        } else {
+            try! napi_throw_error(env.env, nil, String(describing: self)).throwIfError()
+        }
     }
-}
-
-internal func exceptionIsPending(_ env: Environment) throws -> Bool {
-    var result = false
-
-    try napi_is_exception_pending(env.env, &result).throwIfError()
-
-    return result
 }
 
 public typealias Callback = (Environment, Arguments) throws -> ValueConvertible
@@ -59,7 +51,7 @@ func swiftNAPICallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) -> napi_
     } catch NAPIError.pendingException {
         return nil
     } catch {
-        if try! exceptionIsPending(env) == false { try! throwError(env, error) }
+        if !env.exceptionIsPending() { error.throwInJS(env) }
         return nil
     }
 }
@@ -77,7 +69,7 @@ func swiftNAPIGetterCallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) ->
     } catch NAPIError.pendingException {
         return nil
     } catch {
-        if try! exceptionIsPending(env) == false { try! throwError(env, error) }
+        if !env.exceptionIsPending() { error.throwInJS(env) }
         return nil
     }
 }
@@ -95,7 +87,7 @@ func swiftNAPISetterCallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) ->
     } catch NAPIError.pendingException {
         return nil
     } catch {
-        if try! exceptionIsPending(env) == false { try! throwError(env, error) }
+        if !env.exceptionIsPending() { error.throwInJS(env) }
         return nil
     }
 }

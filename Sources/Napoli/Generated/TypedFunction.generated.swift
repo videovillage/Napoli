@@ -61,7 +61,7 @@ func typedFuncNAPICallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) -> n
     } catch NAPIError.pendingException {
         return nil
     } catch {
-        if try! exceptionIsPending(env) == false { try! throwError(env, error) }
+        if !env.exceptionIsPending() { error.throwInJS(env) }
         return nil
     }
 }

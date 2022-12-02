@@ -68,7 +68,7 @@ enum TypedFunction {
             } catch NAPIError.pendingException {
                 return nil
             } catch {
-                if try! exceptionIsPending(env) == false { try! throwError(env, error) }
+                if !env.exceptionIsPending() { error.throwInJS(env) }
                 return nil
             }
         }
