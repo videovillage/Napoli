@@ -23,8 +23,6 @@ enum WebContents {
     static func generateExtension(source: inout Source, paramCount: Int) throws {
         let inGenerics = [Generic](prefix: "P", count: paramCount)
 
-        let commaSeparatedInGenerics = inGenerics.map(\.type).commaSeparated
-
         let wheres = inGenerics.conforming(to: Types.valueConvertible).value
 
         let argValueList = inGenerics.map { $0.type.lowercased() }.commaSeparated.prefixCommaIfNotEmpty()

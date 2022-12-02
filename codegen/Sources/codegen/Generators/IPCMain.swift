@@ -26,7 +26,6 @@ enum IPCMain {
 
         let commaSeparatedInGenerics = inGenerics.map(\.type).commaSeparated
 
-        let wheres = inGenerics.conforming(to: Types.valueConvertible).value
         let allWheres = allGenerics.conforming(to: Types.valueConvertible).value
 
         source.add("""
