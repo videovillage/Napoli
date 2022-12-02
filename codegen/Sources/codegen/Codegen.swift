@@ -39,6 +39,7 @@ struct Codegen: ParsableCommand {
         try ObjectReferenceMethods.generate(maxParams: params).result().write(to: generatedFile(named: "ObjectReferenceMethods"), atomically: true, encoding: .utf8)
         try EventEmitter.generate(maxParams: params).result().write(to: generatedFile(named: "EventEmitter"), atomically: true, encoding: .utf8)
         try IPCMain.generate(maxParams: params).result().write(to: generatedFile(named: "IPCMain"), atomically: true, encoding: .utf8)
+        try WebContents.generate(maxParams: params).result().write(to: generatedFile(named: "WebContents"), atomically: true, encoding: .utf8)
     }
 }
 
