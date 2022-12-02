@@ -76,7 +76,7 @@ public class InstanceGetSetPropertyDescriptor<This: AnyObject>: GetSetPropertyDe
                    setter: nil)
     }
 
-    public init<V: ValueConvertible>(_ name: String, attributes: napi_property_attributes = napi_default, _ get: @escaping (_ this: isolated This) async throws -> V) where This: Actor {
+    public init(_ name: String, attributes: napi_property_attributes = napi_default, _ get: @escaping (_ this: isolated This) async throws -> some ValueConvertible) where This: Actor {
         super.init(name,
                    attributes: attributes,
                    getter: { env, args in

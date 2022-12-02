@@ -224,7 +224,7 @@ actor TestActor: ClassDescribable {
 
     static let jsInstanceProperties: [InstanceGetSetPropertyDescriptor<TestActor>] = [
         .init("storage") { $0.storage },
-        .init("anotherVar") { $0.anotherVar }
+        .init("anotherVar") { $0.anotherVar },
     ]
 }
 
