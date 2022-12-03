@@ -203,7 +203,7 @@ func receiveOnEventEmitter(emitter: EventEmitter, onReady: ThreadsafeTypedFuncti
     }
 }
 
-//actor TestActor: ClassDescribable {
+// actor TestActor: ClassDescribable {
 //    var storage: Int32 = 24
 //    var anotherVar: String = "another"
 //    init() {}
@@ -226,7 +226,7 @@ func receiveOnEventEmitter(emitter: EventEmitter, onReady: ThreadsafeTypedFuncti
 //        .init("storage") { $0.storage },
 //        .init("anotherVar") { $0.anotherVar },
 //    ]
-//}
+// }
 
 final class TestClass1: ClassDescribable {
     var testString: String = "Cool"
