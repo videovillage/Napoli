@@ -19,7 +19,7 @@ struct Codegen: ParsableCommand {
     var folderURL: URL
 
     func generatedFile(named name: String) -> URL {
-        folderURL.appending(path: "\(name).generated.swift", directoryHint: .notDirectory)
+        folderURL.appendingPathComponent("\(name).generated.swift", isDirectory: false)
     }
 
     func validate() throws {
