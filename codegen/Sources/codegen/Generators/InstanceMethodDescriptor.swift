@@ -15,7 +15,7 @@ enum InstanceMethod {
         try source.declareClass(.public, "InstanceMethodDescriptor", genericParams: [.init(type: "This")], conformsTo: "MethodDescriptor", wheres: [.conforms("This", "AnyObject")]) { source in
             for i in (0 ..< maxParams).reversed() {
                 try generateMethods(source: &source, paramCount: i)
-                try generateActorMethods(source: &source, paramCount: i)
+                // try generateActorMethods(source: &source, paramCount: i)
             }
         }
 

@@ -203,30 +203,30 @@ func receiveOnEventEmitter(emitter: EventEmitter, onReady: ThreadsafeTypedFuncti
     }
 }
 
-actor TestActor: ClassDescribable {
-    var storage: Int32 = 24
-    var anotherVar: String = "another"
-    init() {}
-
-    @Sendable func cool(_ string: String) async throws -> Int32 {
-        try assertEqual(expected: "I love actors!", actual: string)
-        return 44
-    }
-
-    @Sendable func mutateStorage(_ new: Int32) async {
-        storage = new
-    }
-
-    static let jsInstanceMethods: [InstanceMethodDescriptor<TestActor>] = [
-        .init("cool", cool),
-        .init("mutateStorage", mutateStorage),
-    ]
-
-    static let jsInstanceProperties: [InstanceGetSetPropertyDescriptor<TestActor>] = [
-        .init("storage") { $0.storage },
-        .init("anotherVar") { $0.anotherVar },
-    ]
-}
+//actor TestActor: ClassDescribable {
+//    var storage: Int32 = 24
+//    var anotherVar: String = "another"
+//    init() {}
+//
+//    @Sendable func cool(_ string: String) async throws -> Int32 {
+//        try assertEqual(expected: "I love actors!", actual: string)
+//        return 44
+//    }
+//
+//    @Sendable func mutateStorage(_ new: Int32) async {
+//        storage = new
+//    }
+//
+//    static let jsInstanceMethods: [InstanceMethodDescriptor<TestActor>] = [
+//        .init("cool", cool),
+//        .init("mutateStorage", mutateStorage),
+//    ]
+//
+//    static let jsInstanceProperties: [InstanceGetSetPropertyDescriptor<TestActor>] = [
+//        .init("storage") { $0.storage },
+//        .init("anotherVar") { $0.anotherVar },
+//    ]
+//}
 
 final class TestClass1: ClassDescribable {
     var testString: String = "Cool"
@@ -328,7 +328,7 @@ func initNapoliTests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointe
         MethodDescriptor("emitOnEventEmitterAsync", emitOnEventEmitterAsync),
         MethodDescriptor("receiveOnEventEmitter", receiveOnEventEmitter),
         ClassDescriptor(TestClass1.self),
-        ClassDescriptor(TestActor.self),
+//        ClassDescriptor(TestActor.self),
     ])
 }
 
