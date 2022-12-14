@@ -1,6 +1,6 @@
 import Foundation
 
-public class EventEmitter: ObjectReference {
+open class EventEmitter: ObjectReference {
     @available(*, noasync)
     func removeAllListeners(_ env: Environment? = nil, _ event: String? = nil) throws {
         if let event {
