@@ -48,11 +48,15 @@ open class Reference: ValueConvertible {
     }
 
     deinit {
-        let internalRef = internalRef
-        let envAccessor = envAccessor
-        Task {
-            try! await envAccessor.withEnvironment { env in
-                try napi_delete_reference(env.env, internalRef).throwIfError()
+        if Thread.isJSThread {
+            try! napi_delete_reference(storedEnvironment.env, internalRef).throwIfError()
+        } else {
+            let internalRef = internalRef
+            let envAccessor = envAccessor
+            Task {
+                try! await envAccessor.withEnvironment { env in
+                    try napi_delete_reference(env.env, internalRef).throwIfError()
+                }
             }
         }
     }
