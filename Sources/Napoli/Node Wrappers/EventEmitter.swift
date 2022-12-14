@@ -2,11 +2,11 @@ import Foundation
 
 open class EventEmitter: ObjectReference {
     @available(*, noasync)
-    public func removeAllListeners(_ env: Environment? = nil, _ event: String? = nil) throws {
+    public func removeAllListeners(env: Environment? = nil, _ event: String? = nil) throws {
         if let event {
-            try callSelf(env, "removeAllListeners", event)
+            try callSelf(env: env, "removeAllListeners", event)
         } else {
-            try callSelf(env, "removeAllListeners")
+            try callSelf(env: env, "removeAllListeners")
         }
     }
 

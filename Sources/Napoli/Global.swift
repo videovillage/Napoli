@@ -21,17 +21,17 @@ public extension Environment.Global {
     final class JSON: ObjectReference {
         @available(*, noasync)
         public func stringify(env: Environment? = nil, _ value: some ValueConvertible) throws -> String {
-            try call(env, "stringify", value)
+            try call(env: env, "stringify", value)
         }
 
         @available(*, noasync)
         public func parse<V: ValueConvertible>(env: Environment? = nil, _ string: String) throws -> V {
-            try call(env, "parse", string)
+            try call(env: env, "parse", string)
         }
     }
 
     @available(*, noasync)
-    func json(_ env: Environment? = nil) throws -> JSON {
-        try get(env, "JSON")
+    func json(env: Environment? = nil) throws -> JSON {
+        try get(env: env, "JSON")
     }
 }

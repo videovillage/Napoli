@@ -125,12 +125,12 @@ func modifyObjectByReferenceAsync(object: ObjectReference) async throws {
     try assertEqual(expected: "good", actual: try await object.get("additional"))
 }
 
-func modifyObjectByReferenceSync(env: Environment, object: ObjectReference) throws {
-    try assertEqual(expected: "bad", actual: try object.get(env, "cool"))
-    try object.set(env, "cool", value: "neat")
-    try object.set(env, "additional", value: "good")
-    try assertEqual(expected: "neat", actual: try object.get(env, "cool"))
-    try assertEqual(expected: "good", actual: try object.get(env, "additional"))
+func modifyObjectByReferenceSync(object: ObjectReference) throws {
+    try assertEqual(expected: "bad", actual: try object.get("cool"))
+    try object.set("cool", value: "neat")
+    try object.set("additional", value: "good")
+    try assertEqual(expected: "neat", actual: try object.get("cool"))
+    try assertEqual(expected: "good", actual: try object.get("additional"))
 }
 
 func testEnvironment(env: Environment) throws -> String {
@@ -177,8 +177,8 @@ func takeTypedCallback(env: Environment, fn: TypedFunction2<String, Int32, Bool>
     try assertEqual(expected: "23true", actual: try fn.call(env, 23, true))
 }
 
-func emitOnEventEmitter(env: Environment, emitter: EventEmitter) throws {
-    try emitter.emit(env, "channel5", "hello from swiftland", "hello from swiftland2")
+func emitOnEventEmitter(emitter: EventEmitter) throws {
+    try emitter.emit("channel5", "hello from swiftland", "hello from swiftland2")
 }
 
 func emitOnEventEmitterAsync(emitter: EventEmitter) async throws {

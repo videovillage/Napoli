@@ -1,6 +1,7 @@
 import Foundation
 import NAPIC
 
+/// initializes with a weak reference to the underlying `napi_value` - if you need a strong reference, call `ref()`
 open class Reference: ValueConvertible {
     public let envAccessor: EnvironmentAccessor
 
@@ -10,10 +11,9 @@ open class Reference: ValueConvertible {
 
     private let internalRef: napi_ref
 
-    /// initializes with a default reference count of 1
     public required init(_ env: Environment, from value: napi_value) throws {
         var result: napi_ref!
-        try napi_create_reference(env.env, value, 1, &result).throwIfError()
+        try napi_create_reference(env.env, value, 0, &result).throwIfError()
         internalRef = result!
         envAccessor = try .init(env)
         storedEnvironment = env
@@ -27,20 +27,34 @@ open class Reference: ValueConvertible {
 
     @available(*, noasync)
     @discardableResult
-    public func unref(_ env: Environment? = nil) throws -> UInt32 {
+    public func unref(env: Environment? = nil) throws -> UInt32 {
         let env = env ?? storedEnvironment
         var result: UInt32 = 0
         try napi_reference_unref(env.env, internalRef, &result).throwIfError()
         return result
     }
 
+    @discardableResult
+    public func unref() async throws -> UInt32 {
+        try await withEnvironment { env in
+            try self.unref(env: env)
+        }
+    }
+
     @available(*, noasync)
     @discardableResult
-    func ref(_ env: Environment? = nil) throws -> UInt32 {
+    public func ref(env: Environment? = nil) throws -> UInt32 {
         let env = env ?? storedEnvironment
         var result: UInt32 = 0
         try napi_reference_ref(env.env, internalRef, &result).throwIfError()
         return result
+    }
+
+    @discardableResult
+    public func ref() async throws -> UInt32 {
+        try await withEnvironment { env in
+            try self.ref(env: env)
+        }
     }
 
     public func withEnvironment<T>(_ closure: @escaping (Environment) throws -> T) async throws -> T {
@@ -102,19 +116,19 @@ open class ObjectReference: Reference {
     }
 
     @available(*, noasync)
-    public func set(_ env: Environment? = nil, _ key: String, value: some ValueConvertible) throws {
+    public func set(env: Environment? = nil, _ key: String, value: some ValueConvertible) throws {
         let env = env ?? storedEnvironment
         try napi_set_property(env.env, napiValue(env), key.napiValue(env), value.napiValue(env)).throwIfError()
     }
 
     public func set(_ key: String, value: some ValueConvertible) async throws {
         try await withEnvironment { env in
-            try self.set(env, key, value: value)
+            try self.set(env: env, key, value: value)
         }
     }
 
     @available(*, noasync)
-    public func get<V: ValueConvertible>(_ env: Environment? = nil, _ key: String) throws -> V {
+    public func get<V: ValueConvertible>(env: Environment? = nil, _ key: String) throws -> V {
         let env = env ?? storedEnvironment
         var value: napi_value!
         try napi_get_property(env.env, napiValue(env), key.napiValue(env), &value).throwIfError()
@@ -123,19 +137,19 @@ open class ObjectReference: Reference {
 
     public func get<V: ValueConvertible>(_ key: String) async throws -> V {
         try await withEnvironment { env in
-            try self.get(env, key)
+            try self.get(env: env, key)
         }
     }
 
     @available(*, noasync)
-    public func immutable(_ env: Environment? = nil) throws -> ImmutableObject {
+    public func immutable(env: Environment? = nil) throws -> ImmutableObject {
         let env = env ?? storedEnvironment
         return try .init(env, from: napiValue(env))
     }
 
     public func immutable() async throws -> ImmutableObject {
         try await withEnvironment { env in
-            try self.immutable(env)
+            try self.immutable(env: env)
         }
     }
 }

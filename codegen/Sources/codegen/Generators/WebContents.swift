@@ -38,12 +38,12 @@ enum WebContents {
         // \(paramCount) param methods
         public extension WebContents {
             @available(*, noasync)
-            func send\(inGenerics.bracketedOrNone)(_ env: Environment? = nil, _ channel: String\(inGenericsAsArgs)) throws\(wheres.backspaceIfNotEmpty()) {
-                try callSelf(env, "send", channel\(argValueList))
+            func send\(inGenerics.bracketedOrNone)(env: Environment? = nil, _ channel: String\(inGenericsAsArgs)) throws\(wheres.backspaceIfNotEmpty()) {
+                try callSelf(env: env, "send", channel\(argValueList))
             }
 
             func send\(inGenerics.bracketedOrNone)(_ channel: String\(inGenericsAsArgs)) async throws\(wheres.backspaceIfNotEmpty()) {
-                try await withEnvironment { env in try self.send(env, channel\(argValueList)) }
+                try await withEnvironment { env in try self.send(env: env, channel\(argValueList)) }
             }
         }
         """)

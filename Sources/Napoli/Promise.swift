@@ -12,14 +12,14 @@ private class JSPromise: ObjectReference {
     @available(*, noasync)
     func attachDummyCatch(_ env: Environment? = nil) throws {
         typealias CatchCallback = TypedFunction1<Undefined, JSError>
-        try callSelf(env, "catch", CatchCallback(named: "dummyCatch") { _, _ in })
+        try callSelf(env: env, "catch", CatchCallback(named: "dummyCatch") { _, _ in })
     }
 
     @available(*, noasync)
     func then<V: ValueConvertible>(_ env: Environment? = nil, onFulfilled: @escaping (Environment, V) -> Void, onReject: @escaping (Environment, JSError) -> Void) throws {
         typealias OnFullfillCallback = TypedFunction1<Undefined, V>
         typealias OnRejectCallback = TypedFunction1<Undefined, JSError>
-        try callSelf(env,
+        try callSelf(env: env,
                      "then",
                      OnFullfillCallback(named: "onFulfilled", onFulfilled),
                      OnRejectCallback(named: "onReject", onReject))

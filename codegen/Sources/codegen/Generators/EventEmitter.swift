@@ -38,66 +38,66 @@ enum EventEmitter {
         // \(paramCount) param methods
         public extension EventEmitter {
             @available(*, noasync)
-            func on\(inGenerics.bracketedOrNone)(_ env: Environment? = nil, _ event: String, _ callback: @escaping (\(commaSeparatedInGenerics)) throws -> Void) throws\(wheres.backspaceIfNotEmpty()) {
-                try callSelf(env, "on", event, TypedFunction\(paramCount)(named: "on", callback))
+            func on\(inGenerics.bracketedOrNone)(env: Environment? = nil, _ event: String, _ callback: @escaping (\(commaSeparatedInGenerics)) throws -> Void) throws\(wheres.backspaceIfNotEmpty()) {
+                try callSelf(env: env, "on", event, TypedFunction\(paramCount)(named: "on", callback))
             }
 
             @available(*, noasync)
-            func on\(inGenerics.bracketedOrNone)(_ env: Environment? = nil, _ event: String, _ callback: @escaping (Environment\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Void) throws\(wheres.backspaceIfNotEmpty()) {
-                try callSelf(env, "on", event, TypedFunction\(paramCount)(named: "on", callback))
+            func on\(inGenerics.bracketedOrNone)(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Void) throws\(wheres.backspaceIfNotEmpty()) {
+                try callSelf(env: env, "on", event, TypedFunction\(paramCount)(named: "on", callback))
             }
 
             @available(*, noasync)
-            func on\(inGenerics.bracketedOrNone)(_ env: Environment? = nil, _ event: String, _ callback: @escaping (\(commaSeparatedInGenerics)) async throws -> Void) throws\(wheres.backspaceIfNotEmpty()) {
-                try callSelf(env, "on", event, TypedFunction\(paramCount)(named: "on", callback))
+            func on\(inGenerics.bracketedOrNone)(env: Environment? = nil, _ event: String, _ callback: @escaping (\(commaSeparatedInGenerics)) async throws -> Void) throws\(wheres.backspaceIfNotEmpty()) {
+                try callSelf(env: env, "on", event, TypedFunction\(paramCount)(named: "on", callback))
             }
 
             func on\(inGenerics.bracketedOrNone)(_ event: String, _ callback: @escaping (\(commaSeparatedInGenerics)) throws -> Void) async throws\(wheres.backspaceIfNotEmpty()) {
-                try await withEnvironment { env in try self.on(env, event, callback) }
+                try await withEnvironment { env in try self.on(env: env, event, callback) }
             }
 
             func on\(inGenerics.bracketedOrNone)(_ event: String, _ callback: @escaping (Environment\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Void) async throws\(wheres.backspaceIfNotEmpty()) {
-                try await withEnvironment { env in try self.on(env, event, callback) }
+                try await withEnvironment { env in try self.on(env: env, event, callback) }
             }
 
             func on\(inGenerics.bracketedOrNone)(_ event: String, _ callback: @escaping (\(commaSeparatedInGenerics)) async throws -> Void) async throws\(wheres.backspaceIfNotEmpty()) {
-                try await withEnvironment { env in try self.on(env, event, callback) }
+                try await withEnvironment { env in try self.on(env: env, event, callback) }
             }
 
             @available(*, noasync)
-            func once\(inGenerics.bracketedOrNone)(_ env: Environment? = nil, _ event: String, _ callback: @escaping (\(commaSeparatedInGenerics)) throws -> Void) throws\(wheres.backspaceIfNotEmpty()) {
-                try callSelf(env, "once", event, TypedFunction\(paramCount)(named: "once", callback))
+            func once\(inGenerics.bracketedOrNone)(env: Environment? = nil, _ event: String, _ callback: @escaping (\(commaSeparatedInGenerics)) throws -> Void) throws\(wheres.backspaceIfNotEmpty()) {
+                try callSelf(env: env, "once", event, TypedFunction\(paramCount)(named: "once", callback))
             }
 
             @available(*, noasync)
-            func once\(inGenerics.bracketedOrNone)(_ env: Environment? = nil, _ event: String, _ callback: @escaping (Environment\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Void) throws\(wheres.backspaceIfNotEmpty()) {
-                try callSelf(env, "once", event, TypedFunction\(paramCount)(named: "once", callback))
+            func once\(inGenerics.bracketedOrNone)(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Void) throws\(wheres.backspaceIfNotEmpty()) {
+                try callSelf(env: env, "once", event, TypedFunction\(paramCount)(named: "once", callback))
             }
 
             @available(*, noasync)
-            func once\(inGenerics.bracketedOrNone)(_ env: Environment? = nil, _ event: String, _ callback: @escaping (\(commaSeparatedInGenerics)) async throws -> Void) throws\(wheres.backspaceIfNotEmpty()) {
-                try callSelf(env, "once", event, TypedFunction\(paramCount)(named: "once", callback))
+            func once\(inGenerics.bracketedOrNone)(env: Environment? = nil, _ event: String, _ callback: @escaping (\(commaSeparatedInGenerics)) async throws -> Void) throws\(wheres.backspaceIfNotEmpty()) {
+                try callSelf(env: env, "once", event, TypedFunction\(paramCount)(named: "once", callback))
             }
 
             func once\(inGenerics.bracketedOrNone)(_ event: String, _ callback: @escaping (\(commaSeparatedInGenerics)) throws -> Void) async throws\(wheres.backspaceIfNotEmpty()) {
-                try await withEnvironment { env in try self.once(env, event, callback) }
+                try await withEnvironment { env in try self.once(env: env, event, callback) }
             }
 
             func once\(inGenerics.bracketedOrNone)(_ event: String, _ callback: @escaping (Environment\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Void) async throws\(wheres.backspaceIfNotEmpty()) {
-                try await withEnvironment { env in try self.once(env, event, callback) }
+                try await withEnvironment { env in try self.once(env: env, event, callback) }
             }
 
             func once\(inGenerics.bracketedOrNone)(_ event: String, _ callback: @escaping (\(commaSeparatedInGenerics)) async throws -> Void) async throws\(wheres.backspaceIfNotEmpty()) {
-                try await withEnvironment { env in try self.once(env, event, callback) }
+                try await withEnvironment { env in try self.once(env: env, event, callback) }
             }
 
             @available(*, noasync)
-            func emit\(inGenerics.bracketedOrNone)(_ env: Environment? = nil, _ event: String\(inGenericsAsArgs)) throws\(wheres.backspaceIfNotEmpty()) {
-                try callSelf(env, "emit", event\(argValueList))
+            func emit\(inGenerics.bracketedOrNone)(env: Environment? = nil, _ event: String\(inGenericsAsArgs)) throws\(wheres.backspaceIfNotEmpty()) {
+                try callSelf(env: env, "emit", event\(argValueList))
             }
 
             func emit\(inGenerics.bracketedOrNone)(_ event: String\(inGenericsAsArgs)) async throws\(wheres.backspaceIfNotEmpty()) {
-                try await withEnvironment { env in try self.emit(env, event\(argValueList)) }
+                try await withEnvironment { env in try self.emit(env: env, event\(argValueList)) }
             }
         }
         """)

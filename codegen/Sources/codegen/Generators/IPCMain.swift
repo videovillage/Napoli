@@ -32,57 +32,57 @@ enum IPCMain {
         // \(paramCount) param methods
         public extension IPCMain {
             @available(*, noasync)
-            func handle\(allGenerics.bracketedOrNone)(_ env: Environment? = nil, _ channel: String, _ callback: @escaping (\(commaSeparatedInGenerics)) throws -> Result) throws\(allWheres.backspaceIfNotEmpty()) {
-                try callSelf(env, "handle", channel, TypedFunction\(paramCount)(named: "handle", callback))
+            func handle\(allGenerics.bracketedOrNone)(env: Environment? = nil, _ channel: String, _ callback: @escaping (\(commaSeparatedInGenerics)) throws -> Result) throws\(allWheres.backspaceIfNotEmpty()) {
+                try callSelf(env: env, "handle", channel, TypedFunction\(paramCount)(named: "handle", callback))
             }
 
             @available(*, noasync)
-            func handle\(allGenerics.bracketedOrNone)(_ env: Environment? = nil, _ channel: String, _ callback: @escaping (Environment\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Result) throws\(allWheres.backspaceIfNotEmpty()) {
-                try callSelf(env, "handle", channel, TypedFunction\(paramCount)(named: "handle", callback))
+            func handle\(allGenerics.bracketedOrNone)(env: Environment? = nil, _ channel: String, _ callback: @escaping (Environment\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Result) throws\(allWheres.backspaceIfNotEmpty()) {
+                try callSelf(env: env, "handle", channel, TypedFunction\(paramCount)(named: "handle", callback))
             }
 
             @available(*, noasync)
-            func handle\(allGenerics.bracketedOrNone)(_ env: Environment? = nil, _ channel: String, _ callback: @escaping (\(commaSeparatedInGenerics)) async throws -> Result) throws\(allWheres.backspaceIfNotEmpty()) {
-                try callSelf(env, "handle", channel, TypedFunction\(paramCount)(named: "handle", callback))
+            func handle\(allGenerics.bracketedOrNone)(env: Environment? = nil, _ channel: String, _ callback: @escaping (\(commaSeparatedInGenerics)) async throws -> Result) throws\(allWheres.backspaceIfNotEmpty()) {
+                try callSelf(env: env, "handle", channel, TypedFunction\(paramCount)(named: "handle", callback))
             }
 
             func handle\(allGenerics.bracketedOrNone)(_ channel: String, _ callback: @escaping (\(commaSeparatedInGenerics)) throws -> Result) async throws\(allWheres.backspaceIfNotEmpty()) {
-                try await withEnvironment { env in try self.handle(env, channel, callback) }
+                try await withEnvironment { env in try self.handle(env: env, channel, callback) }
             }
 
             func handle\(allGenerics.bracketedOrNone)(_ channel: String, _ callback: @escaping (Environment\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Result) async throws\(allWheres.backspaceIfNotEmpty()) {
-                try await withEnvironment { env in try self.handle(env, channel, callback) }
+                try await withEnvironment { env in try self.handle(env: env, channel, callback) }
             }
 
             func handle\(allGenerics.bracketedOrNone)(_ channel: String, _ callback: @escaping (\(commaSeparatedInGenerics)) async throws -> Result) async throws\(allWheres.backspaceIfNotEmpty()) {
-                try await withEnvironment { env in try self.handle(env, channel, callback) }
+                try await withEnvironment { env in try self.handle(env: env, channel, callback) }
             }
 
             @available(*, noasync)
-            func handleOnce\(allGenerics.bracketedOrNone)(_ env: Environment? = nil, _ channel: String, _ callback: @escaping (\(commaSeparatedInGenerics)) throws -> Result) throws\(allWheres.backspaceIfNotEmpty()) {
-                try callSelf(env, "handleOnce", channel, TypedFunction\(paramCount)(named: "handleOnce", callback))
+            func handleOnce\(allGenerics.bracketedOrNone)(env: Environment? = nil, _ channel: String, _ callback: @escaping (\(commaSeparatedInGenerics)) throws -> Result) throws\(allWheres.backspaceIfNotEmpty()) {
+                try callSelf(env: env, "handleOnce", channel, TypedFunction\(paramCount)(named: "handleOnce", callback))
             }
 
             @available(*, noasync)
-            func handleOnce\(allGenerics.bracketedOrNone)(_ env: Environment? = nil, _ channel: String, _ callback: @escaping (Environment\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Result) throws\(allWheres.backspaceIfNotEmpty()) {
-                try callSelf(env, "handleOnce", channel, TypedFunction\(paramCount)(named: "handleOnce", callback))
+            func handleOnce\(allGenerics.bracketedOrNone)(env: Environment? = nil, _ channel: String, _ callback: @escaping (Environment\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Result) throws\(allWheres.backspaceIfNotEmpty()) {
+                try callSelf(env: env, "handleOnce", channel, TypedFunction\(paramCount)(named: "handleOnce", callback))
             }
 
             @available(*, noasync)
-            func handleOnce\(allGenerics.bracketedOrNone)(_ env: Environment? = nil, _ channel: String, _ callback: @escaping (\(commaSeparatedInGenerics)) async throws -> Result) throws\(allWheres.backspaceIfNotEmpty()) {
-                try callSelf(env, "handleOnce", channel, TypedFunction\(paramCount)(named: "handleOnce", callback))
+            func handleOnce\(allGenerics.bracketedOrNone)(env: Environment? = nil, _ channel: String, _ callback: @escaping (\(commaSeparatedInGenerics)) async throws -> Result) throws\(allWheres.backspaceIfNotEmpty()) {
+                try callSelf(env: env, "handleOnce", channel, TypedFunction\(paramCount)(named: "handleOnce", callback))
             }
 
             func handleOnce\(allGenerics.bracketedOrNone)(_ channel: String, _ callback: @escaping (\(commaSeparatedInGenerics)) throws -> Result) async throws\(allWheres.backspaceIfNotEmpty()) {
-                try await withEnvironment { env in try self.handleOnce(env, channel, callback) }
+                try await withEnvironment { env in try self.handleOnce(env: env, channel, callback) }
             }
 
             func handleOnce\(allGenerics.bracketedOrNone)(_ channel: String, _ callback: @escaping (Environment\(commaSeparatedInGenerics.prefixCommaIfNotEmpty())) throws -> Result) async throws\(allWheres.backspaceIfNotEmpty()) {
-                try await withEnvironment { env in try self.handleOnce(env, channel, callback) }
+                try await withEnvironment { env in try self.handleOnce(env: env, channel, callback) }
             }
 
             func handleOnce\(allGenerics.bracketedOrNone)(_ channel: String, _ callback: @escaping (\(commaSeparatedInGenerics)) async throws -> Result) async throws\(allWheres.backspaceIfNotEmpty()) {
-                try await withEnvironment { env in try self.handleOnce(env, channel, callback) }
+                try await withEnvironment { env in try self.handleOnce(env: env, channel, callback) }
             }
         }
         """)
