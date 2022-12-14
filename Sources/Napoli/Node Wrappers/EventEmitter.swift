@@ -2,7 +2,7 @@ import Foundation
 
 open class EventEmitter: ObjectReference {
     @available(*, noasync)
-    func removeAllListeners(_ env: Environment? = nil, _ event: String? = nil) throws {
+    public func removeAllListeners(_ env: Environment? = nil, _ event: String? = nil) throws {
         if let event {
             try callSelf(env, "removeAllListeners", event)
         } else {
@@ -10,7 +10,7 @@ open class EventEmitter: ObjectReference {
         }
     }
 
-    func removeAllListeners(_ event: String? = nil) async throws {
+    public func removeAllListeners(_ event: String? = nil) async throws {
         if let event {
             try await callSelf("removeAllListeners", event)
         } else {
