@@ -4,14 +4,14 @@ import NAPIC
 /// Here Be Dragons
 public protocol ImmutableObjectConvertible: ValueConvertible, Codable {}
 
-internal struct GenericNAPIValue: ValueConvertible {
-    let value: napi_value
+public struct GenericNAPIValue: ValueConvertible {
+    public let value: napi_value
 
-    init(_: Environment, from: napi_value) throws {
+    public init(_: Environment, from: napi_value) throws {
         value = from
     }
 
-    func napiValue(_: Environment) throws -> napi_value {
+    public func napiValue(_: Environment) throws -> napi_value {
         value
     }
 }
