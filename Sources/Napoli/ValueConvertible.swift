@@ -53,8 +53,12 @@ public struct JSError: ValueConvertible, ErrorConvertible, Codable, Equatable, C
 
     public init(_ env: Environment, from: napi_value) throws {
         let object = try ImmutableObject(env, from: from)
-        code = try .init(object["code"] ?? .null)
-        message = try .init(lenient: object["message"] ?? .undefined)
+        if let code = object["code"] {
+            self.code = .init(lenient: code)
+        } else {
+            code = nil
+        }
+        message = .init(lenient: object["message"] ?? .undefined)
     }
 
     public func napiValue(_ env: Environment) throws -> napi_value {
