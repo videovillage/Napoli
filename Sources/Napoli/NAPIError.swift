@@ -22,7 +22,6 @@ public enum NAPIError: Swift.Error {
     case arrayBufferExpected
     case detachableArrayBufferExpected
     case wouldDeadlock
-    case noExternalBuffersAllowed
     case unknown(UInt32)
 
     public init(_ napiStatus: napi_status) {
@@ -48,7 +47,6 @@ public enum NAPIError: Swift.Error {
         case napi_arraybuffer_expected.rawValue: self = .arrayBufferExpected
         case napi_detachable_arraybuffer_expected.rawValue: self = .detachableArrayBufferExpected
         case napi_would_deadlock.rawValue: self = .wouldDeadlock
-        case napi_no_external_buffers_allowed.rawValue: self = .noExternalBuffersAllowed
         default: self = .unknown(UInt32(napiStatus.rawValue))
         }
     }
