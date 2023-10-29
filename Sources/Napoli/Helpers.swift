@@ -40,7 +40,7 @@ public actor EnvironmentAccessor {
         var result: Result<T, Swift.Error>!
         try await function.call(.init(named: "withEnvironmentCallback") { env in
             do {
-                result = .success(try closure(env))
+                result = try .success(closure(env))
             } catch {
                 result = .failure(error)
             }

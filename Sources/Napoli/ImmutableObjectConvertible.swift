@@ -25,7 +25,7 @@ public extension ImmutableObjectConvertible {
     }
 
     func napiValue(_ env: Environment) throws -> napi_value {
-        let jsonString = String(data: try JSONEncoder().encode(self), encoding: .utf8)!
+        let jsonString = try String(data: JSONEncoder().encode(self), encoding: .utf8)!
         let result: GenericNAPIValue = try env.global().json().parse(jsonString)
         return result.value
     }

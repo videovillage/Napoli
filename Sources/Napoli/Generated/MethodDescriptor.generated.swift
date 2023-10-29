@@ -9,7 +9,7 @@ public class MethodDescriptor: PropertyDescriptor {
     private let callback: TypedFunctionCallback
     private let argCount: Int
 
-    internal init(_ name: String, attributes: napi_property_attributes = napi_default, argCount: Int, _ callback: @escaping TypedFunctionCallback) {
+    init(_ name: String, attributes: napi_property_attributes = napi_default, argCount: Int, _ callback: @escaping TypedFunctionCallback) {
         self.name = name
         self.attributes = attributes
         self.callback = callback

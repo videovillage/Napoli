@@ -106,7 +106,7 @@ extension Optional: ValueConvertible where Wrapped: ValueConvertible {
             return
         }
 
-        self = .some(try Wrapped(env, from: from))
+        self = try .some(Wrapped(env, from: from))
     }
 
     public func napiValue(_ env: Environment) throws -> napi_value {
@@ -118,7 +118,7 @@ extension Optional: ValueConvertible where Wrapped: ValueConvertible {
         case .null, .undefined:
             self = .none
         default:
-            self = .some(try Wrapped(any))
+            self = try .some(Wrapped(any))
         }
     }
 
@@ -171,7 +171,7 @@ extension Dictionary: ValueConvertible where Key == String, Value: ValueConverti
         try napi_create_object(env.env, &result).throwIfError()
 
         for (key, value) in self {
-            try napi_set_property(env.env, result, try key.napiValue(env), try value.napiValue(env)).throwIfError()
+            try napi_set_property(env.env, result, key.napiValue(env), value.napiValue(env)).throwIfError()
         }
 
         return result
@@ -192,7 +192,7 @@ extension Dictionary: ValueConvertible where Key == String, Value: ValueConverti
     }
 
     public func eraseToAny() throws -> AnyValue {
-        .object(try mapValues { value in
+        try .object(mapValues { value in
             try value.eraseToAny()
         })
     }
@@ -223,7 +223,7 @@ extension Array: ValueConvertible where Element: ValueConvertible {
         try napi_create_array_with_length(env.env, count, &result).throwIfError()
 
         for (index, element) in enumerated() {
-            try napi_set_element(env.env, result, UInt32(index), try element.napiValue(env)).throwIfError()
+            try napi_set_element(env.env, result, UInt32(index), element.napiValue(env)).throwIfError()
         }
 
         return result

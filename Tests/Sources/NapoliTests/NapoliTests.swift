@@ -101,7 +101,7 @@ func takeError(value: JSError) throws {
 }
 
 func takeSuccessfulPromise(promise: Promise<String>) async throws {
-    try assertEqual(expected: try await promise.value, actual: "cool I did it!")
+    try await try assertEqual(expected: promise.value, actual: "cool I did it!")
 }
 
 func takeThrowingPromise(promise: Promise<String>) async throws {
@@ -116,21 +116,21 @@ func takeThrowingPromise(promise: Promise<String>) async throws {
 }
 
 func modifyObjectByReferenceAsync(object: ObjectReference) async throws {
-    try assertEqual(expected: "bad", actual: try await object.get("cool"))
+    try await try assertEqual(expected: "bad", actual: object.get("cool"))
     try await Task.sleep(seconds: 0.01)
     try await object.set("cool", value: "neat")
     try await Task.sleep(seconds: 0.01)
     try await object.set("additional", value: "good")
-    try assertEqual(expected: "neat", actual: try await object.get("cool"))
-    try assertEqual(expected: "good", actual: try await object.get("additional"))
+    try await try assertEqual(expected: "neat", actual: object.get("cool"))
+    try await try assertEqual(expected: "good", actual: object.get("additional"))
 }
 
 func modifyObjectByReferenceSync(object: ObjectReference) throws {
-    try assertEqual(expected: "bad", actual: try object.get("cool"))
+    try assertEqual(expected: "bad", actual: object.get("cool"))
     try object.set("cool", value: "neat")
     try object.set("additional", value: "good")
-    try assertEqual(expected: "neat", actual: try object.get("cool"))
-    try assertEqual(expected: "good", actual: try object.get("additional"))
+    try assertEqual(expected: "neat", actual: object.get("cool"))
+    try assertEqual(expected: "good", actual: object.get("additional"))
 }
 
 func testEnvironment(env: Environment) throws -> String {
@@ -174,7 +174,7 @@ func returnThrowingPromise(msg _: String) async throws {
 }
 
 func takeTypedCallback(env: Environment, fn: TypedFunction2<String, Int32, Bool>) throws {
-    try assertEqual(expected: "23true", actual: try fn.call(env, 23, true))
+    try assertEqual(expected: "23true", actual: fn.call(env, 23, true))
 }
 
 func emitOnEventEmitter(emitter: EventEmitter) throws {

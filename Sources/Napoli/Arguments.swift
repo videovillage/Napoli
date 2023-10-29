@@ -1,6 +1,6 @@
 import NAPIC
 
-internal typealias NullableArguments = (
+typealias NullableArguments = (
     // Values
     napi_value?,
     napi_value?,

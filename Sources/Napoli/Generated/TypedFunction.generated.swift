@@ -116,7 +116,7 @@ public class TypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>: TypedRe
         self.init(named: name) { env, _, args in
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4]); let p5 = try P5(env, from: args[5]); let p6 = try P6(env, from: args[6]); let p7 = try P7(env, from: args[7]); let p8 = try P8(env, from: args[8])
             return Promise<R> {
-                return try await callback(p0, p1, p2, p3, p4, p5, p6, p7, p8)
+                try await callback(p0, p1, p2, p3, p4, p5, p6, p7, p8)
             }
         }
     }
@@ -241,7 +241,7 @@ public class TypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: TypedResult
         self.init(named: name) { env, _, args in
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4]); let p5 = try P5(env, from: args[5]); let p6 = try P6(env, from: args[6]); let p7 = try P7(env, from: args[7])
             return Promise<R> {
-                return try await callback(p0, p1, p2, p3, p4, p5, p6, p7)
+                try await callback(p0, p1, p2, p3, p4, p5, p6, p7)
             }
         }
     }
@@ -366,7 +366,7 @@ public class TypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: TypedResultFunc
         self.init(named: name) { env, _, args in
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4]); let p5 = try P5(env, from: args[5]); let p6 = try P6(env, from: args[6])
             return Promise<R> {
-                return try await callback(p0, p1, p2, p3, p4, p5, p6)
+                try await callback(p0, p1, p2, p3, p4, p5, p6)
             }
         }
     }
@@ -491,7 +491,7 @@ public class TypedFunction6<Result, P0, P1, P2, P3, P4, P5>: TypedResultFunction
         self.init(named: name) { env, _, args in
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4]); let p5 = try P5(env, from: args[5])
             return Promise<R> {
-                return try await callback(p0, p1, p2, p3, p4, p5)
+                try await callback(p0, p1, p2, p3, p4, p5)
             }
         }
     }
@@ -616,7 +616,7 @@ public class TypedFunction5<Result, P0, P1, P2, P3, P4>: TypedResultFunction whe
         self.init(named: name) { env, _, args in
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3]); let p4 = try P4(env, from: args[4])
             return Promise<R> {
-                return try await callback(p0, p1, p2, p3, p4)
+                try await callback(p0, p1, p2, p3, p4)
             }
         }
     }
@@ -741,7 +741,7 @@ public class TypedFunction4<Result, P0, P1, P2, P3>: TypedResultFunction where R
         self.init(named: name) { env, _, args in
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2]); let p3 = try P3(env, from: args[3])
             return Promise<R> {
-                return try await callback(p0, p1, p2, p3)
+                try await callback(p0, p1, p2, p3)
             }
         }
     }
@@ -866,7 +866,7 @@ public class TypedFunction3<Result, P0, P1, P2>: TypedResultFunction where Resul
         self.init(named: name) { env, _, args in
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1]); let p2 = try P2(env, from: args[2])
             return Promise<R> {
-                return try await callback(p0, p1, p2)
+                try await callback(p0, p1, p2)
             }
         }
     }
@@ -991,7 +991,7 @@ public class TypedFunction2<Result, P0, P1>: TypedResultFunction where Result: V
         self.init(named: name) { env, _, args in
             let p0 = try P0(env, from: args[0]); let p1 = try P1(env, from: args[1])
             return Promise<R> {
-                return try await callback(p0, p1)
+                try await callback(p0, p1)
             }
         }
     }
@@ -1116,7 +1116,7 @@ public class TypedFunction1<Result, P0>: TypedResultFunction where Result: Value
         self.init(named: name) { env, _, args in
             let p0 = try P0(env, from: args[0])
             return Promise<R> {
-                return try await callback(p0)
+                try await callback(p0)
             }
         }
     }
