@@ -81,7 +81,33 @@ enum ThreadsafeTypedFunction {
         }
 
         /// A type-erased threadsafe typed function
-        public protocol ThreadsafeTypedFunction: ValueConvertible {}
+        public class ThreadsafeTypedFunction {
+            fileprivate var tsfn: napi_threadsafe_function!
+            fileprivate var asyncCleanupHandle: napi_async_cleanup_hook_handle!
+
+            init() {}
+
+            fileprivate func cleanup() {
+                napi_release_threadsafe_function(tsfn, napi_tsfn_release)
+                tsfn = nil
+                napi_remove_async_cleanup_hook(asyncCleanupHandle)
+                asyncCleanupHandle = nil
+            }
+
+            deinit {
+                if let tsfn {
+                    napi_release_threadsafe_function(tsfn, napi_tsfn_release)
+                }
+
+                if let asyncCleanupHandle {
+                    napi_remove_async_cleanup_hook(asyncCleanupHandle)
+                }
+            }
+        }
+
+        func threadsafeTypedFunctionCleanup(_: napi_async_cleanup_hook_handle!, _ arg: UnsafeMutableRawPointer!) {
+            Unmanaged<ThreadsafeTypedFunction>.fromOpaque(arg).takeUnretainedValue().cleanup()
+        }
         """)
         source.newline()
 
@@ -109,10 +135,9 @@ enum ThreadsafeTypedFunction {
         A threadsafe and type-safe function with return type `Result`\(paramCount > 0 ? " and \(paramCount) parameter\(paramCount == 1 ? "" : "s")" : "").
         """
 
-        try source.declareClass(.public, "ThreadsafeTypedFunction\(paramCount)", genericParams: allGenerics, conformsTo: "ThreadsafeTypedFunction", wheres: wheres, docs: docs) { source in
+        try source.declareClass(.public, "ThreadsafeTypedFunction\(paramCount)", genericParams: allGenerics, conformsTo: "ThreadsafeTypedFunction, ValueConvertible", wheres: wheres, docs: docs) { source in
             source.add("""
             public typealias InternalFunction = TypedFunction\(paramCount)\(allGenerics.bracketedOrNone)
-            fileprivate var tsfn: napi_threadsafe_function!
 
             public required convenience init(_ env: Environment, from: napi_value) throws {
                 let function = try InternalFunction(env, from: from)
@@ -124,6 +149,7 @@ enum ThreadsafeTypedFunction {
             }
 
             public init(_ env: Environment, _ function: InternalFunction) throws {
+                super.init()
                 try napi_create_threadsafe_function(env.env,
                                                     function.napiValue(env),
                                                     nil,
@@ -135,6 +161,10 @@ enum ThreadsafeTypedFunction {
                                                     nil,
                                                     typedFuncNAPIThreadsafeCallback,
                                                     &tsfn).throwIfError()
+                try napi_add_async_cleanup_hook(env.env, 
+                                                threadsafeTypedFunctionCleanup, 
+                                                Unmanaged<ThreadsafeTypedFunction>.passUnretained(self).toOpaque(), 
+                                                &asyncCleanupHandle).throwIfError()
             }
 
             public func call(this: ValueConvertible = Undefined.default\(inGenericsAsArgs)) async throws where Result == Undefined {
@@ -143,12 +173,6 @@ enum ThreadsafeTypedFunction {
 
             public func call(this: ValueConvertible = Undefined.default\(inGenericsAsArgs)) async throws -> Result {
                 try await _call(tsfn: tsfn, this: this, args: [\(inGenerics.map { $0.type.lowercased() }.commaSeparated)], resultType: Result.self)
-            }
-
-            deinit {
-                if let tsfn {
-                    napi_release_threadsafe_function(tsfn, napi_tsfn_release)
-                }
             }
             """)
         }

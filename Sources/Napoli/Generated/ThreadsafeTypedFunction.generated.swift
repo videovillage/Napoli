@@ -74,12 +74,37 @@ private func _call<Result: ValueConvertible>(tsfn: napi_threadsafe_function, thi
 }
 
 /// A type-erased threadsafe typed function
-public protocol ThreadsafeTypedFunction: ValueConvertible {}
+public class ThreadsafeTypedFunction {
+    fileprivate var tsfn: napi_threadsafe_function!
+    fileprivate var asyncCleanupHandle: napi_async_cleanup_hook_handle!
+
+    init() {}
+
+    fileprivate func cleanup() {
+        napi_release_threadsafe_function(tsfn, napi_tsfn_release)
+        tsfn = nil
+        napi_remove_async_cleanup_hook(asyncCleanupHandle)
+        asyncCleanupHandle = nil
+    }
+
+    deinit {
+        if let tsfn {
+            napi_release_threadsafe_function(tsfn, napi_tsfn_release)
+        }
+
+        if let asyncCleanupHandle {
+            napi_remove_async_cleanup_hook(asyncCleanupHandle)
+        }
+    }
+}
+
+func threadsafeTypedFunctionCleanup(_: napi_async_cleanup_hook_handle!, _ arg: UnsafeMutableRawPointer!) {
+    Unmanaged<ThreadsafeTypedFunction>.fromOpaque(arg).takeUnretainedValue().cleanup()
+}
 
 /// A threadsafe and type-safe function with return type `Result` and 9 parameters.
-public class ThreadsafeTypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>: ThreadsafeTypedFunction where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
+public class ThreadsafeTypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>: ThreadsafeTypedFunction, ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
     public typealias InternalFunction = TypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>
-    fileprivate var tsfn: napi_threadsafe_function!
 
     public required convenience init(_ env: Environment, from: napi_value) throws {
         let function = try InternalFunction(env, from: from)
@@ -91,6 +116,7 @@ public class ThreadsafeTypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8
     }
 
     public init(_ env: Environment, _ function: InternalFunction) throws {
+        super.init()
         try napi_create_threadsafe_function(env.env,
                                             function.napiValue(env),
                                             nil,
@@ -102,6 +128,10 @@ public class ThreadsafeTypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8
                                             nil,
                                             typedFuncNAPIThreadsafeCallback,
                                             &tsfn).throwIfError()
+        try napi_add_async_cleanup_hook(env.env,
+                                        threadsafeTypedFunctionCleanup,
+                                        Unmanaged<ThreadsafeTypedFunction>.passUnretained(self).toOpaque(),
+                                        &asyncCleanupHandle).throwIfError()
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7, _ p8: P8) async throws where Result == Undefined {
@@ -111,18 +141,11 @@ public class ThreadsafeTypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7, _ p8: P8) async throws -> Result {
         try await _call(tsfn: tsfn, this: this, args: [p0, p1, p2, p3, p4, p5, p6, p7, p8], resultType: Result.self)
     }
-
-    deinit {
-        if let tsfn {
-            napi_release_threadsafe_function(tsfn, napi_tsfn_release)
-        }
-    }
 }
 
 /// A threadsafe and type-safe function with return type `Result` and 8 parameters.
-public class ThreadsafeTypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: ThreadsafeTypedFunction where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
+public class ThreadsafeTypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: ThreadsafeTypedFunction, ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
     public typealias InternalFunction = TypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>
-    fileprivate var tsfn: napi_threadsafe_function!
 
     public required convenience init(_ env: Environment, from: napi_value) throws {
         let function = try InternalFunction(env, from: from)
@@ -134,6 +157,7 @@ public class ThreadsafeTypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: T
     }
 
     public init(_ env: Environment, _ function: InternalFunction) throws {
+        super.init()
         try napi_create_threadsafe_function(env.env,
                                             function.napiValue(env),
                                             nil,
@@ -145,6 +169,10 @@ public class ThreadsafeTypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: T
                                             nil,
                                             typedFuncNAPIThreadsafeCallback,
                                             &tsfn).throwIfError()
+        try napi_add_async_cleanup_hook(env.env,
+                                        threadsafeTypedFunctionCleanup,
+                                        Unmanaged<ThreadsafeTypedFunction>.passUnretained(self).toOpaque(),
+                                        &asyncCleanupHandle).throwIfError()
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7) async throws where Result == Undefined {
@@ -154,18 +182,11 @@ public class ThreadsafeTypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: T
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7) async throws -> Result {
         try await _call(tsfn: tsfn, this: this, args: [p0, p1, p2, p3, p4, p5, p6, p7], resultType: Result.self)
     }
-
-    deinit {
-        if let tsfn {
-            napi_release_threadsafe_function(tsfn, napi_tsfn_release)
-        }
-    }
 }
 
 /// A threadsafe and type-safe function with return type `Result` and 7 parameters.
-public class ThreadsafeTypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: ThreadsafeTypedFunction where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
+public class ThreadsafeTypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: ThreadsafeTypedFunction, ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
     public typealias InternalFunction = TypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>
-    fileprivate var tsfn: napi_threadsafe_function!
 
     public required convenience init(_ env: Environment, from: napi_value) throws {
         let function = try InternalFunction(env, from: from)
@@ -177,6 +198,7 @@ public class ThreadsafeTypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: Threa
     }
 
     public init(_ env: Environment, _ function: InternalFunction) throws {
+        super.init()
         try napi_create_threadsafe_function(env.env,
                                             function.napiValue(env),
                                             nil,
@@ -188,6 +210,10 @@ public class ThreadsafeTypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: Threa
                                             nil,
                                             typedFuncNAPIThreadsafeCallback,
                                             &tsfn).throwIfError()
+        try napi_add_async_cleanup_hook(env.env,
+                                        threadsafeTypedFunctionCleanup,
+                                        Unmanaged<ThreadsafeTypedFunction>.passUnretained(self).toOpaque(),
+                                        &asyncCleanupHandle).throwIfError()
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6) async throws where Result == Undefined {
@@ -197,18 +223,11 @@ public class ThreadsafeTypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: Threa
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6) async throws -> Result {
         try await _call(tsfn: tsfn, this: this, args: [p0, p1, p2, p3, p4, p5, p6], resultType: Result.self)
     }
-
-    deinit {
-        if let tsfn {
-            napi_release_threadsafe_function(tsfn, napi_tsfn_release)
-        }
-    }
 }
 
 /// A threadsafe and type-safe function with return type `Result` and 6 parameters.
-public class ThreadsafeTypedFunction6<Result, P0, P1, P2, P3, P4, P5>: ThreadsafeTypedFunction where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
+public class ThreadsafeTypedFunction6<Result, P0, P1, P2, P3, P4, P5>: ThreadsafeTypedFunction, ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
     public typealias InternalFunction = TypedFunction6<Result, P0, P1, P2, P3, P4, P5>
-    fileprivate var tsfn: napi_threadsafe_function!
 
     public required convenience init(_ env: Environment, from: napi_value) throws {
         let function = try InternalFunction(env, from: from)
@@ -220,6 +239,7 @@ public class ThreadsafeTypedFunction6<Result, P0, P1, P2, P3, P4, P5>: Threadsaf
     }
 
     public init(_ env: Environment, _ function: InternalFunction) throws {
+        super.init()
         try napi_create_threadsafe_function(env.env,
                                             function.napiValue(env),
                                             nil,
@@ -231,6 +251,10 @@ public class ThreadsafeTypedFunction6<Result, P0, P1, P2, P3, P4, P5>: Threadsaf
                                             nil,
                                             typedFuncNAPIThreadsafeCallback,
                                             &tsfn).throwIfError()
+        try napi_add_async_cleanup_hook(env.env,
+                                        threadsafeTypedFunctionCleanup,
+                                        Unmanaged<ThreadsafeTypedFunction>.passUnretained(self).toOpaque(),
+                                        &asyncCleanupHandle).throwIfError()
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5) async throws where Result == Undefined {
@@ -240,18 +264,11 @@ public class ThreadsafeTypedFunction6<Result, P0, P1, P2, P3, P4, P5>: Threadsaf
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5) async throws -> Result {
         try await _call(tsfn: tsfn, this: this, args: [p0, p1, p2, p3, p4, p5], resultType: Result.self)
     }
-
-    deinit {
-        if let tsfn {
-            napi_release_threadsafe_function(tsfn, napi_tsfn_release)
-        }
-    }
 }
 
 /// A threadsafe and type-safe function with return type `Result` and 5 parameters.
-public class ThreadsafeTypedFunction5<Result, P0, P1, P2, P3, P4>: ThreadsafeTypedFunction where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
+public class ThreadsafeTypedFunction5<Result, P0, P1, P2, P3, P4>: ThreadsafeTypedFunction, ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
     public typealias InternalFunction = TypedFunction5<Result, P0, P1, P2, P3, P4>
-    fileprivate var tsfn: napi_threadsafe_function!
 
     public required convenience init(_ env: Environment, from: napi_value) throws {
         let function = try InternalFunction(env, from: from)
@@ -263,6 +280,7 @@ public class ThreadsafeTypedFunction5<Result, P0, P1, P2, P3, P4>: ThreadsafeTyp
     }
 
     public init(_ env: Environment, _ function: InternalFunction) throws {
+        super.init()
         try napi_create_threadsafe_function(env.env,
                                             function.napiValue(env),
                                             nil,
@@ -274,6 +292,10 @@ public class ThreadsafeTypedFunction5<Result, P0, P1, P2, P3, P4>: ThreadsafeTyp
                                             nil,
                                             typedFuncNAPIThreadsafeCallback,
                                             &tsfn).throwIfError()
+        try napi_add_async_cleanup_hook(env.env,
+                                        threadsafeTypedFunctionCleanup,
+                                        Unmanaged<ThreadsafeTypedFunction>.passUnretained(self).toOpaque(),
+                                        &asyncCleanupHandle).throwIfError()
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4) async throws where Result == Undefined {
@@ -283,18 +305,11 @@ public class ThreadsafeTypedFunction5<Result, P0, P1, P2, P3, P4>: ThreadsafeTyp
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4) async throws -> Result {
         try await _call(tsfn: tsfn, this: this, args: [p0, p1, p2, p3, p4], resultType: Result.self)
     }
-
-    deinit {
-        if let tsfn {
-            napi_release_threadsafe_function(tsfn, napi_tsfn_release)
-        }
-    }
 }
 
 /// A threadsafe and type-safe function with return type `Result` and 4 parameters.
-public class ThreadsafeTypedFunction4<Result, P0, P1, P2, P3>: ThreadsafeTypedFunction where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
+public class ThreadsafeTypedFunction4<Result, P0, P1, P2, P3>: ThreadsafeTypedFunction, ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
     public typealias InternalFunction = TypedFunction4<Result, P0, P1, P2, P3>
-    fileprivate var tsfn: napi_threadsafe_function!
 
     public required convenience init(_ env: Environment, from: napi_value) throws {
         let function = try InternalFunction(env, from: from)
@@ -306,6 +321,7 @@ public class ThreadsafeTypedFunction4<Result, P0, P1, P2, P3>: ThreadsafeTypedFu
     }
 
     public init(_ env: Environment, _ function: InternalFunction) throws {
+        super.init()
         try napi_create_threadsafe_function(env.env,
                                             function.napiValue(env),
                                             nil,
@@ -317,6 +333,10 @@ public class ThreadsafeTypedFunction4<Result, P0, P1, P2, P3>: ThreadsafeTypedFu
                                             nil,
                                             typedFuncNAPIThreadsafeCallback,
                                             &tsfn).throwIfError()
+        try napi_add_async_cleanup_hook(env.env,
+                                        threadsafeTypedFunctionCleanup,
+                                        Unmanaged<ThreadsafeTypedFunction>.passUnretained(self).toOpaque(),
+                                        &asyncCleanupHandle).throwIfError()
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3) async throws where Result == Undefined {
@@ -326,18 +346,11 @@ public class ThreadsafeTypedFunction4<Result, P0, P1, P2, P3>: ThreadsafeTypedFu
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3) async throws -> Result {
         try await _call(tsfn: tsfn, this: this, args: [p0, p1, p2, p3], resultType: Result.self)
     }
-
-    deinit {
-        if let tsfn {
-            napi_release_threadsafe_function(tsfn, napi_tsfn_release)
-        }
-    }
 }
 
 /// A threadsafe and type-safe function with return type `Result` and 3 parameters.
-public class ThreadsafeTypedFunction3<Result, P0, P1, P2>: ThreadsafeTypedFunction where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
+public class ThreadsafeTypedFunction3<Result, P0, P1, P2>: ThreadsafeTypedFunction, ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
     public typealias InternalFunction = TypedFunction3<Result, P0, P1, P2>
-    fileprivate var tsfn: napi_threadsafe_function!
 
     public required convenience init(_ env: Environment, from: napi_value) throws {
         let function = try InternalFunction(env, from: from)
@@ -349,6 +362,7 @@ public class ThreadsafeTypedFunction3<Result, P0, P1, P2>: ThreadsafeTypedFuncti
     }
 
     public init(_ env: Environment, _ function: InternalFunction) throws {
+        super.init()
         try napi_create_threadsafe_function(env.env,
                                             function.napiValue(env),
                                             nil,
@@ -360,6 +374,10 @@ public class ThreadsafeTypedFunction3<Result, P0, P1, P2>: ThreadsafeTypedFuncti
                                             nil,
                                             typedFuncNAPIThreadsafeCallback,
                                             &tsfn).throwIfError()
+        try napi_add_async_cleanup_hook(env.env,
+                                        threadsafeTypedFunctionCleanup,
+                                        Unmanaged<ThreadsafeTypedFunction>.passUnretained(self).toOpaque(),
+                                        &asyncCleanupHandle).throwIfError()
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2) async throws where Result == Undefined {
@@ -369,18 +387,11 @@ public class ThreadsafeTypedFunction3<Result, P0, P1, P2>: ThreadsafeTypedFuncti
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2) async throws -> Result {
         try await _call(tsfn: tsfn, this: this, args: [p0, p1, p2], resultType: Result.self)
     }
-
-    deinit {
-        if let tsfn {
-            napi_release_threadsafe_function(tsfn, napi_tsfn_release)
-        }
-    }
 }
 
 /// A threadsafe and type-safe function with return type `Result` and 2 parameters.
-public class ThreadsafeTypedFunction2<Result, P0, P1>: ThreadsafeTypedFunction where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible {
+public class ThreadsafeTypedFunction2<Result, P0, P1>: ThreadsafeTypedFunction, ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible {
     public typealias InternalFunction = TypedFunction2<Result, P0, P1>
-    fileprivate var tsfn: napi_threadsafe_function!
 
     public required convenience init(_ env: Environment, from: napi_value) throws {
         let function = try InternalFunction(env, from: from)
@@ -392,6 +403,7 @@ public class ThreadsafeTypedFunction2<Result, P0, P1>: ThreadsafeTypedFunction w
     }
 
     public init(_ env: Environment, _ function: InternalFunction) throws {
+        super.init()
         try napi_create_threadsafe_function(env.env,
                                             function.napiValue(env),
                                             nil,
@@ -403,6 +415,10 @@ public class ThreadsafeTypedFunction2<Result, P0, P1>: ThreadsafeTypedFunction w
                                             nil,
                                             typedFuncNAPIThreadsafeCallback,
                                             &tsfn).throwIfError()
+        try napi_add_async_cleanup_hook(env.env,
+                                        threadsafeTypedFunctionCleanup,
+                                        Unmanaged<ThreadsafeTypedFunction>.passUnretained(self).toOpaque(),
+                                        &asyncCleanupHandle).throwIfError()
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1) async throws where Result == Undefined {
@@ -412,18 +428,11 @@ public class ThreadsafeTypedFunction2<Result, P0, P1>: ThreadsafeTypedFunction w
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1) async throws -> Result {
         try await _call(tsfn: tsfn, this: this, args: [p0, p1], resultType: Result.self)
     }
-
-    deinit {
-        if let tsfn {
-            napi_release_threadsafe_function(tsfn, napi_tsfn_release)
-        }
-    }
 }
 
 /// A threadsafe and type-safe function with return type `Result` and 1 parameter.
-public class ThreadsafeTypedFunction1<Result, P0>: ThreadsafeTypedFunction where Result: ValueConvertible, P0: ValueConvertible {
+public class ThreadsafeTypedFunction1<Result, P0>: ThreadsafeTypedFunction, ValueConvertible where Result: ValueConvertible, P0: ValueConvertible {
     public typealias InternalFunction = TypedFunction1<Result, P0>
-    fileprivate var tsfn: napi_threadsafe_function!
 
     public required convenience init(_ env: Environment, from: napi_value) throws {
         let function = try InternalFunction(env, from: from)
@@ -435,6 +444,7 @@ public class ThreadsafeTypedFunction1<Result, P0>: ThreadsafeTypedFunction where
     }
 
     public init(_ env: Environment, _ function: InternalFunction) throws {
+        super.init()
         try napi_create_threadsafe_function(env.env,
                                             function.napiValue(env),
                                             nil,
@@ -446,6 +456,10 @@ public class ThreadsafeTypedFunction1<Result, P0>: ThreadsafeTypedFunction where
                                             nil,
                                             typedFuncNAPIThreadsafeCallback,
                                             &tsfn).throwIfError()
+        try napi_add_async_cleanup_hook(env.env,
+                                        threadsafeTypedFunctionCleanup,
+                                        Unmanaged<ThreadsafeTypedFunction>.passUnretained(self).toOpaque(),
+                                        &asyncCleanupHandle).throwIfError()
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0) async throws where Result == Undefined {
@@ -455,18 +469,11 @@ public class ThreadsafeTypedFunction1<Result, P0>: ThreadsafeTypedFunction where
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0) async throws -> Result {
         try await _call(tsfn: tsfn, this: this, args: [p0], resultType: Result.self)
     }
-
-    deinit {
-        if let tsfn {
-            napi_release_threadsafe_function(tsfn, napi_tsfn_release)
-        }
-    }
 }
 
 /// A threadsafe and type-safe function with return type `Result`.
-public class ThreadsafeTypedFunction0<Result>: ThreadsafeTypedFunction where Result: ValueConvertible {
+public class ThreadsafeTypedFunction0<Result>: ThreadsafeTypedFunction, ValueConvertible where Result: ValueConvertible {
     public typealias InternalFunction = TypedFunction0<Result>
-    fileprivate var tsfn: napi_threadsafe_function!
 
     public required convenience init(_ env: Environment, from: napi_value) throws {
         let function = try InternalFunction(env, from: from)
@@ -478,6 +485,7 @@ public class ThreadsafeTypedFunction0<Result>: ThreadsafeTypedFunction where Res
     }
 
     public init(_ env: Environment, _ function: InternalFunction) throws {
+        super.init()
         try napi_create_threadsafe_function(env.env,
                                             function.napiValue(env),
                                             nil,
@@ -489,6 +497,10 @@ public class ThreadsafeTypedFunction0<Result>: ThreadsafeTypedFunction where Res
                                             nil,
                                             typedFuncNAPIThreadsafeCallback,
                                             &tsfn).throwIfError()
+        try napi_add_async_cleanup_hook(env.env,
+                                        threadsafeTypedFunctionCleanup,
+                                        Unmanaged<ThreadsafeTypedFunction>.passUnretained(self).toOpaque(),
+                                        &asyncCleanupHandle).throwIfError()
     }
 
     public func call(this: ValueConvertible = Undefined.default) async throws where Result == Undefined {
@@ -497,11 +509,5 @@ public class ThreadsafeTypedFunction0<Result>: ThreadsafeTypedFunction where Res
 
     public func call(this: ValueConvertible = Undefined.default) async throws -> Result {
         try await _call(tsfn: tsfn, this: this, args: [], resultType: Result.self)
-    }
-
-    deinit {
-        if let tsfn {
-            napi_release_threadsafe_function(tsfn, napi_tsfn_release)
-        }
     }
 }
