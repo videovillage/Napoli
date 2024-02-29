@@ -444,7 +444,7 @@ extension Int64: ValueConvertible {
         return result!
     }
 
-    public static let jsSafeRange: ClosedRange<Self> = -(Int64(powl(2, 53)) - 1) ... (Int64(powl(2, 53)) - 1)
+    public static let jsSafeRange: ClosedRange<Self> = -9007199254740991 ... 9007199254740991
 
     public init(_ any: AnyValue) throws {
         switch any {
