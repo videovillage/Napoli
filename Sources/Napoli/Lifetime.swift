@@ -1,7 +1,7 @@
 import Foundation
 import NAPIC
 
-struct Scope {
+enum Scope {
     struct OpenedScope {
         fileprivate let scope: napi_handle_scope
 
