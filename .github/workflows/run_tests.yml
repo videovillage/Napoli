@@ -47,8 +47,8 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
-        node-version: ["19.1.0"]
-        swift-version: ["5.9"]
+        node-version: ["20"]
+        swift-version: ["5.9.2"]
     runs-on: ${{ matrix.os }}
     defaults:
       run:
