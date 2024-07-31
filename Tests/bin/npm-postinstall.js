@@ -13,7 +13,7 @@ async function run() {
   var libraryName = process.argv.slice(2)
   var swiftBuildCommand = "swift build -c release"
   var moveLibraryCommand = ""
-  var nodeHeadersVersion = "27.2.0"
+  var nodeHeadersVersion = "31.3.1"
   var downloadHeadersCommand = ""
 
   const exec = require("node:child_process").exec
