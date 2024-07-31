@@ -48,7 +48,7 @@ jobs:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
         node-version: ["20"]
-        swift-version: ["5.10.1"]
+        swift-version: ["5.10"]
     runs-on: ${{ matrix.os }}
     defaults:
       run:
