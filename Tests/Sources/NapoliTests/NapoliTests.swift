@@ -147,6 +147,43 @@ func testEnvironmentAsync(env: Environment) throws -> Promise<String> {
     }
 }
 
+// Create on the JavaScript thread and release on Swift executors while other
+// tasks register hooks on the JavaScript thread.
+func stressThreadsafeCleanup(env: Environment, iterations: Int32) throws -> Promise<Undefined> {
+    let accessor = try EnvironmentAccessor(env)
+    return Promise {
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            for _ in 0 ..< 8 {
+                group.addTask {
+                    for _ in 0 ..< iterations {
+                        let callback: ThreadsafeTypedFunction0<Undefined> = try await accessor.withEnvironment { env in
+                            try .init(env, .init(named: "cleanupStress") { _ in Undefined.default })
+                        }
+                        try await callback.call()
+                    }
+                }
+            }
+            try await group.waitForAll()
+        }
+        return Undefined.default
+    }
+}
+
+func callAfterEnvironmentShutdown(env: Environment) throws {
+    let callback = try ThreadsafeTypedFunction0<Undefined>(env, .init(named: "shutdownTest") { _ in Undefined.default })
+    Task {
+        try await Task.sleep(seconds: 0.5)
+        do {
+            try await callback.call()
+            print("unexpected callback after shutdown")
+        } catch NAPIError.closing {
+            print("cleanup-closing")
+        } catch {
+            print("unexpected shutdown error: \(error)")
+        }
+    }
+}
+
 func throwError() throws {
     throw TestError(message: "Error message", code: "ETEST")
 }
@@ -284,7 +321,7 @@ struct TestObject: ImmutableObjectConvertible {
 }
 
 @_cdecl("_init_napoli_tests")
-func initNapoliTests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointer? {
+public func initNapoliTests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointer? {
     initModule(env, exports, [
         MethodDescriptor("returnString", returnString),
         MethodDescriptor("returnDouble", returnDouble),
@@ -315,6 +352,8 @@ func initNapoliTests(env: OpaquePointer, exports: OpaquePointer) -> OpaquePointe
 
         MethodDescriptor("testEnvironment", testEnvironment),
         MethodDescriptor("testEnvironmentAsync", testEnvironmentAsync),
+        MethodDescriptor("stressThreadsafeCleanup", stressThreadsafeCleanup),
+        MethodDescriptor("callAfterEnvironmentShutdown", callAfterEnvironmentShutdown),
 
         MethodDescriptor("throwError", throwError),
         MethodDescriptor("runThreadsafeCallback", runThreadsafeCallback),

@@ -30,8 +30,6 @@ enum ThreadsafeTypedFunction {
             }
         }
 
-        func typedFuncNAPIThreadsafeFinalize(_: napi_env!, pointer: UnsafeMutableRawPointer?, hint _: UnsafeMutableRawPointer?) {}
-
         func typedFuncNAPIThreadsafeCallback(_ env: napi_env?, _ js_callback: napi_value?, _: UnsafeMutableRawPointer?, _ data: UnsafeMutableRawPointer!) {
             let callbackData = Unmanaged<ThreadsafeFunctionCallbackData>.fromOpaque(data).takeRetainedValue()
 
@@ -57,56 +55,42 @@ enum ThreadsafeTypedFunction {
                         callbackData.continuation.resume(throwing: error)
                     }
                 }
+            } else {
+                callbackData.continuation.resume(throwing: NAPIError.closing)
             }
         }
 
-        private func _call(tsfn: napi_threadsafe_function, this: ValueConvertible, args: [ValueConvertible]) async throws {
-            try napi_acquire_threadsafe_function(tsfn).throwIfError()
-            defer { napi_release_threadsafe_function(tsfn, napi_tsfn_release) }
-
+        private func _call(lifetime: ThreadsafeFunctionLifetime, this: ValueConvertible, args: [ValueConvertible]) async throws {
             _ = try await withCheckedThrowingContinuation { continuation in
                 let unmanagedData = Unmanaged.passRetained(ThreadsafeFunctionCallbackData(this: this, args: args, continuation: continuation))
-                napi_call_threadsafe_function(tsfn, unmanagedData.toOpaque(), napi_tsfn_blocking)
+                let callStatus = lifetime.enqueue(unmanagedData.toOpaque())
+                if callStatus != napi_ok {
+                    unmanagedData.release()
+                    continuation.resume(throwing: NAPIError(callStatus))
+                }
             }
         }
 
-        private func _call<Result: ValueConvertible>(tsfn: napi_threadsafe_function, this: ValueConvertible, args: [ValueConvertible], resultType: Result.Type) async throws -> Result {
-            try napi_acquire_threadsafe_function(tsfn).throwIfError()
-            defer { napi_release_threadsafe_function(tsfn, napi_tsfn_release) }
-
+        private func _call<Result: ValueConvertible>(lifetime: ThreadsafeFunctionLifetime, this: ValueConvertible, args: [ValueConvertible], resultType: Result.Type) async throws -> Result {
             return try await withCheckedThrowingContinuation { continuation in
                 let unmanagedData = Unmanaged.passRetained(ThreadsafeFunctionCallbackData(this: this, args: args, continuation: continuation, resultType: resultType))
-                napi_call_threadsafe_function(tsfn, unmanagedData.toOpaque(), napi_tsfn_blocking)
+                let callStatus = lifetime.enqueue(unmanagedData.toOpaque())
+                if callStatus != napi_ok {
+                    unmanagedData.release()
+                    continuation.resume(throwing: NAPIError(callStatus))
+                }
             } as! Result
         }
 
         /// A type-erased threadsafe typed function
         public class ThreadsafeTypedFunction {
-            fileprivate var tsfn: napi_threadsafe_function!
-            fileprivate var asyncCleanupHandle: napi_async_cleanup_hook_handle!
+            fileprivate let lifetime = ThreadsafeFunctionLifetime()
 
             init() {}
 
-            fileprivate func cleanup() {
-                napi_release_threadsafe_function(tsfn, napi_tsfn_release)
-                tsfn = nil
-                napi_remove_async_cleanup_hook(asyncCleanupHandle)
-                asyncCleanupHandle = nil
-            }
-
             deinit {
-                if let tsfn {
-                    napi_release_threadsafe_function(tsfn, napi_tsfn_release)
-                }
-
-                if let asyncCleanupHandle {
-                    napi_remove_async_cleanup_hook(asyncCleanupHandle)
-                }
+                lifetime.releaseOwner()
             }
-        }
-
-        func threadsafeTypedFunctionCleanup(_: napi_async_cleanup_hook_handle!, _ arg: UnsafeMutableRawPointer!) {
-            Unmanaged<ThreadsafeTypedFunction>.fromOpaque(arg).takeUnretainedValue().cleanup()
         }
         """)
         source.newline()
@@ -150,29 +134,15 @@ enum ThreadsafeTypedFunction {
 
             public init(_ env: Environment, _ function: InternalFunction) throws {
                 super.init()
-                try napi_create_threadsafe_function(env.env,
-                                                    function.napiValue(env),
-                                                    nil,
-                                                    "ThreadsafeWrapper".napiValue(env),
-                                                    0,
-                                                    1,
-                                                    nil,
-                                                    typedFuncNAPIThreadsafeFinalize,
-                                                    nil,
-                                                    typedFuncNAPIThreadsafeCallback,
-                                                    &tsfn).throwIfError()
-                try napi_add_async_cleanup_hook(env.env, 
-                                                threadsafeTypedFunctionCleanup, 
-                                                Unmanaged<ThreadsafeTypedFunction>.passUnretained(self).toOpaque(), 
-                                                &asyncCleanupHandle).throwIfError()
+                try lifetime.initialize(env, function: function.napiValue(env))
             }
 
             public func call(this: ValueConvertible = Undefined.default\(inGenericsAsArgs)) async throws where Result == Undefined {
-                try await _call(tsfn: tsfn, this: this, args: [\(inGenerics.map { $0.type.lowercased() }.commaSeparated)])
+                try await _call(lifetime: lifetime, this: this, args: [\(inGenerics.map { $0.type.lowercased() }.commaSeparated)])
             }
 
             public func call(this: ValueConvertible = Undefined.default\(inGenericsAsArgs)) async throws -> Result {
-                try await _call(tsfn: tsfn, this: this, args: [\(inGenerics.map { $0.type.lowercased() }.commaSeparated)], resultType: Result.self)
+                try await _call(lifetime: lifetime, this: this, args: [\(inGenerics.map { $0.type.lowercased() }.commaSeparated)], resultType: Result.self)
             }
             """)
         }

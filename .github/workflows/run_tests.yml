@@ -28,6 +28,7 @@ jobs:
         uses: Cyberbeni/install-swift-tool@v2
         with:
           url: https://github.com/nicklockwood/SwiftFormat
+          version: '0.49.18'
       - name: Run SwiftFormat
         run: swiftformat .
       - uses: EndBug/add-and-commit@v9
@@ -45,9 +46,10 @@ jobs:
     name: Run Tests on ${{ matrix.os }} with Swift ${{ matrix.swift-version }} Node ${{ matrix.node-version }}
     needs: swift-format
     strategy:
+      fail-fast: false
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
-        node-version: ["20"]
+        os: [macos-14, ubuntu-22.04, windows-2022]
+        node-version: ["20", "22"]
         swift-version: ["5.10"]
     runs-on: ${{ matrix.os }}
     defaults:
@@ -57,9 +59,13 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: ${{ needs.swift-format.outputs.commitSHA }}
+      - name: Select compatible macOS SDK
+        if: runner.os == 'macOS'
+        run: echo "DEVELOPER_DIR=/Applications/Xcode_15.4.app/Contents/Developer" >> "$GITHUB_ENV"
       - uses: SwiftyLab/setup-swift@latest
         with:
           swift-version: ${{ matrix.swift-version }}
+          update-sdk-modules: true
       - name: Install Node ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
