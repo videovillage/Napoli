@@ -54,17 +54,9 @@ func typedFuncNAPIThreadsafeCallback(_ env: napi_env?, _ js_callback: napi_value
 }
 
 private func _call(lifetime: ThreadsafeFunctionLifetime, this: ValueConvertible, args: [ValueConvertible]) async throws {
-    let tsfn = try lifetime.acquire()
-    var callStatus = napi_ok
-    defer {
-        if callStatus != napi_closing {
-            napi_release_threadsafe_function(tsfn, napi_tsfn_release)
-        }
-    }
-
     _ = try await withCheckedThrowingContinuation { continuation in
         let unmanagedData = Unmanaged.passRetained(ThreadsafeFunctionCallbackData(this: this, args: args, continuation: continuation))
-        callStatus = napi_call_threadsafe_function(tsfn, unmanagedData.toOpaque(), napi_tsfn_blocking)
+        let callStatus = lifetime.enqueue(unmanagedData.toOpaque())
         if callStatus != napi_ok {
             unmanagedData.release()
             continuation.resume(throwing: NAPIError(callStatus))
@@ -73,17 +65,9 @@ private func _call(lifetime: ThreadsafeFunctionLifetime, this: ValueConvertible,
 }
 
 private func _call<Result: ValueConvertible>(lifetime: ThreadsafeFunctionLifetime, this: ValueConvertible, args: [ValueConvertible], resultType: Result.Type) async throws -> Result {
-    let tsfn = try lifetime.acquire()
-    var callStatus = napi_ok
-    defer {
-        if callStatus != napi_closing {
-            napi_release_threadsafe_function(tsfn, napi_tsfn_release)
-        }
-    }
-
-    return try await withCheckedThrowingContinuation { continuation in
+    try await withCheckedThrowingContinuation { continuation in
         let unmanagedData = Unmanaged.passRetained(ThreadsafeFunctionCallbackData(this: this, args: args, continuation: continuation, resultType: resultType))
-        callStatus = napi_call_threadsafe_function(tsfn, unmanagedData.toOpaque(), napi_tsfn_blocking)
+        let callStatus = lifetime.enqueue(unmanagedData.toOpaque())
         if callStatus != napi_ok {
             unmanagedData.release()
             continuation.resume(throwing: NAPIError(callStatus))

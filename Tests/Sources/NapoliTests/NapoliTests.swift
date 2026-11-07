@@ -169,6 +169,21 @@ func stressThreadsafeCleanup(env: Environment, iterations: Int32) throws -> Prom
     }
 }
 
+func callAfterEnvironmentShutdown(env: Environment) throws {
+    let callback = try ThreadsafeTypedFunction0<Undefined>(env, .init(named: "shutdownTest") { _ in Undefined.default })
+    Task {
+        try await Task.sleep(seconds: 0.5)
+        do {
+            try await callback.call()
+            print("unexpected callback after shutdown")
+        } catch NAPIError.closing {
+            print("cleanup-closing")
+        } catch {
+            print("unexpected shutdown error: \(error)")
+        }
+    }
+}
+
 func throwError() throws {
     throw TestError(message: "Error message", code: "ETEST")
 }
@@ -338,6 +353,7 @@ public func initNapoliTests(env: OpaquePointer, exports: OpaquePointer) -> Opaqu
         MethodDescriptor("testEnvironment", testEnvironment),
         MethodDescriptor("testEnvironmentAsync", testEnvironmentAsync),
         MethodDescriptor("stressThreadsafeCleanup", stressThreadsafeCleanup),
+        MethodDescriptor("callAfterEnvironmentShutdown", callAfterEnvironmentShutdown),
 
         MethodDescriptor("throwError", throwError),
         MethodDescriptor("runThreadsafeCallback", runThreadsafeCallback),

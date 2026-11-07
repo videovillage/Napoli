@@ -32,31 +32,33 @@ final class ThreadsafeFunctionLifetime {
         }
     }
 
-    func acquire() throws -> napi_threadsafe_function {
+    func enqueue(_ data: UnsafeMutableRawPointer) -> napi_status {
         lock.lock()
         defer { lock.unlock() }
-        guard !ownerReleased, let function else { throw NAPIError.closing }
-        try napi_acquire_threadsafe_function(function).throwIfError()
-        return function
+        guard !ownerReleased, let function else { return napi_closing }
+        let acquired = napi_acquire_threadsafe_function(function)
+        guard acquired == napi_ok else { return acquired }
+        let status = napi_call_threadsafe_function(function, data, napi_tsfn_blocking)
+        // A closing response already releases the acquired user in Node. No
+        // raw TSFN pointer may survive across the Swift suspension point.
+        if status != napi_closing {
+            napi_release_threadsafe_function(function, napi_tsfn_release)
+        }
+        return status
     }
 
     func releaseOwner() {
         lock.lock()
-        guard !ownerReleased else {
-            lock.unlock()
-            return
-        }
+        defer { lock.unlock() }
+        guard !ownerReleased else { return }
         ownerReleased = true
-        let function = function
-        self.function = nil
-        lock.unlock()
         if let function {
             napi_release_threadsafe_function(function, napi_tsfn_release)
         }
     }
 
-    // Node invokes the TSFN finalizer on its main thread, after queued calls
-    // and acquired users have finished. This is the only hook-removal site.
+    // Node invokes the TSFN finalizer on its main thread. Clear the pointer
+    // before Node tears down the queue. This is the only hook-removal site.
     func finalize() {
         lock.lock()
         function = nil
