@@ -23,8 +23,6 @@ class ThreadsafeFunctionCallbackData {
     }
 }
 
-func typedFuncNAPIThreadsafeFinalize(_: napi_env!, pointer _: UnsafeMutableRawPointer?, hint _: UnsafeMutableRawPointer?) {}
-
 func typedFuncNAPIThreadsafeCallback(_ env: napi_env?, _ js_callback: napi_value?, _: UnsafeMutableRawPointer?, _ data: UnsafeMutableRawPointer!) {
     let callbackData = Unmanaged<ThreadsafeFunctionCallbackData>.fromOpaque(data).takeRetainedValue()
 
@@ -50,56 +48,58 @@ func typedFuncNAPIThreadsafeCallback(_ env: napi_env?, _ js_callback: napi_value
                 callbackData.continuation.resume(throwing: error)
             }
         }
+    } else {
+        callbackData.continuation.resume(throwing: NAPIError.closing)
     }
 }
 
-private func _call(tsfn: napi_threadsafe_function, this: ValueConvertible, args: [ValueConvertible]) async throws {
-    try napi_acquire_threadsafe_function(tsfn).throwIfError()
-    defer { napi_release_threadsafe_function(tsfn, napi_tsfn_release) }
+private func _call(lifetime: ThreadsafeFunctionLifetime, this: ValueConvertible, args: [ValueConvertible]) async throws {
+    let tsfn = try lifetime.acquire()
+    var callStatus = napi_ok
+    defer {
+        if callStatus != napi_closing {
+            napi_release_threadsafe_function(tsfn, napi_tsfn_release)
+        }
+    }
 
     _ = try await withCheckedThrowingContinuation { continuation in
         let unmanagedData = Unmanaged.passRetained(ThreadsafeFunctionCallbackData(this: this, args: args, continuation: continuation))
-        napi_call_threadsafe_function(tsfn, unmanagedData.toOpaque(), napi_tsfn_blocking)
+        callStatus = napi_call_threadsafe_function(tsfn, unmanagedData.toOpaque(), napi_tsfn_blocking)
+        if callStatus != napi_ok {
+            unmanagedData.release()
+            continuation.resume(throwing: NAPIError(callStatus))
+        }
     }
 }
 
-private func _call<Result: ValueConvertible>(tsfn: napi_threadsafe_function, this: ValueConvertible, args: [ValueConvertible], resultType: Result.Type) async throws -> Result {
-    try napi_acquire_threadsafe_function(tsfn).throwIfError()
-    defer { napi_release_threadsafe_function(tsfn, napi_tsfn_release) }
+private func _call<Result: ValueConvertible>(lifetime: ThreadsafeFunctionLifetime, this: ValueConvertible, args: [ValueConvertible], resultType: Result.Type) async throws -> Result {
+    let tsfn = try lifetime.acquire()
+    var callStatus = napi_ok
+    defer {
+        if callStatus != napi_closing {
+            napi_release_threadsafe_function(tsfn, napi_tsfn_release)
+        }
+    }
 
     return try await withCheckedThrowingContinuation { continuation in
         let unmanagedData = Unmanaged.passRetained(ThreadsafeFunctionCallbackData(this: this, args: args, continuation: continuation, resultType: resultType))
-        napi_call_threadsafe_function(tsfn, unmanagedData.toOpaque(), napi_tsfn_blocking)
+        callStatus = napi_call_threadsafe_function(tsfn, unmanagedData.toOpaque(), napi_tsfn_blocking)
+        if callStatus != napi_ok {
+            unmanagedData.release()
+            continuation.resume(throwing: NAPIError(callStatus))
+        }
     } as! Result
 }
 
 /// A type-erased threadsafe typed function
 public class ThreadsafeTypedFunction {
-    fileprivate var tsfn: napi_threadsafe_function!
-    fileprivate var asyncCleanupHandle: napi_async_cleanup_hook_handle!
+    fileprivate let lifetime = ThreadsafeFunctionLifetime()
 
     init() {}
 
-    fileprivate func cleanup() {
-        napi_release_threadsafe_function(tsfn, napi_tsfn_release)
-        tsfn = nil
-        napi_remove_async_cleanup_hook(asyncCleanupHandle)
-        asyncCleanupHandle = nil
-    }
-
     deinit {
-        if let tsfn {
-            napi_release_threadsafe_function(tsfn, napi_tsfn_release)
-        }
-
-        if let asyncCleanupHandle {
-            napi_remove_async_cleanup_hook(asyncCleanupHandle)
-        }
+        lifetime.releaseOwner()
     }
-}
-
-func threadsafeTypedFunctionCleanup(_: napi_async_cleanup_hook_handle!, _ arg: UnsafeMutableRawPointer!) {
-    Unmanaged<ThreadsafeTypedFunction>.fromOpaque(arg).takeUnretainedValue().cleanup()
 }
 
 /// A threadsafe and type-safe function with return type `Result` and 9 parameters.
@@ -117,29 +117,15 @@ public class ThreadsafeTypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8
 
     public init(_ env: Environment, _ function: InternalFunction) throws {
         super.init()
-        try napi_create_threadsafe_function(env.env,
-                                            function.napiValue(env),
-                                            nil,
-                                            "ThreadsafeWrapper".napiValue(env),
-                                            0,
-                                            1,
-                                            nil,
-                                            typedFuncNAPIThreadsafeFinalize,
-                                            nil,
-                                            typedFuncNAPIThreadsafeCallback,
-                                            &tsfn).throwIfError()
-        try napi_add_async_cleanup_hook(env.env,
-                                        threadsafeTypedFunctionCleanup,
-                                        Unmanaged<ThreadsafeTypedFunction>.passUnretained(self).toOpaque(),
-                                        &asyncCleanupHandle).throwIfError()
+        try lifetime.initialize(env, function: function.napiValue(env))
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7, _ p8: P8) async throws where Result == Undefined {
-        try await _call(tsfn: tsfn, this: this, args: [p0, p1, p2, p3, p4, p5, p6, p7, p8])
+        try await _call(lifetime: lifetime, this: this, args: [p0, p1, p2, p3, p4, p5, p6, p7, p8])
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7, _ p8: P8) async throws -> Result {
-        try await _call(tsfn: tsfn, this: this, args: [p0, p1, p2, p3, p4, p5, p6, p7, p8], resultType: Result.self)
+        try await _call(lifetime: lifetime, this: this, args: [p0, p1, p2, p3, p4, p5, p6, p7, p8], resultType: Result.self)
     }
 }
 
@@ -158,29 +144,15 @@ public class ThreadsafeTypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: T
 
     public init(_ env: Environment, _ function: InternalFunction) throws {
         super.init()
-        try napi_create_threadsafe_function(env.env,
-                                            function.napiValue(env),
-                                            nil,
-                                            "ThreadsafeWrapper".napiValue(env),
-                                            0,
-                                            1,
-                                            nil,
-                                            typedFuncNAPIThreadsafeFinalize,
-                                            nil,
-                                            typedFuncNAPIThreadsafeCallback,
-                                            &tsfn).throwIfError()
-        try napi_add_async_cleanup_hook(env.env,
-                                        threadsafeTypedFunctionCleanup,
-                                        Unmanaged<ThreadsafeTypedFunction>.passUnretained(self).toOpaque(),
-                                        &asyncCleanupHandle).throwIfError()
+        try lifetime.initialize(env, function: function.napiValue(env))
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7) async throws where Result == Undefined {
-        try await _call(tsfn: tsfn, this: this, args: [p0, p1, p2, p3, p4, p5, p6, p7])
+        try await _call(lifetime: lifetime, this: this, args: [p0, p1, p2, p3, p4, p5, p6, p7])
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7) async throws -> Result {
-        try await _call(tsfn: tsfn, this: this, args: [p0, p1, p2, p3, p4, p5, p6, p7], resultType: Result.self)
+        try await _call(lifetime: lifetime, this: this, args: [p0, p1, p2, p3, p4, p5, p6, p7], resultType: Result.self)
     }
 }
 
@@ -199,29 +171,15 @@ public class ThreadsafeTypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: Threa
 
     public init(_ env: Environment, _ function: InternalFunction) throws {
         super.init()
-        try napi_create_threadsafe_function(env.env,
-                                            function.napiValue(env),
-                                            nil,
-                                            "ThreadsafeWrapper".napiValue(env),
-                                            0,
-                                            1,
-                                            nil,
-                                            typedFuncNAPIThreadsafeFinalize,
-                                            nil,
-                                            typedFuncNAPIThreadsafeCallback,
-                                            &tsfn).throwIfError()
-        try napi_add_async_cleanup_hook(env.env,
-                                        threadsafeTypedFunctionCleanup,
-                                        Unmanaged<ThreadsafeTypedFunction>.passUnretained(self).toOpaque(),
-                                        &asyncCleanupHandle).throwIfError()
+        try lifetime.initialize(env, function: function.napiValue(env))
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6) async throws where Result == Undefined {
-        try await _call(tsfn: tsfn, this: this, args: [p0, p1, p2, p3, p4, p5, p6])
+        try await _call(lifetime: lifetime, this: this, args: [p0, p1, p2, p3, p4, p5, p6])
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6) async throws -> Result {
-        try await _call(tsfn: tsfn, this: this, args: [p0, p1, p2, p3, p4, p5, p6], resultType: Result.self)
+        try await _call(lifetime: lifetime, this: this, args: [p0, p1, p2, p3, p4, p5, p6], resultType: Result.self)
     }
 }
 
@@ -240,29 +198,15 @@ public class ThreadsafeTypedFunction6<Result, P0, P1, P2, P3, P4, P5>: Threadsaf
 
     public init(_ env: Environment, _ function: InternalFunction) throws {
         super.init()
-        try napi_create_threadsafe_function(env.env,
-                                            function.napiValue(env),
-                                            nil,
-                                            "ThreadsafeWrapper".napiValue(env),
-                                            0,
-                                            1,
-                                            nil,
-                                            typedFuncNAPIThreadsafeFinalize,
-                                            nil,
-                                            typedFuncNAPIThreadsafeCallback,
-                                            &tsfn).throwIfError()
-        try napi_add_async_cleanup_hook(env.env,
-                                        threadsafeTypedFunctionCleanup,
-                                        Unmanaged<ThreadsafeTypedFunction>.passUnretained(self).toOpaque(),
-                                        &asyncCleanupHandle).throwIfError()
+        try lifetime.initialize(env, function: function.napiValue(env))
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5) async throws where Result == Undefined {
-        try await _call(tsfn: tsfn, this: this, args: [p0, p1, p2, p3, p4, p5])
+        try await _call(lifetime: lifetime, this: this, args: [p0, p1, p2, p3, p4, p5])
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5) async throws -> Result {
-        try await _call(tsfn: tsfn, this: this, args: [p0, p1, p2, p3, p4, p5], resultType: Result.self)
+        try await _call(lifetime: lifetime, this: this, args: [p0, p1, p2, p3, p4, p5], resultType: Result.self)
     }
 }
 
@@ -281,29 +225,15 @@ public class ThreadsafeTypedFunction5<Result, P0, P1, P2, P3, P4>: ThreadsafeTyp
 
     public init(_ env: Environment, _ function: InternalFunction) throws {
         super.init()
-        try napi_create_threadsafe_function(env.env,
-                                            function.napiValue(env),
-                                            nil,
-                                            "ThreadsafeWrapper".napiValue(env),
-                                            0,
-                                            1,
-                                            nil,
-                                            typedFuncNAPIThreadsafeFinalize,
-                                            nil,
-                                            typedFuncNAPIThreadsafeCallback,
-                                            &tsfn).throwIfError()
-        try napi_add_async_cleanup_hook(env.env,
-                                        threadsafeTypedFunctionCleanup,
-                                        Unmanaged<ThreadsafeTypedFunction>.passUnretained(self).toOpaque(),
-                                        &asyncCleanupHandle).throwIfError()
+        try lifetime.initialize(env, function: function.napiValue(env))
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4) async throws where Result == Undefined {
-        try await _call(tsfn: tsfn, this: this, args: [p0, p1, p2, p3, p4])
+        try await _call(lifetime: lifetime, this: this, args: [p0, p1, p2, p3, p4])
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4) async throws -> Result {
-        try await _call(tsfn: tsfn, this: this, args: [p0, p1, p2, p3, p4], resultType: Result.self)
+        try await _call(lifetime: lifetime, this: this, args: [p0, p1, p2, p3, p4], resultType: Result.self)
     }
 }
 
@@ -322,29 +252,15 @@ public class ThreadsafeTypedFunction4<Result, P0, P1, P2, P3>: ThreadsafeTypedFu
 
     public init(_ env: Environment, _ function: InternalFunction) throws {
         super.init()
-        try napi_create_threadsafe_function(env.env,
-                                            function.napiValue(env),
-                                            nil,
-                                            "ThreadsafeWrapper".napiValue(env),
-                                            0,
-                                            1,
-                                            nil,
-                                            typedFuncNAPIThreadsafeFinalize,
-                                            nil,
-                                            typedFuncNAPIThreadsafeCallback,
-                                            &tsfn).throwIfError()
-        try napi_add_async_cleanup_hook(env.env,
-                                        threadsafeTypedFunctionCleanup,
-                                        Unmanaged<ThreadsafeTypedFunction>.passUnretained(self).toOpaque(),
-                                        &asyncCleanupHandle).throwIfError()
+        try lifetime.initialize(env, function: function.napiValue(env))
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3) async throws where Result == Undefined {
-        try await _call(tsfn: tsfn, this: this, args: [p0, p1, p2, p3])
+        try await _call(lifetime: lifetime, this: this, args: [p0, p1, p2, p3])
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3) async throws -> Result {
-        try await _call(tsfn: tsfn, this: this, args: [p0, p1, p2, p3], resultType: Result.self)
+        try await _call(lifetime: lifetime, this: this, args: [p0, p1, p2, p3], resultType: Result.self)
     }
 }
 
@@ -363,29 +279,15 @@ public class ThreadsafeTypedFunction3<Result, P0, P1, P2>: ThreadsafeTypedFuncti
 
     public init(_ env: Environment, _ function: InternalFunction) throws {
         super.init()
-        try napi_create_threadsafe_function(env.env,
-                                            function.napiValue(env),
-                                            nil,
-                                            "ThreadsafeWrapper".napiValue(env),
-                                            0,
-                                            1,
-                                            nil,
-                                            typedFuncNAPIThreadsafeFinalize,
-                                            nil,
-                                            typedFuncNAPIThreadsafeCallback,
-                                            &tsfn).throwIfError()
-        try napi_add_async_cleanup_hook(env.env,
-                                        threadsafeTypedFunctionCleanup,
-                                        Unmanaged<ThreadsafeTypedFunction>.passUnretained(self).toOpaque(),
-                                        &asyncCleanupHandle).throwIfError()
+        try lifetime.initialize(env, function: function.napiValue(env))
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2) async throws where Result == Undefined {
-        try await _call(tsfn: tsfn, this: this, args: [p0, p1, p2])
+        try await _call(lifetime: lifetime, this: this, args: [p0, p1, p2])
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1, _ p2: P2) async throws -> Result {
-        try await _call(tsfn: tsfn, this: this, args: [p0, p1, p2], resultType: Result.self)
+        try await _call(lifetime: lifetime, this: this, args: [p0, p1, p2], resultType: Result.self)
     }
 }
 
@@ -404,29 +306,15 @@ public class ThreadsafeTypedFunction2<Result, P0, P1>: ThreadsafeTypedFunction, 
 
     public init(_ env: Environment, _ function: InternalFunction) throws {
         super.init()
-        try napi_create_threadsafe_function(env.env,
-                                            function.napiValue(env),
-                                            nil,
-                                            "ThreadsafeWrapper".napiValue(env),
-                                            0,
-                                            1,
-                                            nil,
-                                            typedFuncNAPIThreadsafeFinalize,
-                                            nil,
-                                            typedFuncNAPIThreadsafeCallback,
-                                            &tsfn).throwIfError()
-        try napi_add_async_cleanup_hook(env.env,
-                                        threadsafeTypedFunctionCleanup,
-                                        Unmanaged<ThreadsafeTypedFunction>.passUnretained(self).toOpaque(),
-                                        &asyncCleanupHandle).throwIfError()
+        try lifetime.initialize(env, function: function.napiValue(env))
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1) async throws where Result == Undefined {
-        try await _call(tsfn: tsfn, this: this, args: [p0, p1])
+        try await _call(lifetime: lifetime, this: this, args: [p0, p1])
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0, _ p1: P1) async throws -> Result {
-        try await _call(tsfn: tsfn, this: this, args: [p0, p1], resultType: Result.self)
+        try await _call(lifetime: lifetime, this: this, args: [p0, p1], resultType: Result.self)
     }
 }
 
@@ -445,29 +333,15 @@ public class ThreadsafeTypedFunction1<Result, P0>: ThreadsafeTypedFunction, Valu
 
     public init(_ env: Environment, _ function: InternalFunction) throws {
         super.init()
-        try napi_create_threadsafe_function(env.env,
-                                            function.napiValue(env),
-                                            nil,
-                                            "ThreadsafeWrapper".napiValue(env),
-                                            0,
-                                            1,
-                                            nil,
-                                            typedFuncNAPIThreadsafeFinalize,
-                                            nil,
-                                            typedFuncNAPIThreadsafeCallback,
-                                            &tsfn).throwIfError()
-        try napi_add_async_cleanup_hook(env.env,
-                                        threadsafeTypedFunctionCleanup,
-                                        Unmanaged<ThreadsafeTypedFunction>.passUnretained(self).toOpaque(),
-                                        &asyncCleanupHandle).throwIfError()
+        try lifetime.initialize(env, function: function.napiValue(env))
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0) async throws where Result == Undefined {
-        try await _call(tsfn: tsfn, this: this, args: [p0])
+        try await _call(lifetime: lifetime, this: this, args: [p0])
     }
 
     public func call(this: ValueConvertible = Undefined.default, _ p0: P0) async throws -> Result {
-        try await _call(tsfn: tsfn, this: this, args: [p0], resultType: Result.self)
+        try await _call(lifetime: lifetime, this: this, args: [p0], resultType: Result.self)
     }
 }
 
@@ -486,28 +360,14 @@ public class ThreadsafeTypedFunction0<Result>: ThreadsafeTypedFunction, ValueCon
 
     public init(_ env: Environment, _ function: InternalFunction) throws {
         super.init()
-        try napi_create_threadsafe_function(env.env,
-                                            function.napiValue(env),
-                                            nil,
-                                            "ThreadsafeWrapper".napiValue(env),
-                                            0,
-                                            1,
-                                            nil,
-                                            typedFuncNAPIThreadsafeFinalize,
-                                            nil,
-                                            typedFuncNAPIThreadsafeCallback,
-                                            &tsfn).throwIfError()
-        try napi_add_async_cleanup_hook(env.env,
-                                        threadsafeTypedFunctionCleanup,
-                                        Unmanaged<ThreadsafeTypedFunction>.passUnretained(self).toOpaque(),
-                                        &asyncCleanupHandle).throwIfError()
+        try lifetime.initialize(env, function: function.napiValue(env))
     }
 
     public func call(this: ValueConvertible = Undefined.default) async throws where Result == Undefined {
-        try await _call(tsfn: tsfn, this: this, args: [])
+        try await _call(lifetime: lifetime, this: this, args: [])
     }
 
     public func call(this: ValueConvertible = Undefined.default) async throws -> Result {
-        try await _call(tsfn: tsfn, this: this, args: [], resultType: Result.self)
+        try await _call(lifetime: lifetime, this: this, args: [], resultType: Result.self)
     }
 }
