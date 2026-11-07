@@ -51,9 +51,7 @@ func swiftNAPICallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) -> napi_
     } catch NAPIError.pendingException {
         return nil
     } catch {
-        if !env.exceptionIsPending() {
-            error.throwInJS(env)
-        }
+        if !env.exceptionIsPending() { error.throwInJS(env) }
         return nil
     }
 }
@@ -71,9 +69,7 @@ func swiftNAPIGetterCallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) ->
     } catch NAPIError.pendingException {
         return nil
     } catch {
-        if !env.exceptionIsPending() {
-            error.throwInJS(env)
-        }
+        if !env.exceptionIsPending() { error.throwInJS(env) }
         return nil
     }
 }
@@ -91,9 +87,7 @@ func swiftNAPISetterCallback(_ env: napi_env!, _ cbinfo: napi_callback_info!) ->
     } catch NAPIError.pendingException {
         return nil
     } catch {
-        if !env.exceptionIsPending() {
-            error.throwInJS(env)
-        }
+        if !env.exceptionIsPending() { error.throwInJS(env) }
         return nil
     }
 }

@@ -103,7 +103,7 @@ public class ThreadsafeTypedFunction {
 }
 
 /// A threadsafe and type-safe function with return type `Result` and 9 parameters.
-public class ThreadsafeTypedFunction9<Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible>: ThreadsafeTypedFunction, ValueConvertible {
+public class ThreadsafeTypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>: ThreadsafeTypedFunction, ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
     public typealias InternalFunction = TypedFunction9<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>
 
     public required convenience init(_ env: Environment, from: napi_value) throws {
@@ -130,7 +130,7 @@ public class ThreadsafeTypedFunction9<Result: ValueConvertible, P0: ValueConvert
 }
 
 /// A threadsafe and type-safe function with return type `Result` and 8 parameters.
-public class ThreadsafeTypedFunction8<Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible>: ThreadsafeTypedFunction, ValueConvertible {
+public class ThreadsafeTypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>: ThreadsafeTypedFunction, ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
     public typealias InternalFunction = TypedFunction8<Result, P0, P1, P2, P3, P4, P5, P6, P7>
 
     public required convenience init(_ env: Environment, from: napi_value) throws {
@@ -157,7 +157,7 @@ public class ThreadsafeTypedFunction8<Result: ValueConvertible, P0: ValueConvert
 }
 
 /// A threadsafe and type-safe function with return type `Result` and 7 parameters.
-public class ThreadsafeTypedFunction7<Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible>: ThreadsafeTypedFunction, ValueConvertible {
+public class ThreadsafeTypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>: ThreadsafeTypedFunction, ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
     public typealias InternalFunction = TypedFunction7<Result, P0, P1, P2, P3, P4, P5, P6>
 
     public required convenience init(_ env: Environment, from: napi_value) throws {
@@ -184,7 +184,7 @@ public class ThreadsafeTypedFunction7<Result: ValueConvertible, P0: ValueConvert
 }
 
 /// A threadsafe and type-safe function with return type `Result` and 6 parameters.
-public class ThreadsafeTypedFunction6<Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible>: ThreadsafeTypedFunction, ValueConvertible {
+public class ThreadsafeTypedFunction6<Result, P0, P1, P2, P3, P4, P5>: ThreadsafeTypedFunction, ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
     public typealias InternalFunction = TypedFunction6<Result, P0, P1, P2, P3, P4, P5>
 
     public required convenience init(_ env: Environment, from: napi_value) throws {
@@ -211,7 +211,7 @@ public class ThreadsafeTypedFunction6<Result: ValueConvertible, P0: ValueConvert
 }
 
 /// A threadsafe and type-safe function with return type `Result` and 5 parameters.
-public class ThreadsafeTypedFunction5<Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible>: ThreadsafeTypedFunction, ValueConvertible {
+public class ThreadsafeTypedFunction5<Result, P0, P1, P2, P3, P4>: ThreadsafeTypedFunction, ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
     public typealias InternalFunction = TypedFunction5<Result, P0, P1, P2, P3, P4>
 
     public required convenience init(_ env: Environment, from: napi_value) throws {
@@ -238,7 +238,7 @@ public class ThreadsafeTypedFunction5<Result: ValueConvertible, P0: ValueConvert
 }
 
 /// A threadsafe and type-safe function with return type `Result` and 4 parameters.
-public class ThreadsafeTypedFunction4<Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible>: ThreadsafeTypedFunction, ValueConvertible {
+public class ThreadsafeTypedFunction4<Result, P0, P1, P2, P3>: ThreadsafeTypedFunction, ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
     public typealias InternalFunction = TypedFunction4<Result, P0, P1, P2, P3>
 
     public required convenience init(_ env: Environment, from: napi_value) throws {
@@ -265,7 +265,7 @@ public class ThreadsafeTypedFunction4<Result: ValueConvertible, P0: ValueConvert
 }
 
 /// A threadsafe and type-safe function with return type `Result` and 3 parameters.
-public class ThreadsafeTypedFunction3<Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible>: ThreadsafeTypedFunction, ValueConvertible {
+public class ThreadsafeTypedFunction3<Result, P0, P1, P2>: ThreadsafeTypedFunction, ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
     public typealias InternalFunction = TypedFunction3<Result, P0, P1, P2>
 
     public required convenience init(_ env: Environment, from: napi_value) throws {
@@ -292,7 +292,7 @@ public class ThreadsafeTypedFunction3<Result: ValueConvertible, P0: ValueConvert
 }
 
 /// A threadsafe and type-safe function with return type `Result` and 2 parameters.
-public class ThreadsafeTypedFunction2<Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible>: ThreadsafeTypedFunction, ValueConvertible {
+public class ThreadsafeTypedFunction2<Result, P0, P1>: ThreadsafeTypedFunction, ValueConvertible where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible {
     public typealias InternalFunction = TypedFunction2<Result, P0, P1>
 
     public required convenience init(_ env: Environment, from: napi_value) throws {
@@ -319,7 +319,7 @@ public class ThreadsafeTypedFunction2<Result: ValueConvertible, P0: ValueConvert
 }
 
 /// A threadsafe and type-safe function with return type `Result` and 1 parameter.
-public class ThreadsafeTypedFunction1<Result: ValueConvertible, P0: ValueConvertible>: ThreadsafeTypedFunction, ValueConvertible {
+public class ThreadsafeTypedFunction1<Result, P0>: ThreadsafeTypedFunction, ValueConvertible where Result: ValueConvertible, P0: ValueConvertible {
     public typealias InternalFunction = TypedFunction1<Result, P0>
 
     public required convenience init(_ env: Environment, from: napi_value) throws {
@@ -346,7 +346,7 @@ public class ThreadsafeTypedFunction1<Result: ValueConvertible, P0: ValueConvert
 }
 
 /// A threadsafe and type-safe function with return type `Result`.
-public class ThreadsafeTypedFunction0<Result: ValueConvertible>: ThreadsafeTypedFunction, ValueConvertible {
+public class ThreadsafeTypedFunction0<Result>: ThreadsafeTypedFunction, ValueConvertible where Result: ValueConvertible {
     public typealias InternalFunction = TypedFunction0<Result>
 
     public required convenience init(_ env: Environment, from: napi_value) throws {

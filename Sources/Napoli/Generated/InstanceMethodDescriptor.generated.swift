@@ -3,8 +3,8 @@
 import Foundation
 import NAPIC
 
-public class InstanceMethodDescriptor<This: AnyObject>: MethodDescriptor {
-    /// 9 param methods
+public class InstanceMethodDescriptor<This>: MethodDescriptor where This: AnyObject {
+    // 9 param methods
     public init<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (P0, P1, P2, P3, P4, P5, P6, P7, P8) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 9) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
@@ -56,7 +56,7 @@ public class InstanceMethodDescriptor<This: AnyObject>: MethodDescriptor {
         }
     }
 
-    /// 8 param methods
+    // 8 param methods
     public init<Result, P0, P1, P2, P3, P4, P5, P6, P7>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (P0, P1, P2, P3, P4, P5, P6, P7) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 8) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
@@ -108,7 +108,7 @@ public class InstanceMethodDescriptor<This: AnyObject>: MethodDescriptor {
         }
     }
 
-    /// 7 param methods
+    // 7 param methods
     public init<Result, P0, P1, P2, P3, P4, P5, P6>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (P0, P1, P2, P3, P4, P5, P6) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 7) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
@@ -160,7 +160,7 @@ public class InstanceMethodDescriptor<This: AnyObject>: MethodDescriptor {
         }
     }
 
-    /// 6 param methods
+    // 6 param methods
     public init<Result, P0, P1, P2, P3, P4, P5>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (P0, P1, P2, P3, P4, P5) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 6) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
@@ -212,7 +212,7 @@ public class InstanceMethodDescriptor<This: AnyObject>: MethodDescriptor {
         }
     }
 
-    /// 5 param methods
+    // 5 param methods
     public init<Result, P0, P1, P2, P3, P4>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (P0, P1, P2, P3, P4) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 5) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
@@ -264,7 +264,7 @@ public class InstanceMethodDescriptor<This: AnyObject>: MethodDescriptor {
         }
     }
 
-    /// 4 param methods
+    // 4 param methods
     public init<Result, P0, P1, P2, P3>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (P0, P1, P2, P3) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 4) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
@@ -316,7 +316,7 @@ public class InstanceMethodDescriptor<This: AnyObject>: MethodDescriptor {
         }
     }
 
-    /// 3 param methods
+    // 3 param methods
     public init<Result, P0, P1, P2>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (P0, P1, P2) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 3) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
@@ -368,7 +368,7 @@ public class InstanceMethodDescriptor<This: AnyObject>: MethodDescriptor {
         }
     }
 
-    /// 2 param methods
+    // 2 param methods
     public init<Result, P0, P1>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (P0, P1) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 2) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
@@ -420,7 +420,7 @@ public class InstanceMethodDescriptor<This: AnyObject>: MethodDescriptor {
         }
     }
 
-    /// 1 param methods
+    // 1 param methods
     public init<Result, P0>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> (P0) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 1) { env, this, args in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
@@ -472,7 +472,7 @@ public class InstanceMethodDescriptor<This: AnyObject>: MethodDescriptor {
         }
     }
 
-    /// 0 param methods
+    // 0 param methods
     public init<Result>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> () throws -> Result) where Result: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 0) { env, this, _ in
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
@@ -505,6 +505,7 @@ public class InstanceMethodDescriptor<This: AnyObject>: MethodDescriptor {
 
     public init<Result>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> () async throws -> Result) where Result: ValueConvertible {
         super.init(name, attributes: attributes, argCount: 0) { env, this, _ in
+
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
             return Promise<Result> {
                 try await callback()
@@ -514,6 +515,7 @@ public class InstanceMethodDescriptor<This: AnyObject>: MethodDescriptor {
 
     public init(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (_ this: This) -> () async throws -> Void) {
         super.init(name, attributes: attributes, argCount: 0) { env, this, _ in
+
             let callback = try callback(Wrap<This>.unwrap(env, jsObject: this))
             return VoidPromise {
                 try await callback()

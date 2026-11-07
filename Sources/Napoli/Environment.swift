@@ -21,9 +21,7 @@ public struct Environment {
 
     public init(_ env: napi_env) {
         _env = env
-        if jsThread == nil {
-            jsThread = Thread.current
-        }
+        if jsThread == nil { jsThread = Thread.current }
     }
 
     public func exceptionIsPending() -> Bool {

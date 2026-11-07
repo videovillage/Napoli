@@ -119,7 +119,7 @@ private actor ThreadSafeDeferred {
     private let finalize: ThreadsafeTypedFunction0<Undefined>
     private let storage: Storage
 
-    init(_ env: Environment, _ promise: UnsafeMutablePointer<napi_value?>!) throws {
+    public init(_ env: Environment, _ promise: UnsafeMutablePointer<napi_value?>!) throws {
         let storage = Storage()
         var deferred: napi_deferred!
         try napi_create_promise(env.env, &deferred, promise).throwIfError()

@@ -88,7 +88,7 @@ struct Source {
         scopedSymbols.insert(symbol)
     }
 
-    func result() -> String {
+    public func result() -> String {
         lines.joined(separator: "\n")
     }
 }

@@ -2,8 +2,8 @@ import Foundation
 import Napoli
 
 struct TestError: Swift.Error, ErrorConvertible {
-    var message: String
-    var code: String?
+    public var message: String
+    public var code: String?
 }
 
 func assertEqual<T: Equatable & CustomStringConvertible>(expected: T, actual: T) throws {
@@ -147,8 +147,8 @@ func testEnvironmentAsync(env: Environment) throws -> Promise<String> {
     }
 }
 
-/// Create on the JavaScript thread and release on Swift executors while other
-/// tasks register hooks on the JavaScript thread.
+// Create on the JavaScript thread and release on Swift executors while other
+// tasks register hooks on the JavaScript thread.
 func stressThreadsafeCleanup(env: Environment, iterations: Int32) throws -> Promise<Undefined> {
     let accessor = try EnvironmentAccessor(env)
     return Promise {
