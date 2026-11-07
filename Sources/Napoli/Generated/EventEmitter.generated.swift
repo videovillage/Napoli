@@ -3,535 +3,535 @@
 import Foundation
 import NAPIC
 
-// 8 param methods
+/// 8 param methods
 public extension EventEmitter {
     @available(*, noasync)
-    func on<P0, P1, P2, P3, P4, P5, P6, P7>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6, P7) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6, P7) throws -> Void) throws {
         try callSelf(env: env, "on", event, TypedFunction8(named: "on", callback))
     }
 
     @available(*, noasync)
-    func on<P0, P1, P2, P3, P4, P5, P6, P7>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5, P6, P7) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5, P6, P7) throws -> Void) throws {
         try callSelf(env: env, "on", event, TypedFunction8(named: "on", callback))
     }
 
     @available(*, noasync)
-    func on<P0, P1, P2, P3, P4, P5, P6, P7>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6, P7) async throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6, P7) async throws -> Void) throws {
         try callSelf(env: env, "on", event, TypedFunction8(named: "on", callback))
     }
 
-    func on<P0, P1, P2, P3, P4, P5, P6, P7>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6, P7) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6, P7) throws -> Void) async throws {
         try await withEnvironment { env in try self.on(env: env, event, callback) }
     }
 
-    func on<P0, P1, P2, P3, P4, P5, P6, P7>(_ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5, P6, P7) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible>(_ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5, P6, P7) throws -> Void) async throws {
         try await withEnvironment { env in try self.on(env: env, event, callback) }
     }
 
-    func on<P0, P1, P2, P3, P4, P5, P6, P7>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6, P7) async throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6, P7) async throws -> Void) async throws {
         try await withEnvironment { env in try self.on(env: env, event, callback) }
     }
 
     @available(*, noasync)
-    func once<P0, P1, P2, P3, P4, P5, P6, P7>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6, P7) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6, P7) throws -> Void) throws {
         try callSelf(env: env, "once", event, TypedFunction8(named: "once", callback))
     }
 
     @available(*, noasync)
-    func once<P0, P1, P2, P3, P4, P5, P6, P7>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5, P6, P7) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5, P6, P7) throws -> Void) throws {
         try callSelf(env: env, "once", event, TypedFunction8(named: "once", callback))
     }
 
     @available(*, noasync)
-    func once<P0, P1, P2, P3, P4, P5, P6, P7>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6, P7) async throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6, P7) async throws -> Void) throws {
         try callSelf(env: env, "once", event, TypedFunction8(named: "once", callback))
     }
 
-    func once<P0, P1, P2, P3, P4, P5, P6, P7>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6, P7) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6, P7) throws -> Void) async throws {
         try await withEnvironment { env in try self.once(env: env, event, callback) }
     }
 
-    func once<P0, P1, P2, P3, P4, P5, P6, P7>(_ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5, P6, P7) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible>(_ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5, P6, P7) throws -> Void) async throws {
         try await withEnvironment { env in try self.once(env: env, event, callback) }
     }
 
-    func once<P0, P1, P2, P3, P4, P5, P6, P7>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6, P7) async throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6, P7) async throws -> Void) async throws {
         try await withEnvironment { env in try self.once(env: env, event, callback) }
     }
 
     @available(*, noasync)
-    func emit<P0, P1, P2, P3, P4, P5, P6, P7>(env: Environment? = nil, _ event: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
+    func emit<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible>(env: Environment? = nil, _ event: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7) throws {
         try callSelf(env: env, "emit", event, p0, p1, p2, p3, p4, p5, p6, p7)
     }
 
-    func emit<P0, P1, P2, P3, P4, P5, P6, P7>(_ event: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
+    func emit<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible>(_ event: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7) async throws {
         try await withEnvironment { env in try self.emit(env: env, event, p0, p1, p2, p3, p4, p5, p6, p7) }
     }
 }
 
-// 7 param methods
+/// 7 param methods
 public extension EventEmitter {
     @available(*, noasync)
-    func on<P0, P1, P2, P3, P4, P5, P6>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6) throws -> Void) throws {
         try callSelf(env: env, "on", event, TypedFunction7(named: "on", callback))
     }
 
     @available(*, noasync)
-    func on<P0, P1, P2, P3, P4, P5, P6>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5, P6) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5, P6) throws -> Void) throws {
         try callSelf(env: env, "on", event, TypedFunction7(named: "on", callback))
     }
 
     @available(*, noasync)
-    func on<P0, P1, P2, P3, P4, P5, P6>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6) async throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6) async throws -> Void) throws {
         try callSelf(env: env, "on", event, TypedFunction7(named: "on", callback))
     }
 
-    func on<P0, P1, P2, P3, P4, P5, P6>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6) throws -> Void) async throws {
         try await withEnvironment { env in try self.on(env: env, event, callback) }
     }
 
-    func on<P0, P1, P2, P3, P4, P5, P6>(_ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5, P6) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible>(_ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5, P6) throws -> Void) async throws {
         try await withEnvironment { env in try self.on(env: env, event, callback) }
     }
 
-    func on<P0, P1, P2, P3, P4, P5, P6>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6) async throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6) async throws -> Void) async throws {
         try await withEnvironment { env in try self.on(env: env, event, callback) }
     }
 
     @available(*, noasync)
-    func once<P0, P1, P2, P3, P4, P5, P6>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6) throws -> Void) throws {
         try callSelf(env: env, "once", event, TypedFunction7(named: "once", callback))
     }
 
     @available(*, noasync)
-    func once<P0, P1, P2, P3, P4, P5, P6>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5, P6) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5, P6) throws -> Void) throws {
         try callSelf(env: env, "once", event, TypedFunction7(named: "once", callback))
     }
 
     @available(*, noasync)
-    func once<P0, P1, P2, P3, P4, P5, P6>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6) async throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6) async throws -> Void) throws {
         try callSelf(env: env, "once", event, TypedFunction7(named: "once", callback))
     }
 
-    func once<P0, P1, P2, P3, P4, P5, P6>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6) throws -> Void) async throws {
         try await withEnvironment { env in try self.once(env: env, event, callback) }
     }
 
-    func once<P0, P1, P2, P3, P4, P5, P6>(_ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5, P6) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible>(_ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5, P6) throws -> Void) async throws {
         try await withEnvironment { env in try self.once(env: env, event, callback) }
     }
 
-    func once<P0, P1, P2, P3, P4, P5, P6>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6) async throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6) async throws -> Void) async throws {
         try await withEnvironment { env in try self.once(env: env, event, callback) }
     }
 
     @available(*, noasync)
-    func emit<P0, P1, P2, P3, P4, P5, P6>(env: Environment? = nil, _ event: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
+    func emit<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible>(env: Environment? = nil, _ event: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6) throws {
         try callSelf(env: env, "emit", event, p0, p1, p2, p3, p4, p5, p6)
     }
 
-    func emit<P0, P1, P2, P3, P4, P5, P6>(_ event: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
+    func emit<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible>(_ event: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6) async throws {
         try await withEnvironment { env in try self.emit(env: env, event, p0, p1, p2, p3, p4, p5, p6) }
     }
 }
 
-// 6 param methods
+/// 6 param methods
 public extension EventEmitter {
     @available(*, noasync)
-    func on<P0, P1, P2, P3, P4, P5>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5) throws -> Void) throws {
         try callSelf(env: env, "on", event, TypedFunction6(named: "on", callback))
     }
 
     @available(*, noasync)
-    func on<P0, P1, P2, P3, P4, P5>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5) throws -> Void) throws {
         try callSelf(env: env, "on", event, TypedFunction6(named: "on", callback))
     }
 
     @available(*, noasync)
-    func on<P0, P1, P2, P3, P4, P5>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5) async throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5) async throws -> Void) throws {
         try callSelf(env: env, "on", event, TypedFunction6(named: "on", callback))
     }
 
-    func on<P0, P1, P2, P3, P4, P5>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5) throws -> Void) async throws {
         try await withEnvironment { env in try self.on(env: env, event, callback) }
     }
 
-    func on<P0, P1, P2, P3, P4, P5>(_ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible>(_ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5) throws -> Void) async throws {
         try await withEnvironment { env in try self.on(env: env, event, callback) }
     }
 
-    func on<P0, P1, P2, P3, P4, P5>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5) async throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5) async throws -> Void) async throws {
         try await withEnvironment { env in try self.on(env: env, event, callback) }
     }
 
     @available(*, noasync)
-    func once<P0, P1, P2, P3, P4, P5>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5) throws -> Void) throws {
         try callSelf(env: env, "once", event, TypedFunction6(named: "once", callback))
     }
 
     @available(*, noasync)
-    func once<P0, P1, P2, P3, P4, P5>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5) throws -> Void) throws {
         try callSelf(env: env, "once", event, TypedFunction6(named: "once", callback))
     }
 
     @available(*, noasync)
-    func once<P0, P1, P2, P3, P4, P5>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5) async throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5) async throws -> Void) throws {
         try callSelf(env: env, "once", event, TypedFunction6(named: "once", callback))
     }
 
-    func once<P0, P1, P2, P3, P4, P5>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5) throws -> Void) async throws {
         try await withEnvironment { env in try self.once(env: env, event, callback) }
     }
 
-    func once<P0, P1, P2, P3, P4, P5>(_ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible>(_ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4, P5) throws -> Void) async throws {
         try await withEnvironment { env in try self.once(env: env, event, callback) }
     }
 
-    func once<P0, P1, P2, P3, P4, P5>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5) async throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4, P5) async throws -> Void) async throws {
         try await withEnvironment { env in try self.once(env: env, event, callback) }
     }
 
     @available(*, noasync)
-    func emit<P0, P1, P2, P3, P4, P5>(env: Environment? = nil, _ event: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
+    func emit<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible>(env: Environment? = nil, _ event: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5) throws {
         try callSelf(env: env, "emit", event, p0, p1, p2, p3, p4, p5)
     }
 
-    func emit<P0, P1, P2, P3, P4, P5>(_ event: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
+    func emit<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible>(_ event: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5) async throws {
         try await withEnvironment { env in try self.emit(env: env, event, p0, p1, p2, p3, p4, p5) }
     }
 }
 
-// 5 param methods
+/// 5 param methods
 public extension EventEmitter {
     @available(*, noasync)
-    func on<P0, P1, P2, P3, P4>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4) throws -> Void) throws {
         try callSelf(env: env, "on", event, TypedFunction5(named: "on", callback))
     }
 
     @available(*, noasync)
-    func on<P0, P1, P2, P3, P4>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4) throws -> Void) throws {
         try callSelf(env: env, "on", event, TypedFunction5(named: "on", callback))
     }
 
     @available(*, noasync)
-    func on<P0, P1, P2, P3, P4>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4) async throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4) async throws -> Void) throws {
         try callSelf(env: env, "on", event, TypedFunction5(named: "on", callback))
     }
 
-    func on<P0, P1, P2, P3, P4>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4) throws -> Void) async throws {
         try await withEnvironment { env in try self.on(env: env, event, callback) }
     }
 
-    func on<P0, P1, P2, P3, P4>(_ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible>(_ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4) throws -> Void) async throws {
         try await withEnvironment { env in try self.on(env: env, event, callback) }
     }
 
-    func on<P0, P1, P2, P3, P4>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4) async throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4) async throws -> Void) async throws {
         try await withEnvironment { env in try self.on(env: env, event, callback) }
     }
 
     @available(*, noasync)
-    func once<P0, P1, P2, P3, P4>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4) throws -> Void) throws {
         try callSelf(env: env, "once", event, TypedFunction5(named: "once", callback))
     }
 
     @available(*, noasync)
-    func once<P0, P1, P2, P3, P4>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4) throws -> Void) throws {
         try callSelf(env: env, "once", event, TypedFunction5(named: "once", callback))
     }
 
     @available(*, noasync)
-    func once<P0, P1, P2, P3, P4>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4) async throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3, P4) async throws -> Void) throws {
         try callSelf(env: env, "once", event, TypedFunction5(named: "once", callback))
     }
 
-    func once<P0, P1, P2, P3, P4>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4) throws -> Void) async throws {
         try await withEnvironment { env in try self.once(env: env, event, callback) }
     }
 
-    func once<P0, P1, P2, P3, P4>(_ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible>(_ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3, P4) throws -> Void) async throws {
         try await withEnvironment { env in try self.once(env: env, event, callback) }
     }
 
-    func once<P0, P1, P2, P3, P4>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4) async throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1, P2, P3, P4) async throws -> Void) async throws {
         try await withEnvironment { env in try self.once(env: env, event, callback) }
     }
 
     @available(*, noasync)
-    func emit<P0, P1, P2, P3, P4>(env: Environment? = nil, _ event: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
+    func emit<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible>(env: Environment? = nil, _ event: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4) throws {
         try callSelf(env: env, "emit", event, p0, p1, p2, p3, p4)
     }
 
-    func emit<P0, P1, P2, P3, P4>(_ event: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
+    func emit<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible>(_ event: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4) async throws {
         try await withEnvironment { env in try self.emit(env: env, event, p0, p1, p2, p3, p4) }
     }
 }
 
-// 4 param methods
+/// 4 param methods
 public extension EventEmitter {
     @available(*, noasync)
-    func on<P0, P1, P2, P3>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3) throws -> Void) throws {
         try callSelf(env: env, "on", event, TypedFunction4(named: "on", callback))
     }
 
     @available(*, noasync)
-    func on<P0, P1, P2, P3>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3) throws -> Void) throws {
         try callSelf(env: env, "on", event, TypedFunction4(named: "on", callback))
     }
 
     @available(*, noasync)
-    func on<P0, P1, P2, P3>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3) async throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3) async throws -> Void) throws {
         try callSelf(env: env, "on", event, TypedFunction4(named: "on", callback))
     }
 
-    func on<P0, P1, P2, P3>(_ event: String, _ callback: @escaping (P0, P1, P2, P3) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1, P2, P3) throws -> Void) async throws {
         try await withEnvironment { env in try self.on(env: env, event, callback) }
     }
 
-    func on<P0, P1, P2, P3>(_ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible>(_ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3) throws -> Void) async throws {
         try await withEnvironment { env in try self.on(env: env, event, callback) }
     }
 
-    func on<P0, P1, P2, P3>(_ event: String, _ callback: @escaping (P0, P1, P2, P3) async throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1, P2, P3) async throws -> Void) async throws {
         try await withEnvironment { env in try self.on(env: env, event, callback) }
     }
 
     @available(*, noasync)
-    func once<P0, P1, P2, P3>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3) throws -> Void) throws {
         try callSelf(env: env, "once", event, TypedFunction4(named: "once", callback))
     }
 
     @available(*, noasync)
-    func once<P0, P1, P2, P3>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3) throws -> Void) throws {
         try callSelf(env: env, "once", event, TypedFunction4(named: "once", callback))
     }
 
     @available(*, noasync)
-    func once<P0, P1, P2, P3>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3) async throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2, P3) async throws -> Void) throws {
         try callSelf(env: env, "once", event, TypedFunction4(named: "once", callback))
     }
 
-    func once<P0, P1, P2, P3>(_ event: String, _ callback: @escaping (P0, P1, P2, P3) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1, P2, P3) throws -> Void) async throws {
         try await withEnvironment { env in try self.once(env: env, event, callback) }
     }
 
-    func once<P0, P1, P2, P3>(_ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible>(_ event: String, _ callback: @escaping (Environment, P0, P1, P2, P3) throws -> Void) async throws {
         try await withEnvironment { env in try self.once(env: env, event, callback) }
     }
 
-    func once<P0, P1, P2, P3>(_ event: String, _ callback: @escaping (P0, P1, P2, P3) async throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1, P2, P3) async throws -> Void) async throws {
         try await withEnvironment { env in try self.once(env: env, event, callback) }
     }
 
     @available(*, noasync)
-    func emit<P0, P1, P2, P3>(env: Environment? = nil, _ event: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
+    func emit<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible>(env: Environment? = nil, _ event: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3) throws {
         try callSelf(env: env, "emit", event, p0, p1, p2, p3)
     }
 
-    func emit<P0, P1, P2, P3>(_ event: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
+    func emit<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible>(_ event: String, _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3) async throws {
         try await withEnvironment { env in try self.emit(env: env, event, p0, p1, p2, p3) }
     }
 }
 
-// 3 param methods
+/// 3 param methods
 public extension EventEmitter {
     @available(*, noasync)
-    func on<P0, P1, P2>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2) throws -> Void) throws {
         try callSelf(env: env, "on", event, TypedFunction3(named: "on", callback))
     }
 
     @available(*, noasync)
-    func on<P0, P1, P2>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1, P2) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1, P2) throws -> Void) throws {
         try callSelf(env: env, "on", event, TypedFunction3(named: "on", callback))
     }
 
     @available(*, noasync)
-    func on<P0, P1, P2>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2) async throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2) async throws -> Void) throws {
         try callSelf(env: env, "on", event, TypedFunction3(named: "on", callback))
     }
 
-    func on<P0, P1, P2>(_ event: String, _ callback: @escaping (P0, P1, P2) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1, P2) throws -> Void) async throws {
         try await withEnvironment { env in try self.on(env: env, event, callback) }
     }
 
-    func on<P0, P1, P2>(_ event: String, _ callback: @escaping (Environment, P0, P1, P2) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible>(_ event: String, _ callback: @escaping (Environment, P0, P1, P2) throws -> Void) async throws {
         try await withEnvironment { env in try self.on(env: env, event, callback) }
     }
 
-    func on<P0, P1, P2>(_ event: String, _ callback: @escaping (P0, P1, P2) async throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1, P2) async throws -> Void) async throws {
         try await withEnvironment { env in try self.on(env: env, event, callback) }
     }
 
     @available(*, noasync)
-    func once<P0, P1, P2>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2) throws -> Void) throws {
         try callSelf(env: env, "once", event, TypedFunction3(named: "once", callback))
     }
 
     @available(*, noasync)
-    func once<P0, P1, P2>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1, P2) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1, P2) throws -> Void) throws {
         try callSelf(env: env, "once", event, TypedFunction3(named: "once", callback))
     }
 
     @available(*, noasync)
-    func once<P0, P1, P2>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2) async throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1, P2) async throws -> Void) throws {
         try callSelf(env: env, "once", event, TypedFunction3(named: "once", callback))
     }
 
-    func once<P0, P1, P2>(_ event: String, _ callback: @escaping (P0, P1, P2) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1, P2) throws -> Void) async throws {
         try await withEnvironment { env in try self.once(env: env, event, callback) }
     }
 
-    func once<P0, P1, P2>(_ event: String, _ callback: @escaping (Environment, P0, P1, P2) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible>(_ event: String, _ callback: @escaping (Environment, P0, P1, P2) throws -> Void) async throws {
         try await withEnvironment { env in try self.once(env: env, event, callback) }
     }
 
-    func once<P0, P1, P2>(_ event: String, _ callback: @escaping (P0, P1, P2) async throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1, P2) async throws -> Void) async throws {
         try await withEnvironment { env in try self.once(env: env, event, callback) }
     }
 
     @available(*, noasync)
-    func emit<P0, P1, P2>(env: Environment? = nil, _ event: String, _ p0: P0, _ p1: P1, _ p2: P2) throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
+    func emit<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible>(env: Environment? = nil, _ event: String, _ p0: P0, _ p1: P1, _ p2: P2) throws {
         try callSelf(env: env, "emit", event, p0, p1, p2)
     }
 
-    func emit<P0, P1, P2>(_ event: String, _ p0: P0, _ p1: P1, _ p2: P2) async throws where P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
+    func emit<P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible>(_ event: String, _ p0: P0, _ p1: P1, _ p2: P2) async throws {
         try await withEnvironment { env in try self.emit(env: env, event, p0, p1, p2) }
     }
 }
 
-// 2 param methods
+/// 2 param methods
 public extension EventEmitter {
     @available(*, noasync)
-    func on<P0, P1>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1) throws -> Void) throws {
         try callSelf(env: env, "on", event, TypedFunction2(named: "on", callback))
     }
 
     @available(*, noasync)
-    func on<P0, P1>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1) throws -> Void) throws {
         try callSelf(env: env, "on", event, TypedFunction2(named: "on", callback))
     }
 
     @available(*, noasync)
-    func on<P0, P1>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1) async throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1) async throws -> Void) throws {
         try callSelf(env: env, "on", event, TypedFunction2(named: "on", callback))
     }
 
-    func on<P0, P1>(_ event: String, _ callback: @escaping (P0, P1) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1) throws -> Void) async throws {
         try await withEnvironment { env in try self.on(env: env, event, callback) }
     }
 
-    func on<P0, P1>(_ event: String, _ callback: @escaping (Environment, P0, P1) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible>(_ event: String, _ callback: @escaping (Environment, P0, P1) throws -> Void) async throws {
         try await withEnvironment { env in try self.on(env: env, event, callback) }
     }
 
-    func on<P0, P1>(_ event: String, _ callback: @escaping (P0, P1) async throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible {
+    func on<P0: ValueConvertible, P1: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1) async throws -> Void) async throws {
         try await withEnvironment { env in try self.on(env: env, event, callback) }
     }
 
     @available(*, noasync)
-    func once<P0, P1>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1) throws -> Void) throws {
         try callSelf(env: env, "once", event, TypedFunction2(named: "once", callback))
     }
 
     @available(*, noasync)
-    func once<P0, P1>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1) throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0, P1) throws -> Void) throws {
         try callSelf(env: env, "once", event, TypedFunction2(named: "once", callback))
     }
 
     @available(*, noasync)
-    func once<P0, P1>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1) async throws -> Void) throws where P0: ValueConvertible, P1: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0, P1) async throws -> Void) throws {
         try callSelf(env: env, "once", event, TypedFunction2(named: "once", callback))
     }
 
-    func once<P0, P1>(_ event: String, _ callback: @escaping (P0, P1) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1) throws -> Void) async throws {
         try await withEnvironment { env in try self.once(env: env, event, callback) }
     }
 
-    func once<P0, P1>(_ event: String, _ callback: @escaping (Environment, P0, P1) throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible>(_ event: String, _ callback: @escaping (Environment, P0, P1) throws -> Void) async throws {
         try await withEnvironment { env in try self.once(env: env, event, callback) }
     }
 
-    func once<P0, P1>(_ event: String, _ callback: @escaping (P0, P1) async throws -> Void) async throws where P0: ValueConvertible, P1: ValueConvertible {
+    func once<P0: ValueConvertible, P1: ValueConvertible>(_ event: String, _ callback: @escaping (P0, P1) async throws -> Void) async throws {
         try await withEnvironment { env in try self.once(env: env, event, callback) }
     }
 
     @available(*, noasync)
-    func emit<P0, P1>(env: Environment? = nil, _ event: String, _ p0: P0, _ p1: P1) throws where P0: ValueConvertible, P1: ValueConvertible {
+    func emit<P0: ValueConvertible, P1: ValueConvertible>(env: Environment? = nil, _ event: String, _ p0: P0, _ p1: P1) throws {
         try callSelf(env: env, "emit", event, p0, p1)
     }
 
-    func emit<P0, P1>(_ event: String, _ p0: P0, _ p1: P1) async throws where P0: ValueConvertible, P1: ValueConvertible {
+    func emit<P0: ValueConvertible, P1: ValueConvertible>(_ event: String, _ p0: P0, _ p1: P1) async throws {
         try await withEnvironment { env in try self.emit(env: env, event, p0, p1) }
     }
 }
 
-// 1 param methods
+/// 1 param methods
 public extension EventEmitter {
     @available(*, noasync)
-    func on<P0>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0) throws -> Void) throws where P0: ValueConvertible {
+    func on<P0: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0) throws -> Void) throws {
         try callSelf(env: env, "on", event, TypedFunction1(named: "on", callback))
     }
 
     @available(*, noasync)
-    func on<P0>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0) throws -> Void) throws where P0: ValueConvertible {
+    func on<P0: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0) throws -> Void) throws {
         try callSelf(env: env, "on", event, TypedFunction1(named: "on", callback))
     }
 
     @available(*, noasync)
-    func on<P0>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0) async throws -> Void) throws where P0: ValueConvertible {
+    func on<P0: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0) async throws -> Void) throws {
         try callSelf(env: env, "on", event, TypedFunction1(named: "on", callback))
     }
 
-    func on<P0>(_ event: String, _ callback: @escaping (P0) throws -> Void) async throws where P0: ValueConvertible {
+    func on<P0: ValueConvertible>(_ event: String, _ callback: @escaping (P0) throws -> Void) async throws {
         try await withEnvironment { env in try self.on(env: env, event, callback) }
     }
 
-    func on<P0>(_ event: String, _ callback: @escaping (Environment, P0) throws -> Void) async throws where P0: ValueConvertible {
+    func on<P0: ValueConvertible>(_ event: String, _ callback: @escaping (Environment, P0) throws -> Void) async throws {
         try await withEnvironment { env in try self.on(env: env, event, callback) }
     }
 
-    func on<P0>(_ event: String, _ callback: @escaping (P0) async throws -> Void) async throws where P0: ValueConvertible {
+    func on<P0: ValueConvertible>(_ event: String, _ callback: @escaping (P0) async throws -> Void) async throws {
         try await withEnvironment { env in try self.on(env: env, event, callback) }
     }
 
     @available(*, noasync)
-    func once<P0>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0) throws -> Void) throws where P0: ValueConvertible {
+    func once<P0: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0) throws -> Void) throws {
         try callSelf(env: env, "once", event, TypedFunction1(named: "once", callback))
     }
 
     @available(*, noasync)
-    func once<P0>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0) throws -> Void) throws where P0: ValueConvertible {
+    func once<P0: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (Environment, P0) throws -> Void) throws {
         try callSelf(env: env, "once", event, TypedFunction1(named: "once", callback))
     }
 
     @available(*, noasync)
-    func once<P0>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0) async throws -> Void) throws where P0: ValueConvertible {
+    func once<P0: ValueConvertible>(env: Environment? = nil, _ event: String, _ callback: @escaping (P0) async throws -> Void) throws {
         try callSelf(env: env, "once", event, TypedFunction1(named: "once", callback))
     }
 
-    func once<P0>(_ event: String, _ callback: @escaping (P0) throws -> Void) async throws where P0: ValueConvertible {
+    func once<P0: ValueConvertible>(_ event: String, _ callback: @escaping (P0) throws -> Void) async throws {
         try await withEnvironment { env in try self.once(env: env, event, callback) }
     }
 
-    func once<P0>(_ event: String, _ callback: @escaping (Environment, P0) throws -> Void) async throws where P0: ValueConvertible {
+    func once<P0: ValueConvertible>(_ event: String, _ callback: @escaping (Environment, P0) throws -> Void) async throws {
         try await withEnvironment { env in try self.once(env: env, event, callback) }
     }
 
-    func once<P0>(_ event: String, _ callback: @escaping (P0) async throws -> Void) async throws where P0: ValueConvertible {
+    func once<P0: ValueConvertible>(_ event: String, _ callback: @escaping (P0) async throws -> Void) async throws {
         try await withEnvironment { env in try self.once(env: env, event, callback) }
     }
 
     @available(*, noasync)
-    func emit<P0>(env: Environment? = nil, _ event: String, _ p0: P0) throws where P0: ValueConvertible {
+    func emit<P0: ValueConvertible>(env: Environment? = nil, _ event: String, _ p0: P0) throws {
         try callSelf(env: env, "emit", event, p0)
     }
 
-    func emit<P0>(_ event: String, _ p0: P0) async throws where P0: ValueConvertible {
+    func emit<P0: ValueConvertible>(_ event: String, _ p0: P0) async throws {
         try await withEnvironment { env in try self.emit(env: env, event, p0) }
     }
 }
 
-// 0 param methods
+/// 0 param methods
 public extension EventEmitter {
     @available(*, noasync)
     func on(env: Environment? = nil, _ event: String, _ callback: @escaping () throws -> Void) throws {

@@ -24,7 +24,7 @@ public class MethodDescriptor: PropertyDescriptor {
     }
 }
 
-// 9 param methods
+/// 9 param methods
 public extension MethodDescriptor {
     convenience init<Result, P0, P1, P2, P3, P4, P5, P6, P7, P8>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6, P7, P8) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible, P8: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 9) { env, _, args in
@@ -72,7 +72,7 @@ public extension MethodDescriptor {
     }
 }
 
-// 8 param methods
+/// 8 param methods
 public extension MethodDescriptor {
     convenience init<Result, P0, P1, P2, P3, P4, P5, P6, P7>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6, P7) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible, P7: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 8) { env, _, args in
@@ -120,7 +120,7 @@ public extension MethodDescriptor {
     }
 }
 
-// 7 param methods
+/// 7 param methods
 public extension MethodDescriptor {
     convenience init<Result, P0, P1, P2, P3, P4, P5, P6>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (P0, P1, P2, P3, P4, P5, P6) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible, P6: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 7) { env, _, args in
@@ -168,7 +168,7 @@ public extension MethodDescriptor {
     }
 }
 
-// 6 param methods
+/// 6 param methods
 public extension MethodDescriptor {
     convenience init<Result, P0, P1, P2, P3, P4, P5>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (P0, P1, P2, P3, P4, P5) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible, P5: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 6) { env, _, args in
@@ -216,7 +216,7 @@ public extension MethodDescriptor {
     }
 }
 
-// 5 param methods
+/// 5 param methods
 public extension MethodDescriptor {
     convenience init<Result, P0, P1, P2, P3, P4>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (P0, P1, P2, P3, P4) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible, P4: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 5) { env, _, args in
@@ -264,7 +264,7 @@ public extension MethodDescriptor {
     }
 }
 
-// 4 param methods
+/// 4 param methods
 public extension MethodDescriptor {
     convenience init<Result, P0, P1, P2, P3>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (P0, P1, P2, P3) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible, P3: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 4) { env, _, args in
@@ -312,7 +312,7 @@ public extension MethodDescriptor {
     }
 }
 
-// 3 param methods
+/// 3 param methods
 public extension MethodDescriptor {
     convenience init<Result, P0, P1, P2>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (P0, P1, P2) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible, P2: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 3) { env, _, args in
@@ -360,7 +360,7 @@ public extension MethodDescriptor {
     }
 }
 
-// 2 param methods
+/// 2 param methods
 public extension MethodDescriptor {
     convenience init<Result, P0, P1>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (P0, P1) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible, P1: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 2) { env, _, args in
@@ -408,7 +408,7 @@ public extension MethodDescriptor {
     }
 }
 
-// 1 param methods
+/// 1 param methods
 public extension MethodDescriptor {
     convenience init<Result, P0>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping (P0) throws -> Result) where Result: ValueConvertible, P0: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 1) { env, _, args in
@@ -456,7 +456,7 @@ public extension MethodDescriptor {
     }
 }
 
-// 0 param methods
+/// 0 param methods
 public extension MethodDescriptor {
     convenience init<Result>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping () throws -> Result) where Result: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 0) { _, _, _ in
@@ -486,7 +486,6 @@ public extension MethodDescriptor {
 
     convenience init<Result>(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping () async throws -> Result) where Result: ValueConvertible {
         self.init(name, attributes: attributes, argCount: 0) { _, _, _ in
-
             Promise<Result> {
                 try await callback()
             }
@@ -495,7 +494,6 @@ public extension MethodDescriptor {
 
     convenience init(_ name: String, attributes: napi_property_attributes = napi_default, _ callback: @escaping () async throws -> Void) {
         self.init(name, attributes: attributes, argCount: 0) { _, _, _ in
-
             VoidPromise {
                 try await callback()
                 return Undefined.default

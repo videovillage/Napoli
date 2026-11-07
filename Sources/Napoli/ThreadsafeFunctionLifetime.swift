@@ -1,9 +1,9 @@
 import Foundation
 import NAPIC
 
-// The Swift owner can disappear on any executor. Node's cleanup-hook queue,
-// however, must only be changed on the JavaScript thread. Retain this separate
-// state through the TSFN finalizer rather than pointing a hook at the owner.
+/// The Swift owner can disappear on any executor. Node's cleanup-hook queue,
+/// however, must only be changed on the JavaScript thread. Retain this separate
+/// state through the TSFN finalizer rather than pointing a hook at the owner.
 final class ThreadsafeFunctionLifetime {
     private let lock = NSLock()
     private var function: napi_threadsafe_function?
@@ -55,8 +55,8 @@ final class ThreadsafeFunctionLifetime {
         }
     }
 
-    // Node invokes the TSFN finalizer on its main thread, after queued calls
-    // and acquired users have finished. This is the only hook-removal site.
+    /// Node invokes the TSFN finalizer on its main thread, after queued calls
+    /// and acquired users have finished. This is the only hook-removal site.
     func finalize() {
         lock.lock()
         function = nil
